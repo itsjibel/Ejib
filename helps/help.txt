@@ -1,0 +1,4 @@
+[exit]               Exit the program
+[clear]              Clear the terminal
+[file -H | --help]   More information about File commands
+[visual -H | --help] More information about visual mode commands

@@ -1,0 +1,2 @@
+[file -N | --new]   Create a new file and modify it
+[file -O | --open]  Open the file
