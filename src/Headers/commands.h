@@ -76,7 +76,7 @@ class CommandLine : public File {
             if (cmd == "file -N" || cmd == "file --new") {
                 mode = "edit";
                 clearEditFile();
-                system ("Cls");
+                system ("clear");
                 printInfo();
                 printText(input, -1, -1, -1);
                 gotoxy (0, 0);
@@ -86,10 +86,10 @@ class CommandLine : public File {
                     mode = "edit";
                     printInfo();
                     printText(input, -1, -1, -1);
-                } else system("cls");
+                } else system("clear");
                 _firstError = true;
             } else if (cmd == "clear") {
-                system ("Cls");
+                system ("clear");
                 _firstError = true;
             } else if (cmd == "exit") {
                 exit (0);

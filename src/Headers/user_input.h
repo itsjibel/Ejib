@@ -200,7 +200,7 @@ void Editor::EDIT_SYSTEM() {
                 case 13: enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
                 case 9:  tab(lineSelected, columnSelected, input);              something_happen_in_text_view=true;      break;
                 case 22: paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
-                case 19: if (!fileSystem("save", input)) { system("cls"); printInfo(); printText(input, -1, -1, -1); }   break;
+                case 19: if (!fileSystem("save", input)) { system("clear"); printInfo(); printText(input, -1, -1, -1); } break;
                 case 24: deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
                 case 27: mode = "command";                                      setColor(7);                             break;
                 default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
@@ -258,7 +258,7 @@ void Editor::reSizeTerminal() {
                 while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 < floor(log10(biggestNumberLine) + 1) + 1)
                     startPrintColumn--;
 
-                system("cls");
+                system("clear");
                 printInfo();
                 printText(input, -1, -1, -1);
             }
@@ -511,7 +511,7 @@ class EditCommand: public Editor {
             } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
                 mode = "file";
                 if (!fileSystem("save", input)) {
-                    system("cls");
+                    system("clear");
                     printInfo();
                     printText(input, -1, -1, -1);
                 }

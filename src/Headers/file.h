@@ -93,7 +93,7 @@ class File {
                 tryAgain = false;
                 if (!haveFilePath) {
                     ShowConsoleCursor(false);
-                    system ("cls");
+                    system ("clear");
                     setColor(97);
                     gotoxy (0, 28);
                     cout<<"                                                       -- FILE --                                                       ";
@@ -144,7 +144,7 @@ class File {
                         cout<<"Try again? [y/*] ";
                         tryAgain = getch() == 'y' ? true : false;
                         if (!tryAgain) return false;
-                        system("cls");
+                        system("clear");
                     }
                     ShowConsoleCursor(true);
                 }

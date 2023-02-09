@@ -15,7 +15,7 @@ class Jibel: public EditCommand {
                 
                 if (mode == "command") {
                     if (_enterToCommantMode)
-                        system ("cls");
+                        system ("clear");
                     _enterToCommantMode=false;
                     commandLine();
                 }
