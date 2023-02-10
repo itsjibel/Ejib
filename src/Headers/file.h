@@ -1,6 +1,7 @@
-#include <curses.h>
 #include "ejib.h"
 #include <fstream>
+#include <stdio.h>
+#include <termios.h>
 #include <vector>
 using std::cin;
 using std::getline;
@@ -9,6 +10,45 @@ using std::ifstream;
 using std::ofstream;
 using std::streampos;
 using std::vector;
+static struct termios old, current;
+
+// Initialize new terminal i/o settings 
+void initTermios(int echo) {
+    tcgetattr(0, &old); // grab old terminal i/o settings
+    current = old; // make new settings same as old settings
+    current.c_lflag &= ~ICANON; // disable buffered i/o
+    if (echo) {
+        current.c_lflag |= ECHO; // set echo mode
+    } else {
+        current.c_lflag &= ~ECHO; // set no echo mode
+    }
+    tcsetattr(0, TCSANOW, &current); // use these new terminal i/o settings now
+}
+
+// Restore old terminal i/o settings
+void resetTermios(void)  {
+  tcsetattr(0, TCSANOW, &old);
+}
+
+// Read 1 character - echo defines echo mode
+char getch_(int echo)  {
+  char ch;
+  initTermios(echo);
+  ch = getchar();
+  resetTermios();
+  return ch;
+}
+
+// Read 1 character without echo
+char getch(void)  {
+  return getch_(0);
+}
+
+// Read 1 character with echo
+char getche(void)  {
+    return getch_(1);
+}
+
 class File {
     private:
         string filePath, fileName;
@@ -67,8 +107,6 @@ class File {
                 file.close();
                 setColor(33);
                 cout<<"Are you sure you want to open a "<<byteConverter((end-begin))<<" file? [y/*]";
-                initscr();
-                noecho();
                 if (getch() == 'y') {
                     vector<char> emptyVector;
                     while (getline(myfile, line)) {
@@ -83,11 +121,9 @@ class File {
                         lineNumber++;
                     }
                     myfile.close();
-                    endwin();
                     return true;
                 } else {
                     agreeFileSize=false;
-                    endwin();
                     return false;
                 }
             } else return false;
@@ -122,10 +158,7 @@ class File {
                             cout<<"Unable to open file! (Make sure the path is correct)\n";
                             setColor(33);
                             cout<<"Try again? [y/*] ";
-                            initscr();
-                            noecho();
                             tryAgain = getch() == 'y' ? true : false;
-                            endwin();
                             if (!tryAgain) return false;
                         }
                     }
@@ -147,10 +180,7 @@ class File {
                         cout<<"Unable to open file! (Make sure the path is correct)\n";
                         setColor(33);
                         cout<<"Try again? [y/*] ";
-                        initscr();
-                        noecho();
                         tryAgain = getch() == 'y' ? true : false;
-                        endwin();
                         if (!tryAgain) return false;
                         system("clear");
                     }

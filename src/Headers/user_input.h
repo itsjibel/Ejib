@@ -183,8 +183,6 @@ void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
 void Editor::EDIT_SYSTEM() {
     int ch;
     bool something_happen_in_text_view=false;
-    initscr();
-    noecho();
     switch (ch = getch()) {
         case 0:
             case 0xE0:
@@ -207,7 +205,6 @@ void Editor::EDIT_SYSTEM() {
                 case 27: mode = "command";                                      setColor(37);                            break;
                 default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
     }
-    endwin();
     int numberLines[10000] = {0}, biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
     for (int i=startPrintLine; i<range; i++)
@@ -274,9 +271,6 @@ void Editor::reSizeTerminal() {
 }
 
 
-
-
-
 class EditCommand: public Editor {
     private:
         vector<vector<char>> _editCommand;
@@ -289,8 +283,6 @@ class EditCommand: public Editor {
             int previousColumn=column, tempLine=line, firstCatchColumn, firstCatchLine;
             bool first_time=true, anythingFound=false;
             column=-1; line=0;
-            initscr();
-            noecho();
             do {
                 string s;
                 for (char ch : text.at(line))
@@ -358,7 +350,6 @@ class EditCommand: public Editor {
                 printInfo();
                 printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line);
             } while (getch() != 27);
-            endwin();
             mode = "edit";
             return true;
         }
@@ -401,8 +392,6 @@ class EditCommand: public Editor {
 
                 _columnSelected = _columnSelected > _editCommand.at(0).size() ? _editCommand.at(0).size() : _columnSelected;
                 int ch;
-                initscr();
-                noecho();
                 switch (ch = getch()) {
                     case 0:
                         case 0xE0:
@@ -419,7 +408,6 @@ class EditCommand: public Editor {
                             case 13: enter = true;                                                                               break;
                             default: getCharacter(ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
                 }
-                endwin();
                 bool showBigCommandWarning=false;
 
                 while (_editCommand.at(0).size() > 32) {
