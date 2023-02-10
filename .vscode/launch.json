@@ -29,8 +29,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/jibel/Documents/Vs code/C++",
-      "program": "/home/jibel/Documents/Vs code/C++/build/Debug/outDebug",
+      "cwd": "/home/jibel/Documents/Vs code/C++/Ejib",
+      "program": "/home/jibel/Documents/Vs code/C++/Ejib/build/Debug/outDebug",
       "MIMode": "lldb",
       "miDebuggerPath": "/usr/bin/lldb",
       "setupCommands": [

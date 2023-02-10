@@ -34,6 +34,7 @@ class File {
                 return to_string((float)bytes/kb) + " KB";
             else if ( bytes < kb)
                 return to_string(bytes) + " Bytes";
+            return "out of range";
         }
 
     public:
@@ -64,8 +65,10 @@ class File {
                 file.seekg (0, ios::end);
                 end = file.tellg();
                 file.close();
-                setColor(6);
+                setColor(33);
                 cout<<"Are you sure you want to open a "<<byteConverter((end-begin))<<" file? [y/*]";
+                initscr();
+                noecho();
                 if (getch() == 'y') {
                     vector<char> emptyVector;
                     while (getline(myfile, line)) {
@@ -80,9 +83,11 @@ class File {
                         lineNumber++;
                     }
                     myfile.close();
+                    endwin();
                     return true;
                 } else {
                     agreeFileSize=false;
+                    endwin();
                     return false;
                 }
             } else return false;
@@ -94,10 +99,7 @@ class File {
                 if (!haveFilePath) {
                     ShowConsoleCursor(false);
                     system ("clear");
-                    setColor(97);
-                    gotoxy (0, 28);
-                    cout<<"                                                       -- FILE --                                                       ";
-                    setColor(2);
+                    setColor(32);
                     gotoxy (0, 0);
                     cout<<"Enter file name(With extension): ";
                     ShowConsoleCursor(true);
@@ -118,9 +120,12 @@ class File {
                         } else {
                             setColor(31);
                             cout<<"Unable to open file! (Make sure the path is correct)\n";
-                            setColor(6);
+                            setColor(33);
                             cout<<"Try again? [y/*] ";
+                            initscr();
+                            noecho();
                             tryAgain = getch() == 'y' ? true : false;
+                            endwin();
                             if (!tryAgain) return false;
                         }
                     }
@@ -128,7 +133,7 @@ class File {
                 if (mode == "save") {
                     ShowConsoleCursor(false);
                     if (saveFile (filePath, fileName, outputText) == true) {
-                        setColor(2);
+                        setColor(32);
                         if (haveFilePath) {
                             setColor(31);
                             gotoxy (44, 29);
@@ -140,14 +145,18 @@ class File {
                     } else {
                         setColor(31);
                         cout<<"Unable to open file! (Make sure the path is correct)\n";
-                        setColor(6);
+                        setColor(33);
                         cout<<"Try again? [y/*] ";
+                        initscr();
+                        noecho();
                         tryAgain = getch() == 'y' ? true : false;
+                        endwin();
                         if (!tryAgain) return false;
                         system("clear");
                     }
                     ShowConsoleCursor(true);
                 }
             }
+            return false;
         }
 };

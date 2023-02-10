@@ -33,7 +33,7 @@ class CommandLine : public File {
 
         void showHelpFile(string helpFileName) {
             string line;
-            ifstream myfile("helps\\" + helpFileName);
+            ifstream myfile("../helps/" + helpFileName);
 
             if (myfile.is_open()) {
                 while(getline (myfile, line)) {
@@ -55,9 +55,9 @@ class CommandLine : public File {
                         else if (ch == ']')
                             startGivingExplain=true;
 
-                    setColor(6);
+                    setColor(33);
                     cout<<'\t'<<key;
-                    setColor(13);
+                    setColor(35);
                     cout<<explanation<<'\n';
                 }
                 myfile.close();
@@ -69,8 +69,8 @@ class CommandLine : public File {
 
         void commandLine() {
             string cmd;
-            setColor(33);
-            cout<<"cmd: ";
+            setColor(32);
+            cout<<"\e[1mcmd: \e[0m";
             getline (cin, cmd);
             
             if (cmd == "file -N" || cmd == "file --new") {
@@ -160,16 +160,17 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             while (numberDigits_Of_LargestLineNumber + lines[j].size() + 1 > TerminalColumn)
                 lines[j].pop_back();
 
-            setColor(12);
+            setColor(31);
             cout<<setw(numberDigits_Of_LargestLineNumber)<<numberLines[j];
-            setColor(97);
+            setColor(44);
             cout<<" ";
+            setColor(0);
             colourizeText(lines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine);
         } else {
             blankView += "$";
             for (int i=0; i<TerminalColumn - 1; i++) blankView += " ";
         }
-    setColor(1);
+    setColor(35);
     cout<<blankView;
     ShowConsoleCursor (true);
 
@@ -187,10 +188,11 @@ void CommandLine::printInfo() {
     modeView += "-- INSERT --";
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
 
-    setColor(97);
+    setColor(43);
     cout<<modeView;
+    setColor(0);
     gotoxy (0, TerminalLine - 1);
-    setColor(2);
+    setColor(32);
     cout<<"cmd@edit:";
     float percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) < 100.0 ? percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) : 100.0;
     percentageTextSeen = percentageTextSeen < 1.0 ? 1.0 : percentageTextSeen;
@@ -200,10 +202,10 @@ void CommandLine::printInfo() {
         cout<<' ';
 
     gotoxy (TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)), TerminalLine - 1);
-    setColor(13);
+    setColor(35);
     cout<<"("<<int(percentageTextSeen)<<"%) ";
-    setColor(11);
+    setColor(36);
     cout<<"Ln "<<lineSelected + 1<<", Col "<<columnSelected + 1;
     temp = TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1));
-    setColor(7);
+    setColor(37);
 }

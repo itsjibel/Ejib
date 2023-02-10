@@ -118,7 +118,7 @@ void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
     column += 4;
 }
 void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
-    if (OpenClipboard(NULL)) {
+    /*if (OpenClipboard(NULL)) {
         string copiedText = (char*)GetClipboardData(CF_TEXT);
         CloseClipboard();
         text.push_back(emptyVector);
@@ -142,7 +142,7 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
         for (int i=0; i<2; i++) text.pop_back();
 
         column = text.at(line).size();
-    }
+    }*/
 }
 void Editor::up(int &line, int &column, const vector<vector<char>> &text) {
     if (line > 0) {
@@ -183,6 +183,8 @@ void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
 void Editor::EDIT_SYSTEM() {
     int ch;
     bool something_happen_in_text_view=false;
+    initscr();
+    noecho();
     switch (ch = getch()) {
         case 0:
             case 0xE0:
@@ -202,9 +204,10 @@ void Editor::EDIT_SYSTEM() {
                 case 22: paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
                 case 19: if (!fileSystem("save", input)) { system("clear"); printInfo(); printText(input, -1, -1, -1); } break;
                 case 24: deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
-                case 27: mode = "command";                                      setColor(7);                             break;
+                case 27: mode = "command";                                      setColor(37);                            break;
                 default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
     }
+    endwin();
     int numberLines[10000] = {0}, biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
     for (int i=startPrintLine; i<range; i++)
@@ -286,6 +289,8 @@ class EditCommand: public Editor {
             int previousColumn=column, tempLine=line, firstCatchColumn, firstCatchLine;
             bool first_time=true, anythingFound=false;
             column=-1; line=0;
+            initscr();
+            noecho();
             do {
                 string s;
                 for (char ch : text.at(line))
@@ -353,6 +358,7 @@ class EditCommand: public Editor {
                 printInfo();
                 printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line);
             } while (getch() != 27);
+            endwin();
             mode = "edit";
             return true;
         }
@@ -395,7 +401,8 @@ class EditCommand: public Editor {
 
                 _columnSelected = _columnSelected > _editCommand.at(0).size() ? _editCommand.at(0).size() : _columnSelected;
                 int ch;
-
+                initscr();
+                noecho();
                 switch (ch = getch()) {
                     case 0:
                         case 0xE0:
@@ -412,7 +419,7 @@ class EditCommand: public Editor {
                             case 13: enter = true;                                                                               break;
                             default: getCharacter(ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
                 }
-
+                endwin();
                 bool showBigCommandWarning=false;
 
                 while (_editCommand.at(0).size() > 32) {
@@ -426,7 +433,7 @@ class EditCommand: public Editor {
                 cout<<"cmd@edit: ";
 
                 if (showBigCommandWarning) {
-                    setColor(6);;
+                    setColor(33);
                     gotoxy (44, TerminalLine - 1);
                     cout<<"[B]";
                 }
@@ -470,7 +477,7 @@ class EditCommand: public Editor {
             
         }
 
-        bool editLine() {
+        void editLine() {
             editCommand();
             _editCommand.clear();
             gotoxy (10, TerminalLine - 1);

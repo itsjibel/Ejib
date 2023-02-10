@@ -17,14 +17,14 @@ void ShowConsoleCursor (bool showFlag) {
 }
 void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd, const int &selectedLine, const int &currentLine) {
     string textPart;
-    int8_t color=7, tempColor=7;
+    int8_t color=37, tempColor=37;
     int index=0;
     bool sharpArea=false, quotationArea=false, angleBracketsArea=false, commentArea=false, selectedArea=false;
     char temp;
     for (char character : text) {
         if ((index == selectedCharacterStart || index == selectedCharacterEnd) && selectedLine == currentLine) {
             selectedArea = !selectedArea;
-            color = 79;
+            color = 47;
         } else if ((character == '/' || character == '*' || character == '-' ||
                     character == '+' || character == '^' || character == '%' ||
                     character == '=' || character == '<' || character == '>') &&
@@ -33,7 +33,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
             if (temp == '/' && character == '/')
                 commentArea=true;
 
-            color = 4;
+            color = 31;
             sharpArea=false;
 
             if (character == '<') {
@@ -50,7 +50,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea) {
 
-            color = 3;
+            color = 36;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -60,7 +60,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     character == '$' || character == '?') && !quotationArea &&
                     !angleBracketsArea && !commentArea && !selectedArea) {
 
-            color = 13;
+            color = 35;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -81,7 +81,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea) {
 
-            color = 9;
+            color = 34;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -89,7 +89,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
         } else if (character == '\'' || character == '\"' && !angleBracketsArea &&
                 !commentArea && !selectedArea) {
 
-            color = 6;
+            color = 33;
             sharpArea=false;
             if (character == '\"' || character == '\'') {
 
@@ -106,7 +106,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
 
         } else
             if (!sharpArea && !quotationArea && !angleBracketsArea && !commentArea && !selectedArea)
-                color = 7;
+                color = 37;
 
         sharpArea = character == '#' ? true : sharpArea;
 

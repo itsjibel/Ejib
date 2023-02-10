@@ -29,8 +29,9 @@ class Jibel: public EditCommand {
                     modeView += "-- VISUAL --";
                     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
 
-                    setColor(97);
+                    setColor(43);
                     cout<<modeView;
+                    setColor(0);
                     ShowConsoleCursor(true);
                     gotoxy (10, TerminalLine - 1);
                     editLine();
