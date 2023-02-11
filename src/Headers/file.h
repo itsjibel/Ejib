@@ -1,6 +1,5 @@
 #include "ejib.h"
 #include <fstream>
-#include <stdio.h>
 #include <termios.h>
 #include <vector>
 using std::cin;
