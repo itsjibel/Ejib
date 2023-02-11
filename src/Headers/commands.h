@@ -187,7 +187,7 @@ void CommandLine::printInfo() {
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
     modeView += "-- INSERT --";
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
-
+    setColor(37);
     setColor(43);
     cout<<modeView;
     setColor(0);
@@ -196,11 +196,6 @@ void CommandLine::printInfo() {
     cout<<"cmd@edit:";
     float percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) < 100.0 ? percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) : 100.0;
     percentageTextSeen = percentageTextSeen < 1.0 ? 1.0 : percentageTextSeen;
-    gotoxy (9, TerminalLine - 1);
-
-    for (int i=9; i<TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)); i++)
-        cout<<' ';
-
     gotoxy (TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)), TerminalLine - 1);
     setColor(35);
     cout<<"("<<int(percentageTextSeen)<<"%) ";
