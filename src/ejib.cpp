@@ -1,7 +1,6 @@
-#include <pthread.h>
 #include "Headers/user_input.h"
 using std::thread;
-class Jibel: public EditCommand {
+class Ejib_System: public EditCommand {
     private:
         bool _enterToCommantMode=false;
 
@@ -40,8 +39,8 @@ class Jibel: public EditCommand {
         }
 };
 int main() {
-	Jibel Editor;
-    thread TerminalColumnTheread = thread(&Editor::reSizeTerminal, Editor);
-	Editor.runSystem();
+	Ejib_System Ejib;
+    thread TerminalColumnTheread = thread(&Editor::reSizeTerminal, Ejib);
+	Ejib.runSystem();
     TerminalColumnTheread.join();
 }
