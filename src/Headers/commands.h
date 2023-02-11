@@ -1,17 +1,13 @@
 #include <cmath>
 #include "file.h"
-#include <iomanip>
-using std::setw;
-
-int TerminalColumn=0,      TerminalLine=0,
-    TerminalColumnTemp=-1, TerminalLineTemp=-1,
-    columnSelected=0,      lineSelected=0,
-    startPrintLine=0,      startPrintColumn=0;
 
 vector<char> emptyVector;
 vector<vector<char>> input;
 string mode="command";
-
+int TerminalColumn=0,      TerminalLine=0,
+    TerminalColumnTemp=-1, TerminalLineTemp=-1,
+    columnSelected=0,      lineSelected=0,
+    startPrintLine=0,      startPrintColumn=0;
 
 class CommandLine : public File {
     private:
@@ -160,8 +156,14 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             while (numberDigits_Of_LargestLineNumber + lines[j].size() + 1 > TerminalColumn)
                 lines[j].pop_back();
 
-            setColor(31);
-            cout<<setw(numberDigits_Of_LargestLineNumber)<<numberLines[j];
+            if (numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1) != 0)
+                for (int i=0; i<=numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1); i++) {
+                    gotoxy (i, j);
+                    cout<<" ";
+                }
+
+            gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1), j);
+            cout<<BOLD(FWHT("\e[1m" + to_string(numberLines[j]) + "\e[0m"));
             setColor(44);
             cout<<" ";
             setColor(0);
@@ -193,12 +195,11 @@ void CommandLine::printInfo() {
     setColor(0);
     gotoxy (0, TerminalLine - 1);
     setColor(32);
-    cout<<"cmd@edit:";
+    cout<<"\e[1mcmd@edit:\e[0m";
     float percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) < 100.0 ? percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) : 100.0;
     percentageTextSeen = percentageTextSeen < 1.0 ? 1.0 : percentageTextSeen;
     gotoxy (TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)), TerminalLine - 1);
-    setColor(35);
-    cout<<"("<<int(percentageTextSeen)<<"%) ";
+    cout<<BOLD(FCYN("("<<int(percentageTextSeen)<<"%) "));
     setColor(36);
     cout<<"Ln "<<lineSelected + 1<<", Col "<<columnSelected + 1;
     temp = TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1));
