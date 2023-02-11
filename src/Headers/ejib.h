@@ -4,7 +4,7 @@ using std::cout;
 using std::string;
 using std::to_string;
 void gotoxy(int x, int y) {
-    printf("%c[%d;%df", 0x1B, y, x);
+    printf("%c[%d;%df", 0x1B, y + 1, x + 1);
 }
 void setColor(int textColor) {
     cout<<"\033[" + to_string (textColor) + "m";
@@ -24,7 +24,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
     for (char character : text) {
         if ((index == selectedCharacterStart || index == selectedCharacterEnd) && selectedLine == currentLine) {
             selectedArea = !selectedArea;
-            color = 47;
+            color = 41;
         } else if ((character == '/' || character == '*' || character == '-' ||
                     character == '+' || character == '^' || character == '%' ||
                     character == '=' || character == '<' || character == '>') &&
@@ -114,6 +114,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
             
             setColor(tempColor);
             cout<<textPart;
+            setColor(0);
             textPart.clear();
             textPart += character;
             
@@ -129,4 +130,5 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
     }
     setColor(color);
     cout<<textPart;
+    setColor(0);
 }
