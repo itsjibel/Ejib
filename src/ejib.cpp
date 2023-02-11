@@ -1,5 +1,5 @@
 #include "Headers/user_input.h"
-using std::thread;
+
 class Ejib_System: public EditCommand {
     private:
         bool _enterToCommantMode=false;
@@ -28,6 +28,7 @@ class Ejib_System: public EditCommand {
                     modeView += "-- VISUAL --";
                     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
 
+                    setColor(37);
                     setColor(43);
                     cout<<modeView;
                     setColor(0);
@@ -40,7 +41,7 @@ class Ejib_System: public EditCommand {
 };
 int main() {
 	Ejib_System Ejib;
-    thread TerminalColumnTheread = thread(&Editor::reSizeTerminal, Ejib);
+    std::thread get_TerminalColumnTheread = std::thread(&Editor::reSizeTerminal, Ejib);
 	Ejib.runSystem();
-    TerminalColumnTheread.join();
+    get_TerminalColumnTheread.join();
 }
