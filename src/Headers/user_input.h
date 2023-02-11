@@ -84,10 +84,9 @@ void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
             }
 }
 void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
-    if (text.size() >= 0) {
-        if (line + 1 == text.size())
-            line = line - 1 > 0 ? line - 1 : line;
-        text.erase(text.begin() + line);
+    if (text.size() > 0) {
+        line = line - 1 > 0 ? line - 1 : 0;
+        text.erase(text.begin() + line + 1);
         column=0;
     }
     if (text.size() == 0)
