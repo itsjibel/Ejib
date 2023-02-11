@@ -187,17 +187,17 @@ void Editor::EDIT_SYSTEM() {
         case 0:
             case 0xE0:
                 switch(ch = getch()) {
-                    case 72:  up(lineSelected,      columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 75:  left(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 77:  right(lineSelected,   columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 80:  down(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 'S': _delete(lineSelected, columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 'A':  up(lineSelected,      columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 'D':  left(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 'C':  right(lineSelected,   columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 'B':  down(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
+                    case '~': _delete(lineSelected, columnSelected, input);          something_happen_in_text_view=true; break;
                     default:  getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
                 }
                 break;
-                case 8:  backspace(lineSelected, columnSelected, input);        something_happen_in_text_view=true;      break;
+                case 127:  backspace(lineSelected, columnSelected, input);        something_happen_in_text_view=true;    break;
                 case 2:  mode = "visual";                                                                                break;
-                case 13: enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
+                case 10: enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
                 case 9:  tab(lineSelected, columnSelected, input);              something_happen_in_text_view=true;      break;
                 case 22: paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
                 case 19: if (!fileSystem("save", input)) { system("clear"); printInfo(); printText(input, -1, -1, -1); } break;
@@ -232,8 +232,8 @@ void Editor::EDIT_SYSTEM() {
     }
 }
 void Editor::reSizeTerminal() {
-    input.push_back(emptyVector);
     while (1) {
+        bool sizeChanged=false;
         struct winsize w;
         ioctl (STDOUT_FILENO, TIOCGWINSZ, &w);
         TerminalLine = w.ws_row;
@@ -261,9 +261,13 @@ void Editor::reSizeTerminal() {
                 system("clear");
                 printInfo();
                 printText(input, -1, -1, -1);
+                sizeChanged=true;
             }
         }
-
+        if (sizeChanged) {
+            printInfo();
+            printText(input, -1, -1, -1);
+        }
         TerminalColumnTemp = TerminalColumn;
         TerminalLineTemp = TerminalLine;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -398,14 +402,14 @@ class EditCommand: public Editor {
                             switch(ch = getch()) {
                                 case 75:  left        (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
                                 case 77:  right       (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                                case 'S': _delete     (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
+                                case '~': _delete     (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
                                 default: getCharacter (ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
                             }
                             break;
-                            case 8:  backspace   (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
+                            case 127:  backspace   (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
                             case 9:  tab         (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
                             case 22: paste       (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
-                            case 13: enter = true;                                                                               break;
+                            case 10: enter = true;                                                                               break;
                             default: getCharacter(ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
                 }
                 bool showBigCommandWarning=false;
@@ -417,7 +421,7 @@ class EditCommand: public Editor {
                 
                 ShowConsoleCursor(false);
                 gotoxy (0, TerminalLine - 1);
-                setColor(33);
+                setColor(32);
                 cout<<"cmd@edit: ";
 
                 if (showBigCommandWarning) {
