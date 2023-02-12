@@ -20,6 +20,7 @@ class Editor: public CommandLine {
         void left        (int &line, int &column, const vector<vector<char>> &text);
         void down        (int &line, int &column, const vector<vector<char>> &text);
         void right       (int &line, int &column, const vector<vector<char>> &text);
+        void undo        (vector<vector<char>> &text);
         void reSizeTerminal();
         void EDIT_SYSTEM();
 };
@@ -352,7 +353,7 @@ class EditCommand: public Editor {
                 string s;
                 for (char ch : text.at(line))
                     s.push_back(ch);
-                    column = s.find(key, column + 1);
+                column = s.find(key, column + 1);
                     
                 if (column != string::npos) {
                     if (anythingFound == false) {
