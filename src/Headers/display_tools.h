@@ -209,6 +209,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
         if (color != tempColor) {
             setColor(tempColor);
             cout<<textPart;
+            setColor(0);
             textPart.clear();
             textPart += character;
         } else textPart += character;
@@ -223,4 +224,5 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
     }
     setColor(color);
     cout<<textPart;
+    setColor(0);
 }
