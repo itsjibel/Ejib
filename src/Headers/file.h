@@ -1,7 +1,7 @@
 #include "display_tools.h"
 #include <fstream>
-#include <termios.h>
 #include <vector>
+
 using std::cin;
 using std::getline;
 using std::ios;
@@ -9,8 +9,40 @@ using std::ifstream;
 using std::ofstream;
 using std::streampos;
 using std::vector;
-static struct termios old, current;
+#if (defined (LINUX) || defined (__linux__))
+#include <termios.h>
 
+Bool PrintSelection(Display *display, Window window, const char *bufname, const char *fmtname, string &text) {
+    char *result;
+    unsigned long ressize, restail;
+    int resbits;
+    Atom bufid  = XInternAtom(display, bufname, False),
+        fmtid  = XInternAtom(display, fmtname, False),
+        propid = XInternAtom(display, "XSEL_DATA", False),
+        incrid = XInternAtom(display, "INCR", False);
+    XEvent event;
+
+    XConvertSelection(display, bufid, fmtid, propid, window, CurrentTime);
+    do {
+        XNextEvent(display, &event);
+    } while (event.type != SelectionNotify || event.xselection.selection != bufid);
+
+    if (event.xselection.property) {
+        XGetWindowProperty(display, window, propid, 0, LONG_MAX/4, False, AnyPropertyType,
+        &fmtid, &resbits, &ressize, &restail, (unsigned char**)&result);
+
+        if (fmtid == incrid)
+            printf("Buffer is too large and INCR reading is not implemented yet.\n");
+        else
+            text = result;
+
+        XFree(result);
+        return True;
+    } else
+        return False;
+}
+
+static struct termios old, current;
 // Initialize new terminal i/o settings 
 void initTermios(int echo) {
     tcgetattr(0, &old); // grab old terminal i/o settings
@@ -47,6 +79,11 @@ char getch(void)  {
 char getche(void)  {
     return getch_(1);
 }
+#endif
+
+#if (defined (_WIN32) || defined (_WIN64))
+#include <conio.h>
+#endif
 
 class File {
     private:
@@ -104,7 +141,12 @@ class File {
                 file.seekg (0, ios::end);
                 end = file.tellg();
                 file.close();
+                #if (defined (LINUX) || defined (__linux__))
                 setColor(33);
+                #endif
+                #if (defined (_WIN32) || defined (_WIN64))
+                setColor(6);
+                #endif
                 cout<<"Are you sure you want to open a "<<byteConverter((end-begin))<<" file? [y/*]";
                 if (getch() == 'y') {
                     vector<char> emptyVector;
@@ -133,8 +175,20 @@ class File {
                 tryAgain = false;
                 if (!haveFilePath) {
                     ShowConsoleCursor(false);
-                    system ("clear");
+
+                    #if (defined (LINUX) || defined (__linux__))
+                    system("clear");
+                    #endif
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    system("cls");
+                    #endif
+
+                    #if (defined (LINUX) || defined (__linux__))
                     setColor(32);
+                    #endif
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    setColor(2);
+                    #endif
                     gotoxy (0, 0);
                     cout<<"Enter file name(With extension): ";
                     ShowConsoleCursor(true);
@@ -153,9 +207,23 @@ class File {
                             tryAgain=true;
                             agreeFileSize=true;
                         } else {
+
+                            #if (defined (LINUX) || defined (__linux__))
                             setColor(31);
+                            #endif
+                            #if (defined (_WIN32) || defined (_WIN64))
+                            setColor(4);
+                            #endif
+
                             cout<<"Unable to open file! (Make sure the path is correct)\n";
+
+                            #if (defined (LINUX) || defined (__linux__))
                             setColor(33);
+                            #endif
+                            #if (defined (_WIN32) || defined (_WIN64))
+                            setColor(6);
+                            #endif
+
                             cout<<"Try again? [y/*] ";
                             tryAgain = getch() == 'y' ? true : false;
                             if (!tryAgain) return false;
@@ -165,9 +233,19 @@ class File {
                 if (mode == "save") {
                     ShowConsoleCursor(false);
                     if (saveFile (filePath, fileName, outputText) == true) {
+                        #if (defined (LINUX) || defined (__linux__))
                         setColor(32);
+                        #endif
+                        #if (defined (_WIN32) || defined (_WIN64))
+                        setColor(10);
+                        #endif
                         if (haveFilePath) {
+                            #if (defined (LINUX) || defined (__linux__))
                             setColor(31);
+                            #endif
+                            #if (defined (_WIN32) || defined (_WIN64))
+                            setColor(4);
+                            #endif
                             gotoxy (44, 29);
                             cout<<"[+]";
                             gotoxy(10, 29);
@@ -175,13 +253,32 @@ class File {
                         haveFilePath=true;
                         return true;
                     } else {
+                        #if (defined (LINUX) || defined (__linux__))
                         setColor(31);
+                        #endif
+                        #if (defined (_WIN32) || defined (_WIN64))
+                        setColor(4);
+                        #endif
+
                         cout<<"Unable to open file! (Make sure the path is correct)\n";
+
+                        #if (defined (LINUX) || defined (__linux__))
                         setColor(33);
+                        #endif
+                        #if (defined (_WIN32) || defined (_WIN64))
+                        setColor(6);
+                        #endif
+                        
                         cout<<"Try again? [y/*] ";
                         tryAgain = getch() == 'y' ? true : false;
                         if (!tryAgain) return false;
+
+                        #if (defined (LINUX) || defined (__linux__))
                         system("clear");
+                        #endif
+                        #if (defined (_WIN32) || defined (_WIN64))
+                        system("cls");
+                        #endif
                     }
                     ShowConsoleCursor(true);
                 }

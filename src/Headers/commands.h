@@ -50,29 +50,56 @@ class CommandLine : public File {
                             explanation += ch;
                         else if (ch == ']')
                             startGivingExplain=true;
-
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    setColor(6);
+                    #endif
+                    #if (defined (LINUX) || defined (__linux__))
                     setColor(33);
+                    #endif
                     cout<<'\t'<<key;
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    setColor(5);
+                    #endif
+                    #if (defined (LINUX) || defined (__linux__))
                     setColor(35);
+                    #endif
                     cout<<explanation<<'\n';
                 }
                 myfile.close();
             } else {
+                #if (defined (_WIN32) || defined (_WIN64))
+                setColor(4);
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 setColor(31);
+                #endif
                 cout << "\tUnable to open \'"<<helpFileName<<"' file!\n"; 
             }
         }
 
         void commandLine() {
             string cmd;
+
+            #if (defined (_WIN32) || defined (_WIN64))
+            setColor(2);
+            cout<<"cmd: ";
+            #endif
+            #if (defined (LINUX) || defined (__linux__))
             setColor(32);
             cout<<"\e[1mcmd: \e[0m";
+            #endif
+            
             getline (cin, cmd);
             
             if (cmd == "file -N" || cmd == "file --new") {
                 mode = "edit";
                 clearEditFile();
+                #if (defined (_WIN32) || defined (_WIN64))
+                system ("cls");
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 system ("clear");
+                #endif
                 printInfo();
                 printText(input, -1, -1, -1);
                 gotoxy (0, 0);
@@ -82,10 +109,22 @@ class CommandLine : public File {
                     mode = "edit";
                     printInfo();
                     printText(input, -1, -1, -1);
-                } else system("clear");
+                } else {
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    system ("cls");
+                    #endif
+                    #if (defined (LINUX) || defined (__linux__))
+                    system ("clear");
+                    #endif
+                }
                 _firstError = true;
             } else if (cmd == "clear") {
+                #if (defined (_WIN32) || defined (_WIN64))
+                system ("cls");
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 system ("clear");
+                #endif
                 _firstError = true;
             } else if (cmd == "exit") {
                 exit (0);
@@ -98,11 +137,25 @@ class CommandLine : public File {
                 showHelpFile("visual_mode_help.txt");
             } else if (cmd == "") {} else {
                 if (_firstError) {
+
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    setColor(4);
+                    #endif
+                    #if (defined (LINUX) || defined (__linux__))
                     setColor(31);
+                    #endif
+
                     cout<<"[Command Error]: command not found (type \'help\' for help)\n";
                     _firstError = false;
                 } else {
+
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    setColor(4);
+                    #endif
+                    #if (defined (LINUX) || defined (__linux__))
                     setColor(31);
+                    #endif
+
                     cout<<"[Command Error]: command not found\n";
                 }
             }
@@ -113,6 +166,7 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
     string blankView, lines[10000];
     int range = startPrintLine + TerminalLine - 2 <= text.size() ? startPrintLine + TerminalLine - 2 : text.size();
 
+    ShowConsoleCursor(false);
     if (!(text.size() == 1 && text.at(0).size() == 0))
         for (int i=startPrintLine; i<range; i++) {
             numberLines[i - startPrintLine] = i + 1;
@@ -163,8 +217,23 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
                 }
 
             gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1), j);
+
+            #if (defined (_WIN32) || defined (_WIN64))
+            setColor(15);
+            cout<<numberLines[j];
+            #endif
+
+            #if (defined (LINUX) || defined (__linux__))
             cout<<BOLD(FWHT("\e[1m" + to_string(numberLines[j]) + "\e[0m"));
+            #endif
+
+            #if (defined (_WIN32) || defined (_WIN64))
+            setColor(17);
+            #endif
+            #if (defined (LINUX) || defined (__linux__))
             setColor(44);
+            #endif
+
             cout<<" ";
             setColor(0);
             colourizeText(lines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine);
@@ -172,9 +241,16 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             blankView += "$";
             for (int i=0; i<TerminalColumn - 1; i++) blankView += " ";
         }
+
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(5);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
     setColor(35);
+    #endif
+    
     cout<<blankView;
-    ShowConsoleCursor (true);
+    ShowConsoleCursor(true);
 
     if (text.at(0).size() == 0 && text.size() == 1)
         gotoxy (0, 0);
@@ -182,26 +258,68 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
         gotoxy (columnSelected - startPrintColumn + numberDigits_Of_LargestLineNumber + 1, lineSelected - startPrintLine);
 }
 void CommandLine::printInfo() {
-    ShowConsoleCursor (false);
+    ShowConsoleCursor(false);
     gotoxy (0, TerminalLine - 2);
     string modeView;
 
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
     modeView += "-- INSERT --";
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(7);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
     setColor(37);
+    #endif
+    
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(97);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
     setColor(43);
+    #endif
+
     cout<<modeView;
     setColor(0);
     gotoxy (0, TerminalLine - 1);
+
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(10);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
     setColor(32);
+    #endif
+
     cout<<"\e[1mcmd@edit:\e[0m";
     float percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) < 100.0 ? percentageTextSeen = 100.0 / ((float)input.size()) * ((float)(startPrintLine + TerminalLine - 1)) : 100.0;
     percentageTextSeen = percentageTextSeen < 1.0 ? 1.0 : percentageTextSeen;
     gotoxy (TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)), TerminalLine - 1);
+
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(11);
+    cout<<"("<<int(percentageTextSeen)<<"%) ";
+    #endif
+
+    #if (defined (LINUX) || defined (__linux__))
     cout<<BOLD(FCYN("("<<int(percentageTextSeen)<<"%) "));
+    #endif
+    
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(3);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
     setColor(36);
+    #endif
+
     cout<<"Ln "<<lineSelected + 1<<", Col "<<columnSelected + 1;
     temp = TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1));
+
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(7);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
     setColor(37);
+    #endif
+    ShowConsoleCursor(true);
 }

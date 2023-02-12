@@ -1,9 +1,12 @@
 #include "commands.h"
-#include <sys/ioctl.h>
+#if (defined (LINUX) || defined (__linux__))
 #include <stdio.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <thread>
 #include <chrono>
+#endif
+
 class Editor: public CommandLine {
 	public:
 		void getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text);
@@ -118,6 +121,7 @@ void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
 }
 void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     string copiedText;
+    #if (defined (LINUX) || defined (__linux__))
     Display *display = XOpenDisplay(NULL);
     unsigned long color = BlackPixel(display, DefaultScreen(display));
     Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0,0, 1,1, 0, color, color);
@@ -125,6 +129,12 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     XDestroyWindow(display, window);
     XCloseDisplay(display);
     if (result) {
+    #endif
+    #if (defined (_WIN32) || defined (_WIN64))
+    if (OpenClipboard(NULL)) {
+        string copiedText = (char*)GetClipboardData(CF_TEXT);
+        CloseClipboard();
+    #endif
         text.push_back(emptyVector);
         for (int i=0; i<copiedText.size(); i++)
             if (copiedText.at(i) != '\r' && copiedText.at(i) != '\t' &&
@@ -186,6 +196,31 @@ void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
 void Editor::EDIT_SYSTEM() {
     int ch;
     bool something_happen_in_text_view=false;
+    #if (defined (_WIN32) || defined (_WIN64))
+    switch (ch = getch()) {
+        case 0:
+            case 0xE0:
+                switch(ch = getch()) {
+                    case 72:  up(lineSelected,      columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 75:  left(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 77:  right(lineSelected,   columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 80:  down(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
+                    case 83: _delete(lineSelected, columnSelected, input);          something_happen_in_text_view=true; break;
+                    default:  getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
+                }
+                break;
+                case 8:  backspace(lineSelected, columnSelected, input);        something_happen_in_text_view=true;      break;
+                case 2:  mode = "visual";                                                                                break;
+                case 13: enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
+                case 9:  tab(lineSelected, columnSelected, input);              something_happen_in_text_view=true;      break;
+                case 22: paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
+                case 19: if (!fileSystem("save", input)) { system("cls"); printInfo(); printText(input, -1, -1, -1); }   break;
+                case 24: deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
+                case 27: mode = "command";                                      SetConsoleTextAttribute(hConsole, 7);    break;
+                default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
+    }
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
     switch (ch = getch()) {
         case 27:
             switch(ch = getch()) {
@@ -217,6 +252,7 @@ void Editor::EDIT_SYSTEM() {
         case 16:  mode = "command";                                      setColor(37);                            break;
         default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
     }
+    #endif
     int numberLines[10000] = {0}, biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
     for (int i=startPrintLine; i<range; i++)
@@ -246,11 +282,19 @@ void Editor::EDIT_SYSTEM() {
 void Editor::reSizeTerminal() {
     while (1) {
         bool sizeChanged=false;
+        #if (defined (_WIN32) || defined (_WIN64))
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        TerminalColumn = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        TerminalLine = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+        #endif
+        #if (defined (LINUX) || defined (__linux__))
         struct winsize w;
         ioctl (STDOUT_FILENO, TIOCGWINSZ, &w);
         TerminalLine = w.ws_row;
         TerminalColumn = w.ws_col;
-
+        #endif
         if (mode == "visual" || mode == "edit") {
             if (TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp) {
                 int numberLines[10000] = {0}, biggestNumberLine=0,
@@ -282,7 +326,12 @@ void Editor::reSizeTerminal() {
         }
         TerminalColumnTemp = TerminalColumn;
         TerminalLineTemp = TerminalLine;
+        #if (defined (_WIN32) || defined (_WIN64))
+        Sleep(1);
+        #endif
+        #if (defined (LINUX) || defined (__linux__))
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        #endif
     }
 }
 
@@ -372,12 +421,32 @@ class EditCommand: public Editor {
         void editCommand() {
             bool enter=false;
             while (!enter) {
+                int ch;
 
                 if (_editCommand.size() == 0)
                     _editCommand.push_back(emptyVector);
 
                 _columnSelected = _columnSelected > _editCommand.at(0).size() ? _editCommand.at(0).size() : _columnSelected;
-                int ch;
+
+                #if (defined (_WIN32) || defined (_WIN64))
+                switch (ch = getch()) {
+                    case 0:
+                        case 0xE0:
+                            switch(ch = getch()) {
+                                case 75:  left        (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
+                                case 77:  right       (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
+                                case 'S': _delete     (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
+                                default: getCharacter (ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
+                            }
+                            break;
+                            case 8:  backspace   (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
+                            case 9:  tab         (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
+                            case 22: paste       (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
+                            case 13: enter = true;                                                                               break;
+                            default: getCharacter(ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
+                }
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 switch (ch = getch()) {
                     case 27:
                         switch(ch = getch()) {
@@ -403,6 +472,7 @@ class EditCommand: public Editor {
                     case 10:  enter = true;                                                                                 break;
                     default:  getCharacter  (ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
                 }
+                #endif
                 bool showBigCommandWarning=false;
 
                 while (_editCommand.at(0).size() > 32) {
@@ -412,11 +482,22 @@ class EditCommand: public Editor {
                 
                 ShowConsoleCursor(false);
                 gotoxy (0, TerminalLine - 1);
+                #if (defined (_WIN32) || defined (_WIN64))
+                setColor(10);
+                cout<<"cmd@edit: ";
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 setColor(32);
                 cout<<"\e[1mcmd@edit: \e[0m";
                 setColor(32);
+                #endif
                 if (showBigCommandWarning) {
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    setColor(6);
+                    #endif
+                    #if (defined (LINUX) || defined (__linux__))
                     setColor(33);
+                    #endif
                     gotoxy (44, TerminalLine - 1);
                     cout<<"[B]";
                 }
@@ -445,15 +526,30 @@ class EditCommand: public Editor {
 
         void showMassage(string massageType) {
             if (massageType == "accept") {
+                #if (defined (_WIN32) || defined (_WIN64))
+                setColor(10);
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 setColor(32);
+                #endif
                 gotoxy (44, TerminalLine - 1);
                 cout<<"[+]";
             } else if (massageType == "command not found") {
+                #if (defined (_WIN32) || defined (_WIN64))
+                setColor(4);
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 setColor(31);
+                #endif
                 gotoxy (44, TerminalLine - 1);
                 cout<<"[!]";
             } else if (massageType == "nothing found") {
+                #if (defined (_WIN32) || defined (_WIN64))
+                setColor(4);
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
                 setColor(31);
+                #endif
                 gotoxy (44, TerminalLine - 1);
                 cout<<"[?]";
             }
@@ -480,7 +576,14 @@ class EditCommand: public Editor {
                 printInfo();
                 printText(input, -1, -1, -1);
                 ShowConsoleCursor (false);
-                setColor(33);
+
+                #if (defined (_WIN32) || defined (_WIN64))
+                setColor(10);
+                #endif
+                #if (defined (LINUX) || defined (__linux__))
+                setColor(32);
+                #endif
+
                 gotoxy (44, TerminalLine - 1);
                 cout<<"[+]";
 

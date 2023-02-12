@@ -1,5 +1,11 @@
 #include "Headers/user_input.h"
 
+#if (defined (_WIN32) || defined (_WIN64))
+#include "Headers/mingw.thread.h"
+#endif
+
+using std::thread;
+
 class Ejib_System: public EditCommand {
     private:
         bool _enterToCommantMode=false;
@@ -27,9 +33,13 @@ class Ejib_System: public EditCommand {
                     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
                     modeView += "-- VISUAL --";
                     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
-
+                    #if (defined (_WIN32) || defined (_WIN64))
+                    setColor(97);
+                    #endif
+                    #if (defined (LINUX) || defined (__linux__))
                     setColor(37);
                     setColor(43);
+                    #endif
                     cout<<modeView;
                     setColor(0);
                     ShowConsoleCursor(true);
