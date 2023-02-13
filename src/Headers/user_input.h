@@ -260,7 +260,8 @@ void Editor::EDIT_SYSTEM() {
                 case 22: paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
                 case 19: if (!fileSystem("save", input)) { system("cls"); printInfo(); printText(input, -1, -1, -1); }   break;
                 case 24: deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
-                case 27: mode = "command";                                      SetConsoleTextAttribute(hConsole, 7);    break;
+                case 16: mode = "command";                                      SetConsoleTextAttribute(hConsole, 7);    break;
+                case 21: undo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
                 default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
     }
     #endif
