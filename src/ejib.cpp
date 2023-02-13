@@ -17,7 +17,7 @@ class Ejib_System: public EditCommand {
                     EDIT_SYSTEM();
                     _enterToCommantMode= true;
                 }
-                
+
                 if (mode == "command") {
                     if (_enterToCommantMode)
                         system ("clear");

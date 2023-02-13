@@ -9,6 +9,9 @@
 #endif
 
 class Editor: public CommandLine {
+    private:
+        string partOfCharacterInput;
+        int startColumn_partOfCharacter;
 	public:
 		void getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text);
         void backspace   (int &line, int &column,       vector<vector<char>> &text);
@@ -28,6 +31,12 @@ class Editor: public CommandLine {
 
 void Editor::getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text) {
     if (int(characterInput) > 31 && int(characterInput) < 127) {
+        partOfCharacterInput.push_back(characterInput);
+        if (partOfCharacterInput.size() == 6) {
+            startColumn_partOfCharacter = column - 5;
+            AddTrack (true, line, startColumn_partOfCharacter, partOfCharacterInput);
+            partOfCharacterInput = "";
+        }
         if (column != text.at(line).size()) {
             text.at(line).insert (text.at(line).begin() + column, characterInput);
         } else {
@@ -211,6 +220,11 @@ void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
 }
 
 void Editor::undo(int &line, int &column, vector<vector<char>> &text) {
+    if (partOfCharacterInput.size() < 6 && partOfCharacterInput.size() != 0) {
+        startColumn_partOfCharacter = column - partOfCharacterInput.size();
+        AddTrack (true, line, startColumn_partOfCharacter, partOfCharacterInput);
+        partOfCharacterInput = "";
+    }
     if (currentTrack > 0) {
         currentTrack--;
         column = GetTrack(currentTrack).startActioncolumn;
