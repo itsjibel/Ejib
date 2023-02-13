@@ -1,4 +1,8 @@
-# Operating systems supported in the project
+# Ejib
+
+![Ejib Logo](EjibLogo.png)
+
+## Operating systems supported in the project
 
 + Linux
 
