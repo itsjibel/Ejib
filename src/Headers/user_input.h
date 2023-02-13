@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "change_control.h"
 #if (defined (LINUX) || defined (__linux__))
 #include <stdio.h>
 #include <sys/ioctl.h>
@@ -20,29 +21,33 @@ class Editor: public CommandLine {
         void left        (int &line, int &column, const vector<vector<char>> &text);
         void down        (int &line, int &column, const vector<vector<char>> &text);
         void right       (int &line, int &column, const vector<vector<char>> &text);
-        void undo        (vector<vector<char>> &text);
+        void undo        (int &line, int &column,       vector<vector<char>> &text);
         void reSizeTerminal();
         void EDIT_SYSTEM();
 };
-void Editor::getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text) {
-    if (column != text.at(line).size()) {
-        text.at(line).insert (text.at(line).begin() + column, characterInput);
-    } else {
-        text.at(line).push_back (characterInput);
-        if (characterInput == '(')
-            text.at(line).push_back (')');
-        else if (characterInput == '\"')
-            text.at(line).push_back ('\"');
-        else if (characterInput == '\'')
-            text.at(line).push_back ('\'');
-        else if (characterInput == '[')
-            text.at(line).push_back (']');
-        else if (characterInput == '{')
-            text.at(line).push_back ('}');
-    }
 
-    column++;
+void Editor::getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text) {
+    if (int(characterInput) > 31 && int(characterInput) < 127) {
+        if (column != text.at(line).size()) {
+            text.at(line).insert (text.at(line).begin() + column, characterInput);
+        } else {
+            text.at(line).push_back (characterInput);
+            if (characterInput == '(')
+                text.at(line).push_back (')');
+            else if (characterInput == '\"')
+                text.at(line).push_back ('\"');
+            else if (characterInput == '\'')
+                text.at(line).push_back ('\'');
+            else if (characterInput == '[')
+                text.at(line).push_back (']');
+            else if (characterInput == '{')
+                text.at(line).push_back ('}');
+        }
+
+        column++;
+    }
 }
+
 void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
     int numberLines[10000] = {0}, biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
@@ -74,6 +79,7 @@ void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
         } else column=0;
     }
 }
+
 void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() != 0)
         if (text.at(line).size() > column)
@@ -87,6 +93,7 @@ void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
                 text.erase (text.begin() + line + 1);
             }
 }
+
 void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() > 0) {
         line = line - 1 > 0 ? line - 1 : 0;
@@ -96,6 +103,7 @@ void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() == 0)
         text.push_back(emptyVector);
 }
+
 void Editor::enter(int &line, int &column, vector<vector<char>> &text) {
     vector<char> part1, part2;
 
@@ -110,6 +118,7 @@ void Editor::enter(int &line, int &column, vector<vector<char>> &text) {
     line++;
     column=0;
 }
+
 void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
     if (column != text.at(line).size())
         for (int i = 0; i < 4; i++)
@@ -120,6 +129,7 @@ void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
 
     column += 4;
 }
+
 void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     string copiedText;
     #if (defined (LINUX) || defined (__linux__))
@@ -137,6 +147,7 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
         CloseClipboard();
     #endif
         text.push_back(emptyVector);
+        AddTrack (true, line, column, copiedText);
         for (int i=0; i<copiedText.size(); i++)
             if (copiedText.at(i) != '\r' && copiedText.at(i) != '\t' &&
                 copiedText.at(i) != '\v' && copiedText.at(i) != '\0' &&
@@ -158,12 +169,14 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
         column = text.at(line).size();
     }
 }
+
 void Editor::up(int &line, int &column, const vector<vector<char>> &text) {
     if (line > 0) {
         line--;
         column = column > text.at(line).size() ? text.at(line).size() : column;
     }
 }
+
 void Editor::left(int &line, int &column, const vector<vector<char>> &text) {
     column = column - 1 > -1 ? column - 1 : -1;
 
@@ -175,6 +188,7 @@ void Editor::left(int &line, int &column, const vector<vector<char>> &text) {
             column=0;
         }
 }
+
 void Editor::right(int &line, int &column, const vector<vector<char>> &text) {
     column++;
     if (column > text.at(line).size()) {
@@ -188,12 +202,41 @@ void Editor::right(int &line, int &column, const vector<vector<char>> &text) {
 
     }
 }
+
 void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
     if (line < text.size() - 1) {
         line++;
         column = column > text.at(line).size() ? text.at(line).size() : column;
     }
 }
+
+void Editor::undo(int &line, int &column, vector<vector<char>> &text) {
+    if (currentTrack > 0) {
+        currentTrack--;
+        column = GetTrack(currentTrack).startActioncolumn;
+        line   = GetTrack(currentTrack).startActionLine;
+
+        bool isMultipleLine=false;
+        int ActionLine   = GetTrack(currentTrack).startActionLine,
+            ActionColumn = GetTrack(currentTrack).startActioncolumn;
+
+        if (GetTrack(currentTrack).isWirte) {
+            for (int i=0; i<GetTrack(currentTrack).changeString.size(); i++) {
+
+                if (GetTrack(currentTrack).changeString.at(i) == '\n') {
+                    ActionLine++;
+                    text.erase (text.begin() + ActionLine);
+                    isMultipleLine=true;
+                }
+
+                if (!isMultipleLine)
+                    text.at(ActionLine).erase (text.at(ActionLine).begin() + ActionColumn);
+            }
+        }
+        stack.pop_back();
+    }
+}
+
 void Editor::EDIT_SYSTEM() {
     int ch;
     bool something_happen_in_text_view=false;
@@ -243,15 +286,16 @@ void Editor::EDIT_SYSTEM() {
                 default: ;
             }
             break;
-        case 127:  backspace(lineSelected, columnSelected, input);        something_happen_in_text_view=true;    break;
-        case 2:  mode = "visual";                                                                                break;
-        case 10: enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
-        case 9:  tab(lineSelected, columnSelected, input);              something_happen_in_text_view=true;      break;
-        case 22: paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
-        case 19: if (!fileSystem("save", input)) { system("clear"); printInfo(); printText(input, -1, -1, -1); } break;
-        case 24: deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
+        case 127: backspace(lineSelected, columnSelected, input);        something_happen_in_text_view=true;      break;
+        case 2:   mode = "visual";                                                                                break;
+        case 10:  enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
+        case 9:   tab(lineSelected, columnSelected, input);              something_happen_in_text_view=true;      break;
+        case 22:  paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
+        case 19:  if (!fileSystem("save", input)) { system("clear"); printInfo(); printText(input, -1, -1, -1); } break;
+        case 24:  deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
         case 16:  mode = "command";                                      setColor(37);                            break;
-        default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
+        case 21:  undo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
+        default:  getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
     }
     #endif
     int numberLines[10000] = {0}, biggestNumberLine=0,

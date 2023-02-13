@@ -58,7 +58,7 @@ void initTermios(int echo) {
 
 // Restore old terminal i/o settings
 void resetTermios(void)  {
-  tcsetattr(0, TCSANOW, &old);
+    tcsetattr(0, TCSANOW, &old);
 }
 
 // Read 1 character - echo defines echo mode
@@ -92,11 +92,12 @@ class File {
         bool agreeFileSize=true;
 
         string byteConverter(long long int bytes) {
-            float pb = 1125899906842624;
-            float tb = 1099511627776;
-            float gb = 1073741824;
-            float mb = 1048576;
-            float kb = 1024;
+            #define pb 1125899906842624
+            #define tb 1099511627776
+            #define gb 1073741824
+            #define mb 1048576
+            #define kb 1024
+
             string convertedSize;
             if( bytes >= pb )
                 return to_string((float)bytes/pb) + " PB";
@@ -130,6 +131,7 @@ class File {
                 return true;
             } else return false;
         }
+
         bool loadFile (string filePath, string fileName, vector<vector<char>> &outputText) {
             string line;
             int lineNumber=0;
@@ -169,6 +171,7 @@ class File {
                 }
             } else return false;
         }
+
         bool fileSystem (string mode, vector<vector<char>> &outputText) {
             bool tryAgain=true;
             while (tryAgain == true) {
