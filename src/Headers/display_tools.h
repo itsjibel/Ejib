@@ -226,3 +226,52 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
     cout<<textPart;
     setColor(0);
 }
+
+Bool PrintSelection(Display *display, Window window, const char *bufname, const char *fmtname, string &text) {
+    char *result;
+    unsigned long ressize, restail;
+    int resbits;
+    Atom bufid  = XInternAtom(display, bufname, False),
+        fmtid  = XInternAtom(display, fmtname, False),
+        propid = XInternAtom(display, "XSEL_DATA", False),
+        incrid = XInternAtom(display, "INCR", False);
+    XEvent event;
+
+    XConvertSelection(display, bufid, fmtid, propid, window, CurrentTime);
+    do {
+        XNextEvent(display, &event);
+    } while (event.type != SelectionNotify || event.xselection.selection != bufid);
+
+    if (event.xselection.property) {
+        XGetWindowProperty(display, window, propid, 0, LONG_MAX/4, False, AnyPropertyType,
+        &fmtid, &resbits, &ressize, &restail, (unsigned char**)&result);
+
+        if (fmtid == incrid)
+            printf("Buffer is too large and INCR reading is not implemented yet.\n");
+        else
+            text = result;
+
+        XFree(result);
+        return True;
+    } else
+        return False;
+}
+
+bool GetCopiedText(string &copiedText) {
+    #if (defined (LINUX) || defined (__linux__))
+    Display *display = XOpenDisplay(NULL);
+    unsigned long color = BlackPixel(display, DefaultScreen(display));
+    Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0,0, 1,1, 0, color, color);
+    Bool result = PrintSelection(display, window, "CLIPBOARD", "UTF8_STRING", copiedText) || PrintSelection(display, window, "CLIPBOARD", "STRING", copiedText);
+    XDestroyWindow(display, window);
+    XCloseDisplay(display);
+    return result;
+    #endif
+    #if (defined (_WIN32) || defined (_WIN64))
+    if (OpenClipboard(NULL)) {
+        string copiedText = (char*)GetClipboardData(CF_TEXT);
+        CloseClipboard();
+        return true;
+    } else return false;
+    #endif
+}

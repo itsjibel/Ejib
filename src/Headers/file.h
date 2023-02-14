@@ -12,36 +12,6 @@ using std::vector;
 #if (defined (LINUX) || defined (__linux__))
 #include <termios.h>
 
-Bool PrintSelection(Display *display, Window window, const char *bufname, const char *fmtname, string &text) {
-    char *result;
-    unsigned long ressize, restail;
-    int resbits;
-    Atom bufid  = XInternAtom(display, bufname, False),
-        fmtid  = XInternAtom(display, fmtname, False),
-        propid = XInternAtom(display, "XSEL_DATA", False),
-        incrid = XInternAtom(display, "INCR", False);
-    XEvent event;
-
-    XConvertSelection(display, bufid, fmtid, propid, window, CurrentTime);
-    do {
-        XNextEvent(display, &event);
-    } while (event.type != SelectionNotify || event.xselection.selection != bufid);
-
-    if (event.xselection.property) {
-        XGetWindowProperty(display, window, propid, 0, LONG_MAX/4, False, AnyPropertyType,
-        &fmtid, &resbits, &ressize, &restail, (unsigned char**)&result);
-
-        if (fmtid == incrid)
-            printf("Buffer is too large and INCR reading is not implemented yet.\n");
-        else
-            text = result;
-
-        XFree(result);
-        return True;
-    } else
-        return False;
-}
-
 static struct termios old, current;
 // Initialize new terminal i/o settings 
 void initTermios(int echo) {

@@ -3,7 +3,7 @@
 #if (defined (_WIN32) || defined (_WIN64))
 #include "Headers/mingw.thread.h"
 #endif
-
+using std::ref;
 using std::thread;
 
 class Ejib_System: public EditCommand {
@@ -51,7 +51,9 @@ class Ejib_System: public EditCommand {
 };
 int main() {
 	Ejib_System Ejib;
-    std::thread get_TerminalColumnTheread = std::thread(&Editor::reSizeTerminal, Ejib);
+    thread get_TerminalColumnTheread = thread(&Editor::reSizeTerminal, Ejib);
+    thread RealTimeControlUndoStack (controlUndoStack, ref(lineSelected), ref(columnSelected), ref(recentInput));
 	Ejib.runSystem();
     get_TerminalColumnTheread.join();
+    RealTimeControlUndoStack.join();
 }

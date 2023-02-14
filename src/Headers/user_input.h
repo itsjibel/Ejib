@@ -4,14 +4,10 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <thread>
-#include <chrono>
 #endif
+string recentInput="";
 
 class Editor: public CommandLine {
-    private:
-        string partOfCharacterInput;
-        int startColumn_partOfCharacter;
 	public:
 		void getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text);
         void backspace   (int &line, int &column,       vector<vector<char>> &text);
@@ -31,12 +27,8 @@ class Editor: public CommandLine {
 
 void Editor::getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text) {
     if (int(characterInput) > 31 && int(characterInput) < 127) {
-        partOfCharacterInput.push_back(characterInput);
-        if (partOfCharacterInput.size() == 6) {
-            startColumn_partOfCharacter = column - 5;
-            AddTrack (true, line, startColumn_partOfCharacter, partOfCharacterInput);
-            partOfCharacterInput = "";
-        }
+        recentInput.push_back(characterInput);
+
         if (column != text.at(line).size()) {
             text.at(line).insert (text.at(line).begin() + column, characterInput);
         } else {
@@ -141,22 +133,11 @@ void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
 
 void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     string copiedText;
-    #if (defined (LINUX) || defined (__linux__))
-    Display *display = XOpenDisplay(NULL);
-    unsigned long color = BlackPixel(display, DefaultScreen(display));
-    Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0,0, 1,1, 0, color, color);
-    Bool result = PrintSelection(display, window, "CLIPBOARD", "UTF8_STRING", copiedText) || PrintSelection(display, window, "CLIPBOARD", "STRING", copiedText);
-    XDestroyWindow(display, window);
-    XCloseDisplay(display);
-    if (result) {
-    #endif
-    #if (defined (_WIN32) || defined (_WIN64))
-    if (OpenClipboard(NULL)) {
-        string copiedText = (char*)GetClipboardData(CF_TEXT);
-        CloseClipboard();
-    #endif
+
+    if (GetCopiedText (copiedText)) {
+        recentInput.append(copiedText);
         text.push_back(emptyVector);
-        AddTrack (true, line, column, copiedText);
+
         for (int i=0; i<copiedText.size(); i++)
             if (copiedText.at(i) != '\r' && copiedText.at(i) != '\t' &&
                 copiedText.at(i) != '\v' && copiedText.at(i) != '\0' &&
@@ -220,11 +201,6 @@ void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
 }
 
 void Editor::undo(int &line, int &column, vector<vector<char>> &text) {
-    if (partOfCharacterInput.size() < 6 && partOfCharacterInput.size() != 0) {
-        startColumn_partOfCharacter = column - partOfCharacterInput.size();
-        AddTrack (true, line, startColumn_partOfCharacter, partOfCharacterInput);
-        partOfCharacterInput = "";
-    }
     if (currentTrack > 0) {
         currentTrack--;
         column = GetTrack(currentTrack).startActioncolumn;
