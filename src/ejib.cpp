@@ -52,8 +52,6 @@ class Ejib_System: public EditCommand {
 int main() {
 	Ejib_System Ejib;
     thread get_TerminalColumnTheread = thread(&Editor::reSizeTerminal, Ejib);
-    thread RealTimeControlUndoStack (controlUndoStack, ref(lineSelected), ref(columnSelected), ref(recentInput));
 	Ejib.runSystem();
     get_TerminalColumnTheread.join();
-    RealTimeControlUndoStack.join();
 }

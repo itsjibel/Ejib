@@ -5,7 +5,6 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #endif
-string recentInput="";
 
 class Editor: public CommandLine {
 	public:
@@ -27,7 +26,7 @@ class Editor: public CommandLine {
 
 void Editor::getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text) {
     if (int(characterInput) > 31 && int(characterInput) < 127) {
-        recentInput.push_back(characterInput);
+        AddTrack (true, line, column, characterInput);
 
         if (column != text.at(line).size()) {
             text.at(line).insert (text.at(line).begin() + column, characterInput);
@@ -61,10 +60,12 @@ void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
     int numberLineDigits = floor(log10(biggestNumberLine) + 1);
 
     if (column > 0) {
+        AddTrack (false, line, column, text.at(line).at(column - 1));
         text.at(line).erase (text.at(line).begin() + column - 1);
         column--;
     } else {
         if (line > 0) {
+            AddTrack (false, line, column, text.at(line).at(column - 1));
             line--;
             column = text.at(line).size();
             column = text.at(line).size();
@@ -116,17 +117,21 @@ void Editor::enter(int &line, int &column, vector<vector<char>> &text) {
 
     text.at(line) = part1;
     text.insert (text.begin() + line + 1, part2);
+    AddTrack (true, line, column, "\n");
     line++;
     column=0;
 }
 
 void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
-    if (column != text.at(line).size())
+    if (column != text.at(line).size()) {
         for (int i = 0; i < 4; i++)
             text.at(line).insert (text.at(line).begin() + column, ' ');
-    else
+        AddTrack (true, line, column, "    ");
+    } else {
         for (int i = 0; i < 4; i++)
             text.at(line).push_back (' ');
+        AddTrack (true, line, column, "    ");
+    }
 
     column += 4;
 }
@@ -135,8 +140,8 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     string copiedText;
 
     if (GetCopiedText (copiedText)) {
-        recentInput.append(copiedText);
         text.push_back(emptyVector);
+        AddTrack (true, line, column, copiedText);
 
         for (int i=0; i<copiedText.size(); i++)
             if (copiedText.at(i) != '\r' && copiedText.at(i) != '\t' &&
@@ -221,6 +226,23 @@ void Editor::undo(int &line, int &column, vector<vector<char>> &text) {
 
                 if (!isMultipleLine)
                     text.at(ActionLine).erase (text.at(ActionLine).begin() + ActionColumn);
+            }
+        } else {
+            for (int i=0; i<GetTrack(currentTrack).changeString.size(); i++) {
+                vector<char> StringToVector;
+
+                for (char ch : GetTrack(currentTrack).changeString)
+                    StringToVector.push_back(ch);
+
+                if (GetTrack(currentTrack).changeString.at(i) == '\n') {
+                    ActionLine++;
+                    text.insert (text.begin() + ActionLine, StringToVector);
+                    isMultipleLine=true;
+                }
+
+                if (!isMultipleLine)
+                    for (char ch : GetTrack(currentTrack).changeString)
+                        text.at(ActionLine).insert (text.at(ActionLine).begin() + ActionColumn, ch);
             }
         }
         stack.pop_back();
