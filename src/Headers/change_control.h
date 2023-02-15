@@ -42,3 +42,50 @@ Track GetTrack(int TrackNumber) {
     else
         return stack.at(TrackNumber);
 }
+
+void undo(int &line, int &column, vector<vector<char>> &text) {
+    if (currentTrack > 0) {
+        currentTrack--;
+        column = GetTrack(currentTrack).startActioncolumn;
+        line   = GetTrack(currentTrack).startActionLine;
+
+        bool isMultipleLine=false;
+
+        if (GetTrack(currentTrack).isWirte) {
+            for (int i=0; i<GetTrack(currentTrack).changeString.size(); i++) {
+                if (GetTrack(currentTrack).changeString.at(i) == '\n') {
+                    text.erase (text.begin() + line + 1);
+                    isMultipleLine=true;
+                }
+
+                if (!isMultipleLine)
+                    text.at(line).erase (text.at(line).begin() + column);
+            }
+        } else {
+            for (int i=0; i<GetTrack(currentTrack).changeString.size(); i++) {
+
+                if (GetTrack(currentTrack).changeString.at(i) == '\n') {
+                    vector<char> StringToVector;
+                    if (GetTrack(currentTrack).changeMode != "Delete Line")
+                        for (int j=0; j<GetTrack(currentTrack).changeString.size() - 1; j++)
+                            text.at(line).pop_back();
+
+                    for (char ch : GetTrack(currentTrack).changeString)
+                        StringToVector.push_back(ch);
+                    
+                    StringToVector.erase(StringToVector.begin());
+                    text.insert (text.begin() + line + 1, StringToVector);
+                    if (GetTrack(currentTrack).changeMode == "Backspace" || GetTrack(currentTrack).changeMode == "Delete Line")
+                        line++;
+                    isMultipleLine=true;
+                }
+                if (!isMultipleLine)
+                    if (GetTrack(currentTrack).changeMode == "Backspace" || GetTrack(currentTrack).changeMode == "Delete")
+                        text.at(line).insert (text.at(line).begin() + column - 1, GetTrack(currentTrack).changeString.at(0));
+                    else
+                        text.at(line).insert (text.at(line).begin() + i, GetTrack(currentTrack).changeString.at(i));
+            }
+        }
+        stack.pop_back();
+    }
+}

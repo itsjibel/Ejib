@@ -20,7 +20,6 @@ class Editor: public CommandLine {
         void left        (int &line, int &column, const vector<vector<char>> &text);
         void down        (int &line, int &column, const vector<vector<char>> &text);
         void right       (int &line, int &column, const vector<vector<char>> &text);
-        void undo        (int &line, int &column,       vector<vector<char>> &text);
         void reSizeTerminal();
         void EDIT_SYSTEM();
 };
@@ -90,7 +89,7 @@ void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
 void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() != 0) {
         if (text.at(line).size() > column) {
-            AddTrack (false, line, column + 1, text.at(line).at(column), "Delete");
+            AddTrack (false, line, column, text.at(line).at(column), "Delete");
             text.at(line).erase (text.at(line).begin() + column);
         } else {
             if (line < text.size() - 1) {
@@ -111,11 +110,24 @@ void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
 }
 
 void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
-    if (text.size() > 0) {
-        line = line - 1 > 0 ? line - 1 : 0;
-        text.erase(text.begin() + line + 1);
+    if (text.size() > line) {
+        string cutLineChange;
+
+        for (int i=0; i<text.at(line).size(); i++)
+            cutLineChange.push_back (text.at(line).at(i));
+
+        if (line >= 1)
+            AddTrack (false, line - 1, column, '\n' + cutLineChange, "Delete Line");
+        else
+            AddTrack (false, 0, column, cutLineChange, "Delete Line");
+
+        text.erase(text.begin() + line);
         column=0;
     }
+
+    if (text.size() <= line)
+        line = line - 1 > 0 ? line - 1 : 0;
+
     if (text.size() == 0)
         text.push_back(emptyVector);
 }
@@ -216,52 +228,6 @@ void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
     if (line < text.size() - 1) {
         line++;
         column = column > text.at(line).size() ? text.at(line).size() : column;
-    }
-}
-
-void Editor::undo(int &line, int &column, vector<vector<char>> &text) {
-    if (currentTrack > 0) {
-        currentTrack--;
-        column = GetTrack(currentTrack).startActioncolumn;
-        line   = GetTrack(currentTrack).startActionLine;
-
-        bool isMultipleLine=false;
-
-        if (GetTrack(currentTrack).isWirte) {
-            for (int i=0; i<GetTrack(currentTrack).changeString.size(); i++) {
-                if (GetTrack(currentTrack).changeString.at(i) == '\n') {
-                    text.erase (text.begin() + line + 1);
-                    isMultipleLine=true;
-                }
-
-                if (!isMultipleLine)
-                    text.at(line).erase (text.at(line).begin() + column);
-            }
-        } else {
-            for (int i=0; i<GetTrack(currentTrack).changeString.size(); i++) {
-
-                if (GetTrack(currentTrack).changeString.at(i) == '\n') {
-                    vector<char> StringToVector;
-
-                    for (int j=0; j<GetTrack(currentTrack).changeString.size() - 1; j++)
-                        text.at(line).pop_back();
-
-                    for (char ch : GetTrack(currentTrack).changeString)
-                        StringToVector.push_back(ch);
-                    
-                    StringToVector.erase(StringToVector.begin());
-                    text.insert (text.begin() + line + 1, StringToVector);
-                    if (GetTrack(currentTrack).changeMode == "Backspace")
-                        line++;
-                    isMultipleLine=true;
-                }
-
-                if (!isMultipleLine)
-                    for (char ch : GetTrack(currentTrack).changeString)
-                        text.at(line).insert (text.at(line).begin() + column - 1, ch);
-            }
-        }
-        stack.pop_back();
     }
 }
 
