@@ -1,7 +1,7 @@
-#include "Headers/user_input.h"
+#include "Headers/user_input.hpp"
 
 #if (defined (_WIN32) || defined (_WIN64))
-#include "Headers/mingw.thread.h"
+#include "Headers/mingw.thread.hpp"
 #endif
 using std::ref;
 using std::thread;
