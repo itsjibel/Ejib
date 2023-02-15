@@ -1,8 +1,4 @@
 #include <string>
-#include <vector>
-#include <chrono>
-#include <thread>
-using std::vector;
 using std::string;
 
 struct Track
@@ -11,27 +7,30 @@ struct Track
     int startActionLine;
     int startActioncolumn;
     string changeString;
+    string changeMode;
 };
 vector<Track> stack;
 int currentTrack=0;
 
-void AddTrack(bool isWirte, int &startActionLine, int &startActionColumn, string changeString) {
+void AddTrack(bool isWirte, int startActionLine, int startActionColumn, string changeString, string changeMode) {
     Track TrackForAdd;
     TrackForAdd.changeString = changeString;
     TrackForAdd.startActioncolumn = startActionColumn;
     TrackForAdd.startActionLine = startActionLine;
     TrackForAdd.isWirte = isWirte;
+    TrackForAdd.changeMode = changeMode;
 
     stack.push_back(TrackForAdd);
     currentTrack++;
 }
 
-void AddTrack(bool isWirte, int &startActionLine, int &startActionColumn, char changeCharacter) {
+void AddTrack(bool isWirte, int startActionLine, int startActionColumn, char changeCharacter, string changeMode) {
     Track TrackForAdd;
     TrackForAdd.changeString = changeCharacter;
     TrackForAdd.startActioncolumn = startActionColumn;
     TrackForAdd.startActionLine = startActionLine;
     TrackForAdd.isWirte = isWirte;
+    TrackForAdd.changeMode = changeMode;
 
     stack.push_back(TrackForAdd);
     currentTrack++;
