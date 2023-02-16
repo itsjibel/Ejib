@@ -168,26 +168,39 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     if (GetCopiedText (copiedText)) {
         text.push_back(emptyVector);
         AddTrackToUndoStack (true, line, column, copiedText, "Paste");
+        vector<char> linkToEnd;
 
-        for (int i=0; i<copiedText.size(); i++)
+        for (int j=column; j<text.at(line).size(); j++)
+            linkToEnd.push_back(text.at(line).at(j));
+
+        for (int j=0; j<linkToEnd.size(); j++)
+            text.at(line).pop_back();
+
+        for (int i=0; i<copiedText.size(); i++) {
             if (copiedText.at(i) != '\r' && copiedText.at(i) != '\t' &&
                 copiedText.at(i) != '\v' && copiedText.at(i) != '\0' &&
                 copiedText.at(i) != '\f' && copiedText.at(i) != '\a' &&
                 copiedText.at(i) != '\e' && copiedText.at(i) != '\b') {
 
                 if (!(copiedText.at(i) == '\n'))
-                    text.at(line).push_back(copiedText.at(i));
+                    text.at(line).insert(text.at(line).begin() + column, copiedText.at(i));
+
+                column++;
 
                 if (copiedText.at(i) == '\n' || i == copiedText.size() - 1) {
+                    if (i != copiedText.size() - 1)
+                        column=0;
                     text.push_back(emptyVector);
                     line = i != copiedText.size() - 1 ? line + 1 : line;
                 }
 
             }
+        }
+
+        for (char ch : linkToEnd)
+            text.at(line).push_back(ch);
 
         for (int i=0; i<2; i++) text.pop_back();
-
-        column = text.at(line).size();
     }
 }
 
@@ -256,6 +269,7 @@ void Editor::EDIT_SYSTEM() {
                 case 24: deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
                 case 16: mode = "command";                                      SetConsoleTextAttribute(hConsole, 7);    break;
                 case 21: undo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
+                case 18:  redo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
                 default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
     }
     #endif
@@ -290,6 +304,7 @@ void Editor::EDIT_SYSTEM() {
         case 24:  deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
         case 16:  mode = "command";                                      setColor(37);                            break;
         case 21:  undo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
+        case 18:  redo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
         default:  getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
     }
     #endif
