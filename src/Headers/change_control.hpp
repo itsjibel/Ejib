@@ -69,7 +69,7 @@ void undo(int &line, int &column, vector<vector<char>> &text) {
         if (GetUndoTrack(currentUndoTrack).isWirte) {
             for (int i=0; i<GetUndoTrack(currentUndoTrack).changeString.size(); i++) {
                 if (GetUndoTrack(currentUndoTrack).changeString.at(i) == '\n') {
-                    lastLineDeleted = text.at(line+1);
+                    lastLineDeleted = text.at(line + 1);
                     text.erase (text.begin() + line + 1);
                     isMultipleLine=true;
                 }
@@ -77,7 +77,6 @@ void undo(int &line, int &column, vector<vector<char>> &text) {
                 if (!isMultipleLine)
                     text.at(line).erase (text.at(line).begin() + column);
             }
-
             for (char ch : lastLineDeleted)
                 text.at(line).push_back(ch);
 
