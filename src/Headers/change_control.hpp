@@ -161,11 +161,10 @@ void redo(int &line, int &column, vector<vector<char>> &text) {
             if (GetRedoTrack(currentRedoTrack).changeMode == "Paste") {
                 line++;
                 column--;
-                text.at(line).clear();
                 int j=GetRedoTrack(currentRedoTrack).changeString.size()-1;
 
                 while (GetRedoTrack(currentRedoTrack).changeString.at(j) != '\n') {
-                    text.at(line).insert(text.at(line).begin(), GetRedoTrack(currentRedoTrack).changeString.at(j));
+                    text.at(line).insert(text.at(line).begin() + column, GetRedoTrack(currentRedoTrack).changeString.at(j));
                     j--;
                 }
             }
