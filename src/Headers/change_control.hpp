@@ -134,12 +134,10 @@ void redo(int &line, int &column, vector<vector<char>> &text) {
             for (int i=0; i<GetRedoTrack(currentRedoTrack).changeString.size(); i++) {
                 if (GetRedoTrack(currentRedoTrack).changeString.at(i) == '\n') {
                     vector<char> StringToVector;
-                    
-                    for (int j=saveIndexLine; j<GetRedoTrack(currentRedoTrack).changeString.size(); j++) {
-                        StringToVector.push_back(GetRedoTrack(currentRedoTrack).changeString.at(j));
 
+                    for (int j=saveIndexLine; j<GetRedoTrack(currentRedoTrack).changeString.size(); j++) {
                         if (GetRedoTrack(currentRedoTrack).changeString.at(j) == '\n') {
-                            saveIndexLine=j;
+                            saveIndexLine=j+1;
 
                             if (!first_time)
                                 line++;
@@ -148,10 +146,10 @@ void redo(int &line, int &column, vector<vector<char>> &text) {
 
                             column=0;
                             break;
-                        }
+                        } else
+                            StringToVector.push_back(GetRedoTrack(currentRedoTrack).changeString.at(j));
                     }
-                    
-                    StringToVector.erase(StringToVector.begin());
+
                     text.insert (text.begin() + line, StringToVector);
                     isMultipleLine=true;
                 }

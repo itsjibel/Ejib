@@ -166,6 +166,7 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     string copiedText;
 
     if (GetCopiedText (copiedText)) {
+        cleaningText(copiedText);
         text.push_back(emptyVector);
         AddTrackToUndoStack (true, line, column, copiedText, "Paste");
         vector<char> linkToEnd;
@@ -177,23 +178,16 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
             text.at(line).pop_back();
 
         for (int i=0; i<copiedText.size(); i++) {
-            if (copiedText.at(i) != '\r' && copiedText.at(i) != '\t' &&
-                copiedText.at(i) != '\v' && copiedText.at(i) != '\0' &&
-                copiedText.at(i) != '\f' && copiedText.at(i) != '\a' &&
-                copiedText.at(i) != '\e' && copiedText.at(i) != '\b') {
+            if (!(copiedText.at(i) == '\n'))
+                text.at(line).insert(text.at(line).begin() + column, copiedText.at(i));
 
-                if (!(copiedText.at(i) == '\n'))
-                    text.at(line).insert(text.at(line).begin() + column, copiedText.at(i));
+            column++;
 
-                column++;
-
-                if (copiedText.at(i) == '\n' || i == copiedText.size() - 1) {
-                    if (i != copiedText.size() - 1)
-                        column=0;
-                    text.push_back(emptyVector);
-                    line = i != copiedText.size() - 1 ? line + 1 : line;
-                }
-
+            if (copiedText.at(i) == '\n' || i == copiedText.size() - 1) {
+                if (i != copiedText.size() - 1)
+                    column=0;
+                text.push_back(emptyVector);
+                line = i != copiedText.size() - 1 ? line + 1 : line;
             }
         }
 
