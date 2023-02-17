@@ -26,6 +26,7 @@ class Editor: public CommandLine {
 
 void Editor::getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text) {
     if (int(characterInput) > 31 && int(characterInput) < 127) {
+        RedoStack.clear();
         AddTrackToUndoStack (true, line, column, characterInput, "CharacterInput");
 
         if (column != text.at(line).size()) {
@@ -60,11 +61,13 @@ void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
     int numberLineDigits = floor(log10(biggestNumberLine) + 1);
 
     if (column > 0) {
+        RedoStack.clear();
         AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), "Backspace");
         text.at(line).erase (text.at(line).begin() + column - 1);
         column--;
     } else {
         if (line > 0) {
+            RedoStack.clear();
             string cutLineChange;
 
             for (int i=0; i<text.at(line).size(); i++)
@@ -89,15 +92,17 @@ void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
 void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() != 0) {
         if (text.at(line).size() > column) {
+            RedoStack.clear();
             AddTrackToUndoStack (false, line, column, text.at(line).at(column), "Delete");
             text.at(line).erase (text.at(line).begin() + column);
         } else {
+            RedoStack.clear();
             if (line < text.size() - 1) {
                 string cutLineChange;
 
                 for (int i=0; i<text.at(line + 1).size(); i++)
                     cutLineChange.push_back (text.at(line + 1).at(i));
-                
+
                 AddTrackToUndoStack (false, line, column, '\n' + cutLineChange, "Delete");
 
                 for (int i=0; i<text.at(line + 1).size(); i++)
@@ -111,6 +116,7 @@ void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
 
 void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() > line) {
+        RedoStack.clear();
         string cutLineChange;
 
         for (int i=0; i<text.at(line).size(); i++)
@@ -133,6 +139,7 @@ void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
 }
 
 void Editor::enter(int &line, int &column, vector<vector<char>> &text) {
+    RedoStack.clear();
     vector<char> part1, part2;
 
     for (int i=0; i<column; i++)
@@ -149,15 +156,12 @@ void Editor::enter(int &line, int &column, vector<vector<char>> &text) {
 }
 
 void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
-    if (column != text.at(line).size()) {
-        for (int i = 0; i < 4; i++)
-            text.at(line).insert (text.at(line).begin() + column, ' ');
-        AddTrackToUndoStack (true, line, column, "    ", "Tab");
-    } else {
-        for (int i = 0; i < 4; i++)
-            text.at(line).push_back (' ');
-        AddTrackToUndoStack (true, line, column, "    ", "Tab");
-    }
+    RedoStack.clear();
+
+    for (int i = 0; i < 4; i++)
+        text.at(line).insert (text.at(line).begin() + column, ' ');
+
+    AddTrackToUndoStack (true, line, column, "    ", "Tab");
 
     column += 4;
 }
@@ -166,6 +170,7 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     string copiedText;
 
     if (GetCopiedText (copiedText)) {
+        RedoStack.clear();
         cleaningText(copiedText);
         text.push_back(emptyVector);
         AddTrackToUndoStack (true, line, column, copiedText, "Paste");

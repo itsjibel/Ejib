@@ -13,9 +13,6 @@ struct Track
 };
 
 vector<Track> UndoStack, RedoStack;
-int currentUndoTrack=0, currentRedoTrack=0;
-
-
 
 void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColumn,
                          string changeString, string changeMode) {
@@ -27,7 +24,6 @@ void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColum
     TrackForAdd.changeMode = changeMode;
 
     UndoStack.push_back(TrackForAdd);
-    currentUndoTrack++;
 }
 
 void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColumn,
@@ -40,35 +36,27 @@ void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColum
     TrackForAdd.changeMode = changeMode;
 
     UndoStack.push_back(TrackForAdd);
-    currentUndoTrack++;
 }
 
-Track GetUndoTrack(int TrackNumber) {
-    if (TrackNumber == -1)
-        return UndoStack.back();
-    else
-        return UndoStack.at(TrackNumber);
+Track GetUndoTrack() {
+    return UndoStack.at(UndoStack.size() - 1);
 }
 
-Track GetRedoTrack(int TrackNumber) {
-    if (TrackNumber == -1)
-        return RedoStack.back();
-    else
-        return RedoStack.at(TrackNumber);
+Track GetRedoTrack() {
+    return RedoStack.at(RedoStack.size() - 1);
 }
 
 void undo(int &line, int &column, vector<vector<char>> &text) {
-    if (currentUndoTrack > 0) {
-        currentUndoTrack--;
+    if (UndoStack.size() > 0) {
         RedoStack.push_back(UndoStack.back());
-        column = GetUndoTrack(currentUndoTrack).startActioncolumn;
-        line   = GetUndoTrack(currentUndoTrack).startActionLine;
+        column = GetUndoTrack().startActioncolumn;
+        line   = GetUndoTrack().startActionLine;
         vector<char> lastLineDeleted;
         bool isMultipleLine=false;
 
-        if (GetUndoTrack(currentUndoTrack).isWirte) {
-            for (int i=0; i<GetUndoTrack(currentUndoTrack).changeString.size(); i++) {
-                if (GetUndoTrack(currentUndoTrack).changeString.at(i) == '\n') {
+        if (GetUndoTrack().isWirte) {
+            for (int i=0; i<GetUndoTrack().changeString.size(); i++) {
+                if (GetUndoTrack().changeString.at(i) == '\n') {
                     lastLineDeleted = text.at(line + 1);
                     text.erase (text.begin() + line + 1);
                     isMultipleLine=true;
@@ -83,96 +71,119 @@ void undo(int &line, int &column, vector<vector<char>> &text) {
                 text.at(line).push_back(ch);
 
             if (isMultipleLine)
-                if (GetRedoTrack(currentRedoTrack).changeMode == "Paste") {
-                    int j=GetRedoTrack(currentRedoTrack).changeString.size()-1;
+                if (GetRedoTrack().changeMode == "Paste") {
+                    int j=GetRedoTrack().changeString.size()-1;
 
-                    while (GetRedoTrack(currentRedoTrack).changeString.at(j) != '\n') {
+                    while (GetRedoTrack().changeString.at(j) != '\n') {
                         text.at(line).erase(text.at(line).begin() + column);
                         j--;
                     }
                 }
         } else {
-            for (int i=0; i<GetUndoTrack(currentUndoTrack).changeString.size(); i++) {
+            for (int i=0; i<GetUndoTrack().changeString.size(); i++) {
 
-                if (GetUndoTrack(currentUndoTrack).changeString.at(i) == '\n') {
+                if (GetUndoTrack().changeString.at(i) == '\n') {
                     vector<char> StringToVector;
-                    if (GetUndoTrack(currentUndoTrack).changeMode != "Delete Line")
-                        for (int j=0; j<GetUndoTrack(currentUndoTrack).changeString.size() - 1; j++)
+                    if (GetUndoTrack().changeMode != "Delete Line")
+                        for (int j=0; j<GetUndoTrack().changeString.size() - 1; j++)
                             text.at(line).pop_back();
 
-                    for (char ch : GetUndoTrack(currentUndoTrack).changeString)
+                    for (char ch : GetUndoTrack().changeString)
                         StringToVector.push_back(ch);
                     
                     StringToVector.erase(StringToVector.begin());
                     text.insert (text.begin() + line + 1, StringToVector);
-                    if (GetUndoTrack(currentUndoTrack).changeMode == "Backspace" || GetUndoTrack(currentUndoTrack).changeMode == "Delete Line")
+                    if (GetUndoTrack().changeMode == "Backspace" || GetUndoTrack().changeMode == "Delete Line")
                         line++;
                     isMultipleLine=true;
                 }
-                if (!isMultipleLine)
-                    if (GetUndoTrack(currentUndoTrack).changeMode == "Backspace" || GetUndoTrack(currentUndoTrack).changeMode == "Delete")
-                        text.at(line).insert (text.at(line).begin() + column - 1, GetUndoTrack(currentUndoTrack).changeString.at(0));
+                if (!isMultipleLine) {
+                    if (GetUndoTrack().changeMode == "Backspace")
+                        text.at(line).insert (text.at(line).begin() + column - 1, GetUndoTrack().changeString.at(0));
+                    else if (GetUndoTrack().changeMode == "Delete")
+                        text.at(line).insert (text.at(line).begin() + column, GetUndoTrack().changeString.at(0));
                     else
-                        text.at(line).insert (text.at(line).begin() + i, GetUndoTrack(currentUndoTrack).changeString.at(i));
+                        text.at(line).insert (text.at(line).begin() + i, GetUndoTrack().changeString.at(i));
+                }
             }
         }
         UndoStack.pop_back();
-        currentRedoTrack++;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 void redo(int &line, int &column, vector<vector<char>> &text) {
-    if (currentRedoTrack > 0) {
+    if (RedoStack.size() > 0) {
         UndoStack.push_back(RedoStack.back());
-        currentRedoTrack--;
-        int saveIndexLine=0;
-        bool isMultipleLine=false;
-        bool first_time=true;
-        if (GetRedoTrack(currentRedoTrack).isWirte) {
-            for (int i=0; i<GetRedoTrack(currentRedoTrack).changeString.size(); i++) {
-                if (GetRedoTrack(currentRedoTrack).changeString.at(i) == '\n') {
+        bool isMultipleLine=false, first_line=true;
+        if (GetRedoTrack().isWirte) {
+            int saveIndexLine=0;
+            vector<char> secondPartOfString;
+
+            for (int i=column; i<text.at(line).size(); i++)
+                secondPartOfString.push_back(text.at(line).at(i));
+
+            for (int i=0; i<secondPartOfString.size(); i++)
+                text.at(line).pop_back();
+
+            for (int i=0; i<GetRedoTrack().changeString.size(); i++) {
+                if (GetRedoTrack().changeString.at(i) == '\n') {
                     vector<char> StringToVector;
 
-                    for (int j=saveIndexLine; j<GetRedoTrack(currentRedoTrack).changeString.size(); j++) {
-                        if (GetRedoTrack(currentRedoTrack).changeString.at(j) == '\n') {
+                    for (int j=saveIndexLine; j<GetRedoTrack().changeString.size(); j++) {
+                        if (GetRedoTrack().changeString.at(j) == '\n') {
                             saveIndexLine=j+1;
-
-                            if (!first_time)
-                                line++;
-                            else
-                                first_time=false;
-
-                            column=0;
+                            column = 0;
+                            line = line + 1 <= text.size() - 1 ? line + 1 : line;
                             break;
                         } else
-                            StringToVector.push_back(GetRedoTrack(currentRedoTrack).changeString.at(j));
+                            StringToVector.push_back(GetRedoTrack().changeString.at(j));
                     }
 
-                    text.insert (text.begin() + line, StringToVector);
+                    if (!first_line)
+                        text.insert (text.begin() + line + 1, StringToVector);
+                    else
+                        first_line=false;
+
                     isMultipleLine=true;
                 }
 
-                if (!isMultipleLine)
-                    text.at(line).insert (text.at(line).begin() + column, GetRedoTrack(currentRedoTrack).changeString.at(i));
+                if (!isMultipleLine) {
+                    saveIndexLine = i+1;
+                    text.at(line).insert (text.at(line).begin() + column, GetRedoTrack().changeString.at(i));
+                }
                 column++;
             }
 
-            if (isMultipleLine)
-                if (GetRedoTrack(currentRedoTrack).changeMode == "Paste") {
-                    line++;
+            if (isMultipleLine) {
+                if (GetRedoTrack().changeMode == "Paste") {
+                    line+=2;
+                    text.insert(text.begin() + line, secondPartOfString);
                     column--;
-                    int j=GetRedoTrack(currentRedoTrack).changeString.size()-1;
+                    int j=GetRedoTrack().changeString.size()-1;
 
-                    while (GetRedoTrack(currentRedoTrack).changeString.at(j) != '\n') {
-                        text.at(line).insert(text.at(line).begin() + column, GetRedoTrack(currentRedoTrack).changeString.at(j));
+                    while (GetRedoTrack().changeString.at(j) != '\n') {
+                        text.at(line).insert(text.at(line).begin(), GetRedoTrack().changeString.at(j));
                         j--;
                     }
                 }
+            } else {
+                for (char ch : secondPartOfString)
+                    text.at(line).push_back(ch);
+            }
         } else {
+            for (int i=0; i<GetRedoTrack().changeString.size(); i++) {
+                if (text.at(line).size() > 0) {
+                    if (GetRedoTrack().changeMode == "Backspace") {
+                        column--;
+                        text.at(line).erase (text.at(line).begin() + column);
+                    } else if (GetRedoTrack().changeMode == "Delete") {
+                        text.at(line).erase (text.at(line).begin() + column);
+                    }
+                }
+            }
         }
         RedoStack.pop_back();
-        currentUndoTrack++;
     }
 }
