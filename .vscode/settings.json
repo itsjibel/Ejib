@@ -105,5 +105,6 @@
     "cfenv": "cpp",
     "typeindex": "cpp",
     "variant": "cpp"
-  }
+  },
+  "C_Cpp_Runner.useAddressSanitizer": false
 }
