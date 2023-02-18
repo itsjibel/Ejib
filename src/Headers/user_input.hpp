@@ -2,12 +2,11 @@
 #include "change_control.hpp"
 #if (defined (LINUX) || defined (__linux__))
 #include <stdio.h>
-#include <sys/ioctl.h>
 #include <thread>
-#include <unistd.h>
 #endif
 
-class Editor: public CommandLine {
+class Editor: public CommandLine
+{
 	public:
 		void INPUT_CHARACTER  (char characterInput, int &line,  int &column, vector<vector<char>> &text);
         void BACKSPACE        (int &line,           int &column,             vector<vector<char>> &text);
@@ -25,23 +24,32 @@ class Editor: public CommandLine {
         void reSizeTerminal();
         void EDIT_SYSTEM();
 };
-void Editor::INPUT_CHARACTER(char characterInput, int &line, int &column, vector<vector<char>> &text) {
-    if (int(characterInput) > 31 && int(characterInput) < 127) {
+
+void Editor::INPUT_CHARACTER(char characterInput, int &line, int &column, vector<vector<char>> &text)
+{
+    if (int(characterInput) > 31 && int(characterInput) < 127)
+    {
         RedoStack.clear();
         AddTrackToUndoStack (true, line, column, characterInput, "CharacterInput");
 
-        if (column != text.at(line).size()) {
+        if (column != text.at(line).size())
+        {
             text.at(line).insert (text.at(line).begin() + column, characterInput);
         } else {
             text.at(line).push_back (characterInput);
+            
             if (characterInput == '(')
                 text.at(line).push_back (')');
+
             else if (characterInput == '\"')
                 text.at(line).push_back ('\"');
+
             else if (characterInput == '\'')
                 text.at(line).push_back ('\'');
+
             else if (characterInput == '[')
                 text.at(line).push_back (']');
+
             else if (characterInput == '{')
                 text.at(line).push_back ('}');
         }
@@ -50,24 +58,29 @@ void Editor::INPUT_CHARACTER(char characterInput, int &line, int &column, vector
     }
 }
 
-void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text) {
+void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text)
+{
     int numberLines[10000] = {0}, biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
 
     for (int i=startPrintLine; i<range; i++)
         numberLines[i - startPrintLine] = i + 1;
+
     for (int i=0; i<TerminalLine - 2; i++)
         if (numberLines[i] > biggestNumberLine)
             biggestNumberLine = numberLines[i];
+
     int numberLineDigits = floor(log10(biggestNumberLine) + 1);
 
-    if (column > 0) {
+    if (column > 0)
+    {
         RedoStack.clear();
         AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), "Backspace");
         text.at(line).erase (text.at(line).begin() + column - 1);
         column--;
     } else {
-        if (line > 0) {
+        if (line > 0)
+        {
             RedoStack.clear();
             string cutLineChange;
 
@@ -81,6 +94,7 @@ void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text) {
 
             for (int i=0; i<text.at(line).size(); i++)
                 linkToEnd.push_back (text.at(line).at(i));
+
             for (int i=0; i<text.at(line + 1).size(); i++)
                 linkToEnd.push_back (text.at(line+1).at(i));
 
@@ -90,15 +104,19 @@ void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text) {
     }
 }
 
-void Editor::DELETE(int &line, int &column, vector<vector<char>> &text) {
-    if (text.size() != 0) {
-        if (text.at(line).size() > column) {
+void Editor::DELETE(int &line, int &column, vector<vector<char>> &text)
+{
+    if (text.size() != 0)
+    {
+        if (text.at(line).size() > column)
+        {
             RedoStack.clear();
             AddTrackToUndoStack (false, line, column, text.at(line).at(column), "Delete");
             text.at(line).erase (text.at(line).begin() + column);
         } else {
             RedoStack.clear();
-            if (line < text.size() - 1) {
+            if (line < text.size() - 1)
+            {
                 string cutLineChange;
 
                 for (int i=0; i<text.at(line + 1).size(); i++)
@@ -115,8 +133,10 @@ void Editor::DELETE(int &line, int &column, vector<vector<char>> &text) {
     }
 }
 
-void Editor::DELETE_LINE(int &line, int &column, vector<vector<char>> &text) {
-    if (text.size() > line) {
+void Editor::DELETE_LINE(int &line, int &column, vector<vector<char>> &text)
+{
+    if (text.size() > line)
+    {
         RedoStack.clear();
         string cutLineChange;
 
@@ -131,15 +151,15 @@ void Editor::DELETE_LINE(int &line, int &column, vector<vector<char>> &text) {
         text.erase(text.begin() + line);
         column=0;
     }
-
-    if (text.size() <= line)
-        line = line - 1 > 0 ? line - 1 : 0;
+    
+    line = text.size() <= line && line - 1 > 0 ? line - 1 : 0;
 
     if (text.size() == 0)
         text.push_back(emptyVector);
 }
 
-void Editor::ENTER(int &line, int &column, vector<vector<char>> &text) {
+void Editor::ENTER(int &line, int &column, vector<vector<char>> &text)
+{
     RedoStack.clear();
     vector<char> part1, part2;
 
@@ -156,7 +176,8 @@ void Editor::ENTER(int &line, int &column, vector<vector<char>> &text) {
     column=0;
 }
 
-void Editor::TAB(int &line, int &column, vector<vector<char>> &text) {
+void Editor::TAB(int &line, int &column, vector<vector<char>> &text)
+{
     RedoStack.clear();
 
     for (int i = 0; i < 4; i++)
@@ -167,10 +188,12 @@ void Editor::TAB(int &line, int &column, vector<vector<char>> &text) {
     column += 4;
 }
 
-void Editor::PASTE(int &line, int &column, vector<vector<char>> &text) {
+void Editor::PASTE(int &line, int &column, vector<vector<char>> &text)
+{
     string copiedText;
 
-    if (GetCopiedText (copiedText)) {
+    if (GetCopiedText (copiedText))
+    {
         RedoStack.clear();
         modificationText(copiedText);
         text.push_back(emptyVector);
@@ -183,13 +206,15 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text) {
         for (int j=0; j<linkToEnd.size(); j++)
             text.at(line).pop_back();
 
-        for (int i=0; i<copiedText.size(); i++) {
+        for (int i=0; i<copiedText.size(); i++)
+        {
             if (!(copiedText.at(i) == '\n'))
                 text.at(line).insert(text.at(line).begin() + column, copiedText.at(i));
 
             column++;
 
-            if (copiedText.at(i) == '\n' || i == copiedText.size() - 1) {
+            if (copiedText.at(i) == '\n' || i == copiedText.size() - 1)
+            {
                 if (i != copiedText.size() - 1)
                     column=0;
                 text.push_back(emptyVector);
@@ -204,18 +229,22 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text) {
     }
 }
 
-void Editor::UP(int &line, int &column, const vector<vector<char>> &text) {
-    if (line > 0) {
+void Editor::UP(int &line, int &column, const vector<vector<char>> &text)
+{
+    if (line > 0)
+    {
         line--;
         column = column > text.at(line).size() ? text.at(line).size() : column;
     }
 }
 
-void Editor::LEFT(int &line, int &column, const vector<vector<char>> &text) {
+void Editor::LEFT(int &line, int &column, const vector<vector<char>> &text)
+{
     column = column - 1 > -1 ? column - 1 : -1;
 
     if (column < 0)
-        if (line > 0) {
+        if (line > 0)
+        {
             line--;
             column = text.at(line).size();
         } else {
@@ -223,28 +252,30 @@ void Editor::LEFT(int &line, int &column, const vector<vector<char>> &text) {
         }
 }
 
-void Editor::RIGHT(int &line, int &column, const vector<vector<char>> &text) {
+void Editor::RIGHT(int &line, int &column, const vector<vector<char>> &text)
+{
     column++;
-    if (column > text.at(line).size()) {
-
-        if (line < text.size() - 1) {
+    if (column > text.at(line).size())
+        if (line < text.size() - 1)
+        {
             line++;
             column = 0;
         } else {
             column = text.at(line).size();
-        }
-
     }
 }
 
-void Editor::DOWN(int &line, int &column, const vector<vector<char>> &text) {
-    if (line < text.size() - 1) {
+void Editor::DOWN(int &line, int &column, const vector<vector<char>> &text)
+{
+    if (line < text.size() - 1)
+    {
         line++;
         column = column > text.at(line).size() ? text.at(line).size() : column;
     }
 }
 
-int Editor::biggestLineNumber() {
+int Editor::biggestLineNumber()
+{
     int numberLines[10000] = {0}, biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
 
@@ -258,7 +289,8 @@ int Editor::biggestLineNumber() {
     return biggestNumberLine;
 }
 
-bool Editor::updateViewport() {
+bool Editor::updateViewport()
+{
     int biggestNumberLine = biggestLineNumber();
     bool updated=false;
     while (lineSelected - startPrintLine > TerminalLine - 3) {
@@ -283,14 +315,52 @@ bool Editor::updateViewport() {
     return updated;
 }
 
-void Editor::EDIT_SYSTEM() {
+void Editor::reSizeTerminal()
+{
+    while(1)
+    {
+        bool sizeChanged=false;
+        TerminalLine = getTerminaLine_Column().at(0);
+        TerminalColumn = getTerminaLine_Column().at(1);
+        if ((TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp)
+            && (mode == "visual" || mode == "edit")) {
+            updateViewport();
+            #if (defined (_WIN32) || defined (_WIN64))
+            system("cls");
+            #endif
+            #if (defined (LINUX) || defined (__linux__))
+            system("clear");
+            #endif
+            printInfo();
+            printText(input, -1, -1, -1);
+            sizeChanged=true;
+        }
+        if (sizeChanged) {
+            printInfo();
+            printText(input, -1, -1, -1);
+        }
+        TerminalColumnTemp = TerminalColumn;
+        TerminalLineTemp = TerminalLine;
+        #if (defined (_WIN32) || defined (_WIN64))
+        Sleep(1);
+        #endif
+        #if (defined (LINUX) || defined (__linux__))
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        #endif
+    }
+}
+
+void Editor::EDIT_SYSTEM()
+{
     int ch;
     bool something_happen_in_text_view=false;
     #if (defined (_WIN32) || defined (_WIN64))
-    switch (ch = getch()) {
+    switch (ch = getch())
+    {
         case 0:
             case 0xE0:
-                switch(ch = getch()) {
+                switch(ch = getch())
+                {
                     case 72:
                         UP(lineSelected, columnSelected, input);
                         something_happen_in_text_view=true;
@@ -365,11 +435,14 @@ void Editor::EDIT_SYSTEM() {
     }
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    switch (ch = getch()) {
+    switch (ch = getch())
+    {
         case 27:
-            switch(ch = getch()) {
+            switch(ch = getch())
+            {
                 case 91:
-                    switch(ch = getch()) {
+                    switch(ch = getch())
+                    {
                         case 65:
                             UP(lineSelected, columnSelected, input);
                             something_happen_in_text_view=true;
@@ -387,7 +460,8 @@ void Editor::EDIT_SYSTEM() {
                             something_happen_in_text_view=true;
                             break;
                         case 51:
-                            switch(ch = getch()) {
+                            switch(ch = getch())
+                            {
                                 case 126: 
                                     DELETE(lineSelected, columnSelected, input);
                                     something_happen_in_text_view=true;
@@ -417,7 +491,9 @@ void Editor::EDIT_SYSTEM() {
             something_happen_in_text_view=true;
             break;
         case 22:
-            PASTE(lineSelected, columnSelected, input);               something_happen_in_text_view=true;   break;
+            PASTE(lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
         case 19:
             if (!fileSystem("save", input))
             {
@@ -452,57 +528,9 @@ void Editor::EDIT_SYSTEM() {
     if (updateViewport())
         something_happen_in_text_view=true;
 
-    if (something_happen_in_text_view) {
+    if (something_happen_in_text_view)
+    {
         printInfo();
         printText(input, -1, -1, -1);
-    }
-}
-void Editor::reSizeTerminal() {
-    while (1) {
-        bool sizeChanged=false;
-        #if (defined (_WIN32) || defined (_WIN64))
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-        TerminalColumn = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-        TerminalLine = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
-        struct winsize w;
-        ioctl (STDOUT_FILENO, TIOCGWINSZ, &w);
-        TerminalLine = w.ws_row;
-        TerminalColumn = w.ws_col;
-        #endif
-        if (mode == "visual" || mode == "edit") {
-            if (TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp) {
-                int biggestNumberLine = biggestLineNumber();
-
-                while (lineSelected - startPrintLine > TerminalLine - 3)
-                    startPrintLine++;
-                while (lineSelected - startPrintLine < 0)
-                    startPrintLine--;
-                while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 > TerminalColumn - 1)
-                    startPrintColumn++;
-                while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 < floor(log10(biggestNumberLine) + 1) + 1)
-                    startPrintColumn--;
-
-                system("clear");
-                printInfo();
-                printText(input, -1, -1, -1);
-                sizeChanged=true;
-            }
-        }
-        if (sizeChanged) {
-            printInfo();
-            printText(input, -1, -1, -1);
-        }
-        TerminalColumnTemp = TerminalColumn;
-        TerminalLineTemp = TerminalLine;
-        #if (defined (_WIN32) || defined (_WIN64))
-        Sleep(1);
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        #endif
     }
 }

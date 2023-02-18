@@ -1,6 +1,9 @@
 #include <iostream>
 #include <limits.h>
 #include <string>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <vector>
 #include <X11/Xlib.h>
 
 #if (defined (LINUX) || defined (__linux__))
@@ -27,35 +30,44 @@
 using std::cout;
 using std::string;
 using std::to_string;
+using std::vector;
 
 #if (defined (_WIN32) || defined (_WIN64))
 #include <windows.h>
 
 HANDLE hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
-void gotoxy (SHORT x, SHORT y) { SetConsoleCursorPosition (hConsole, COORD {x, y}); }
+void gotoxy (SHORT x, SHORT y)
+{
+    SetConsoleCursorPosition (hConsole, COORD {x, y});
+}
 
-void ShowConsoleCursor (bool showFlag) {
+void ShowConsoleCursor (bool showFlag)
+{
     CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo (hConsole, &cursorInfo);
     cursorInfo.bVisible = showFlag;
     SetConsoleCursorInfo (hConsole, &cursorInfo);
 }
 
-void setColor(int textColor) {
+void setColor(int textColor)
+{
     SetConsoleTextAttribute (hConsole, textColor);
 }
 #endif
 
 #if (defined (LINUX) || defined (__linux__))
-void gotoxy(int x, int y) {
+void gotoxy(int x, int y)
+{
     printf("%c[%d;%df", 0x1B, y + 1, x + 1);
 }
 
-void setColor(int textColor) {
+void setColor(int textColor)
+{
     cout<<"\033[" + to_string (textColor) + "m";
 }
 
-void ShowConsoleCursor (bool showFlag) {
+void ShowConsoleCursor (bool showFlag)
+{
     if (showFlag)
         printf("\e[?25h");
     else
@@ -63,7 +75,9 @@ void ShowConsoleCursor (bool showFlag) {
 }
 #endif
 
-void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd, const int &selectedLine, const int &currentLine) {
+void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
+                    const int &selectedLine, const int &currentLine)
+{
     string textPart;
     #if (defined (_WIN32) || defined (_WIN64))
     int8_t color=7, tempColor=7;
@@ -74,8 +88,11 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
     int index=0;
     bool sharpArea=false, quotationArea=false, angleBracketsArea=false, commentArea=false, selectedArea=false;
     char temp;
-    for (char character : text) {
-        if ((index == selectedCharacterStart || index == selectedCharacterEnd) && selectedLine == currentLine) {
+    for (char character : text)
+    {
+        if ((index == selectedCharacterStart || index == selectedCharacterEnd)
+            && selectedLine == currentLine)
+        {
             selectedArea = !selectedArea;
             #if (defined (_WIN32) || defined (_WIN64))
             color = 79;
@@ -100,9 +117,11 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
 
             sharpArea=false;
 
-            if (character == '<') {
+            if (character == '<')
+            {
                 for (int i=index; i<text.size(); i++)
-                    if (text.at(i) == '>') {
+                    if (text.at(i) == '>')
+                    {
                         angleBracketsArea = angleBracketsArea ? false : true;
                         break;
                     }
@@ -187,7 +206,8 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     quotationArea = false;
                 else
                     for (int i=index + 1; i<text.size(); i++)
-                        if (text.at(i) == '\"' || text.at(i) == '\'') {
+                        if (text.at(i) == '\"' || text.at(i) == '\'')
+                        {
                             quotationArea = !quotationArea;
                             break;
                         }
@@ -195,7 +215,8 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
             }
 
         } else {
-            if (!sharpArea && !quotationArea && !angleBracketsArea && !commentArea && !selectedArea) {
+            if (!sharpArea && !quotationArea && !angleBracketsArea && !commentArea && !selectedArea)
+            {
                 #if (defined (_WIN32) || defined (_WIN64))
                 color = 7;
                 #endif
@@ -206,7 +227,8 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
         }
         sharpArea = character == '#' ? true : sharpArea;
 
-        if (color != tempColor) {
+        if (color != tempColor)
+        {
             setColor(tempColor);
             cout<<textPart;
             setColor(0);
@@ -227,24 +249,29 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
     setColor(0);
 }
 
-Bool PrintSelection(Display *display, Window window, const char *bufname, const char *fmtname, string &text) {
+Bool PrintSelection(Display *display, Window window, const char *bufname,
+                    const char *fmtname, string &text)
+{
     char *result;
     unsigned long ressize, restail;
     int resbits;
-    Atom bufid  = XInternAtom(display, bufname, False),
-        fmtid  = XInternAtom(display, fmtname, False),
-        propid = XInternAtom(display, "XSEL_DATA", False),
-        incrid = XInternAtom(display, "INCR", False);
+    Atom bufid  = XInternAtom(display, bufname,     False),
+         fmtid  = XInternAtom(display, fmtname,     False),
+         propid = XInternAtom(display, "XSEL_DATA", False),
+         incrid = XInternAtom(display, "INCR",      False);
     XEvent event;
 
     XConvertSelection(display, bufid, fmtid, propid, window, CurrentTime);
-    do {
+
+    do
+    {
         XNextEvent(display, &event);
     } while (event.type != SelectionNotify || event.xselection.selection != bufid);
 
-    if (event.xselection.property) {
+    if (event.xselection.property)
+    {
         XGetWindowProperty(display, window, propid, 0, LONG_MAX/4, False, AnyPropertyType,
-        &fmtid, &resbits, &ressize, &restail, (unsigned char**)&result);
+                           &fmtid, &resbits, &ressize, &restail, (unsigned char**)&result);
 
         if (fmtid == incrid)
             printf("Buffer is too large and INCR reading is not implemented yet.\n");
@@ -257,7 +284,8 @@ Bool PrintSelection(Display *display, Window window, const char *bufname, const 
         return False;
 }
 
-bool GetCopiedText(string &copiedText) {
+bool GetCopiedText(string &copiedText)
+{
     #if (defined (LINUX) || defined (__linux__))
     Display *display = XOpenDisplay(NULL);
     unsigned long color = BlackPixel(display, DefaultScreen(display));
@@ -268,10 +296,30 @@ bool GetCopiedText(string &copiedText) {
     return result;
     #endif
     #if (defined (_WIN32) || defined (_WIN64))
-    if (OpenClipboard(NULL)) {
+    if (OpenClipboard(NULL))
+    {
         string copiedText = (char*)GetClipboardData(CF_TEXT);
         CloseClipboard();
         return true;
     } else return false;
     #endif
+}
+
+vector<int> getTerminaLine_Column()
+{
+    vector<int> TerminalSize;
+    #if (defined (_WIN32) || defined (_WIN64))
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    TerminalSize.push_back(csbi.srWindow.Right - csbi.srWindow.Left + 1);
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    TerminalSize.push_back(csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
+    struct winsize w;
+    ioctl (STDOUT_FILENO, TIOCGWINSZ, &w);
+    TerminalSize.push_back(w.ws_row);
+    TerminalSize.push_back(w.ws_col);
+    #endif
+    return TerminalSize;
 }

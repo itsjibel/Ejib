@@ -18,14 +18,12 @@ using std::vector;
 
 void modificationText (string &text)
 {
-    for (int i=0; i<text.size(); i++) {
+    for (int i=0; i<text.size(); i++)
         if (text.at(i) == '\r' || text.at(i) == '\t' ||
             text.at(i) == '\v' || text.at(i) == '\0' ||
             text.at(i) == '\f' || text.at(i) == '\a' ||
-            text.at(i) == '\e' || text.at(i) == '\b') {
+            text.at(i) == '\e' || text.at(i) == '\b')
             text.erase(text.begin() + i);
-        }
-    }
 }
 
 #if (defined (LINUX) || defined (__linux__))

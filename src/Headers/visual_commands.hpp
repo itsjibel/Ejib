@@ -1,6 +1,7 @@
 #include "user_input.hpp"
 
-class EditCommand: public Editor {
+class EditCommand: public Editor
+{
     private:
         vector<vector<char>> _editCommand;
         int _columnSelected=0, line=0;
@@ -8,15 +9,17 @@ class EditCommand: public Editor {
         string _string_editCommand;
 
     protected:
-        bool search(string key, vector<vector<char>> &text, int &line, int &column) {
+        bool search(string key, vector<vector<char>> &text, int &line, int &column)
+        {
             int previousColumn=column, tempLine=line, firstCatchColumn, firstCatchLine;
             bool first_time=true, anythingFound=false;
             column=-1; line=0;
             do {
                 string s;
+                int find_index;
+
                 for (char ch : text.at(line))
                     s.push_back(ch);
-                int find_index;
 
                 if (key.size() > 0)
                     find_index = column > 0 ? column : 0;
@@ -25,19 +28,23 @@ class EditCommand: public Editor {
 
                 column = s.find(key, find_index);
                     
-                if (column != string::npos) {
-                    if (anythingFound == false) {
+                if (column != string::npos)
+                {
+                    if (anythingFound == false)
+                    {
                         firstCatchColumn = column;
                         firstCatchLine = line;
                     }
                     anythingFound=true;
                 }
                 
-                while (column < 0) {
-                    if (text.size() > line + 1) {
+                while (column < 0)
+                {
+                    if (text.size() > line + 1)
                         line++;
-                    } else {
-                        if (anythingFound) {
+                    else {
+                        if (anythingFound)
+                        {
                             line=firstCatchLine;
                             column=firstCatchColumn;
                             break;
@@ -54,8 +61,10 @@ class EditCommand: public Editor {
 
                     column = s.find(key, 0);
 
-                    if (column != string::npos) {
-                        if (anythingFound == false) {
+                    if (column != string::npos)
+                    {
+                        if (anythingFound == false)
+                        {
                             firstCatchColumn = column;
                             firstCatchLine = line;
                         }
@@ -64,34 +73,20 @@ class EditCommand: public Editor {
                 }
 
                 column = column + key.size();
-
-                int numberLines[10000] = {0}, biggestNumberLine=0,
-                    range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
-                if (!(input.size() == 1 && input.at(0).size() == 0))
-                    for (int i=startPrintLine; i<range; i++)
-                        numberLines[i - startPrintLine] = i + 1;
-                for (int i=0; i<TerminalLine - 2; i++)
-                    if (numberLines[i] > biggestNumberLine)
-                        biggestNumberLine = numberLines[i];
-                while (lineSelected - startPrintLine > 27)
-                    startPrintLine++;
-                while (lineSelected - startPrintLine < 0)
-                    startPrintLine--;
-                while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 + key.size() > TerminalColumn - 1)
-                    startPrintColumn++;
-                while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 - key.size() < floor(log10(biggestNumberLine) + 1) + 1)
-                    startPrintColumn--;
-                    
+                updateViewport();
                 ShowConsoleCursor(false);
                 printInfo();
                 printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line);
             } while (getch() != 27);
+
             mode = "edit";
             return true;
         }
-        void editCommand() {
+        void editCommand()
+        {
             bool enter=false;
-            while (!enter) {
+            while (!enter)
+            {
                 int ch;
 
                 if (_editCommand.size() == 0)
@@ -103,26 +98,54 @@ class EditCommand: public Editor {
                 switch (ch = getch()) {
                     case 0:
                         case 0xE0:
-                            switch(ch = getch()) {
-                                case 75:  left        (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                                case 77:  right       (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                                case 'S': _delete     (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                                default: getCharacter (ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
+                            switch(ch = getch())
+                            {
+                                case 75:
+                                    left(line, _columnSelected, _editCommand);
+                                    _something_happen_in_text_view=true;
+                                    break;
+                                case 77:
+                                    right(line, _columnSelected, _editCommand);
+                                    _something_happen_in_text_view=true;
+                                    break;
+                                case 'S':
+                                    _delete(line, _columnSelected, _editCommand);
+                                    _something_happen_in_text_view=true;
+                                    break;
+                                default:
+                                    getCharacter(ch, line, _columnSelected, _editCommand);
+                                    _something_happen_in_text_view=true;
                             }
                             break;
-                            case 8:  backspace   (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
-                            case 9:  tab         (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
-                            case 22: paste       (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
-                            case 13: enter = true;                                                                               break;
-                            default: getCharacter(ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
+                            case 8:
+                                backspace(line, _columnSelected, _editCommand);
+                                _something_happen_in_text_view=true;
+                                break;
+                            case 9:
+                                tab(line, _columnSelected, _editCommand);
+                                _something_happen_in_text_view=true;
+                                break;
+                            case 22:
+                                paste(line, _columnSelected, _editCommand);
+                                _something_happen_in_text_view=true;
+                                break;
+                            case 13:
+                                enter = true;
+                                break;
+                            default:
+                                getCharacter(ch, line, _columnSelected, _editCommand);
+                                _something_happen_in_text_view=true;
                 }
                 #endif
                 #if (defined (LINUX) || defined (__linux__))
-                switch (ch = getch()) {
+                switch (ch = getch())
+                {
                     case 27:
-                        switch(ch = getch()) {
+                        switch(ch = getch())
+                        {
                             case 91:
-                                switch(ch = getch()) {
+                                switch(ch = getch())
+                                {
                                     case 68:
                                         LEFT(line, _columnSelected, _editCommand);
                                         break;
@@ -182,7 +205,9 @@ class EditCommand: public Editor {
                 cout<<"\e[1mcmd@edit: \e[0m";
                 setColor(32);
                 #endif
-                if (showBigCommandWarning) {
+
+                if (showBigCommandWarning)
+                {
                     #if (defined (_WIN32) || defined (_WIN64))
                     setColor(6);
                     #endif
@@ -216,7 +241,8 @@ class EditCommand: public Editor {
         };
 
         void showMassage(string massageType) {
-            if (massageType == "accept") {
+            if (massageType == "accept")
+            {
                 #if (defined (_WIN32) || defined (_WIN64))
                 setColor(10);
                 #endif
@@ -247,13 +273,15 @@ class EditCommand: public Editor {
             
         }
 
-        void editLine() {
+        void editLine()
+        {
             editCommand();
             _editCommand.clear();
             gotoxy (10, TerminalLine - 1);
             cout<<"                                     ";
 
-            if (_string_editCommand == "edit" || _string_editCommand == "E") {
+            if (_string_editCommand == "edit" || _string_editCommand == "E")
+            {
 
                 showMassage("accept");
                 mode = "edit";
@@ -278,27 +306,33 @@ class EditCommand: public Editor {
                 gotoxy (44, TerminalLine - 1);
                 cout<<"[+]";
 
-            } else if (_string_editCommand.find("text -S \"") == 0 || _string_editCommand.find("text --search \"") == 0) {
+            } else if (_string_editCommand.find("text -S \"")       == 0 ||
+                       _string_editCommand.find("text --search \"") == 0) {
                 string key;
                 bool isKey=false;
-                for (char ch : _string_editCommand) {
+                for (char ch : _string_editCommand)
+                {
                     if (isKey && ch != '\"')
                         key += ch;
+
                     if (isKey && ch == '\"')
                         isKey=false;
+
                     if (ch == '\"')
                         isKey=true;
                 }
-                if (!search(key, input, lineSelected, columnSelected)) {
+                if (!search(key, input, lineSelected, columnSelected))
                     showMassage("nothing found");
-                }
             } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
                 mode = "file";
-                if (!fileSystem("save", input)) {
+
+                if (!fileSystem("save", input))
+                {
                     system("clear");
                     printInfo();
                     printText(input, -1, -1, -1);
                 }
+
                 mode = "visual";
             } else {
                 showMassage("command not found");
