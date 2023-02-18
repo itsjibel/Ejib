@@ -17,6 +17,7 @@ class CommandLine : public File
 
     public:
         void printText(const vector<vector<char>> &text, const int &selectedCharacterStart, const int &selectedCharacterEnd, const int line);
+        void printTabs();
         void printInfo();
 
         void clearEditFile()
@@ -106,13 +107,15 @@ class CommandLine : public File
                 system ("clear");
                 #endif
                 printInfo();
+                printTabs();
                 printText(input, -1, -1, -1);
-                gotoxy (0, 0);
+                gotoxy (0, 2);
                 _firstError = true;
             } else if (cmd == "file -O" || cmd == "file --open") {
                 if (fileSystem("open", input) == true) {
                     mode = "edit";
                     printInfo();
+                    printTabs();
                     printText(input, -1, -1, -1);
                 } else {
                     #if (defined (_WIN32) || defined (_WIN64))
@@ -165,6 +168,40 @@ class CommandLine : public File
             }
         }
 };
+
+void CommandLine::printTabs() {
+    if (!haveFilePath) {
+        gotoxy (0, 0);
+        cout<<"  ";
+        setColor(44);
+        cout<<"  ";
+        setColor(0);
+        cout<<" \e[1mUntitled.txt\e[0m ";
+        setColor(44);
+        cout<<"  ";
+    } else {
+        gotoxy (0, 0);
+        cout<<"  ";
+        setColor(44);
+        cout<<"  ";
+        setColor(0);
+        cout<<" \e[1m"<<fileName<<"\e[0m ";
+        setColor(44);
+        cout<<"  ";
+    }
+    string bar;
+    for (int i=0; i<TerminalColumn; i++) bar+=" ";
+    gotoxy(0, 1);
+    #if (defined (_WIN32) || defined (_WIN64))
+    setColor(97);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
+    setColor(44);
+    #endif
+    cout<<bar;
+    setColor(0);
+}
+
 void CommandLine::printText(const vector<vector<char>> &text, const int &selectedCharacterStart,
                             const int &selectedCharacterEnd, const int line)
 {
@@ -205,9 +242,9 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
         }
 
     int numberDigits_Of_LargestLineNumber = floor(log10(biggestNumberLine) + 1);
-    gotoxy(0, 0);
+    gotoxy(0, 2);
 
-    for (int j=0; j<TerminalLine - 2; j++)
+    for (int j=0; j<TerminalLine - 4; j++)
         if (j<index)
         {
             for (int l=lines[j].size() % TerminalColumn; l<TerminalColumn; l++)
@@ -220,11 +257,11 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             if (numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1) != 0)
                 for (int i=0; i<=numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1); i++)
                 {
-                    gotoxy (i, j);
+                    gotoxy (i, j + 2);
                     cout<<" ";
                 }
 
-            gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1), j);
+            gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1), j + 2);
 
             #if (defined (_WIN32) || defined (_WIN64))
             setColor(15);
@@ -261,16 +298,16 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
     ShowConsoleCursor(true);
 
     if (text.at(0).size() == 0 && text.size() == 1)
-        gotoxy (0, 0);
+        gotoxy (0, 2);
     else
-        gotoxy (columnSelected - startPrintColumn + numberDigits_Of_LargestLineNumber + 1, lineSelected - startPrintLine);
+        gotoxy (columnSelected - startPrintColumn + numberDigits_Of_LargestLineNumber + 1, lineSelected - startPrintLine + 2);
 }
 void CommandLine::printInfo()
 {
     ShowConsoleCursor(false);
     gotoxy (0, TerminalLine - 2);
     string modeView;
-
+    
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
     modeView += "-- INSERT --";
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
@@ -286,7 +323,7 @@ void CommandLine::printInfo()
     setColor(97);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    setColor(43);
+    setColor(44);
     #endif
 
     cout<<modeView;
@@ -314,7 +351,7 @@ void CommandLine::printInfo()
     #endif
 
     #if (defined (LINUX) || defined (__linux__))
-    cout<<BOLD(FCYN("("<<int(percentageTextSeen)<<"%) "));
+    cout<<BOLD(FCYN(" ("<<int(percentageTextSeen)<<"%) "));
     #endif
     
     #if (defined (_WIN32) || defined (_WIN64))

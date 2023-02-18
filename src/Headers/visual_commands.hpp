@@ -257,14 +257,11 @@ void VisualCommand::VisualEdit()
             showMassage("nothing found");
     } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
         mode = "file";
-
-        if (!fileSystem("save", input))
-        {
-            system("clear");
-            printInfo();
-            printText(input, -1, -1, -1);
-        }
-
+        fileSystem("save", input);
+        system("clear");
+        printInfo();
+        printTabs();
+        printText(input, -1, -1, -1);
         mode = "visual";
     } else {
         showMassage("command not found");

@@ -78,7 +78,7 @@ char getche(void)
 
 class File
 {
-    private:
+    public:
         string filePath, fileName;
         bool haveFilePath=false;
         bool agreeFileSize=true;
@@ -133,6 +133,7 @@ class File
                     #if (defined (_WIN32) || defined (_WIN64))
                     setColor(2);
                     #endif
+                    system("clear");
                     gotoxy (0, 0);
                     cout<<"Enter file name(With extension): ";
                     ShowConsoleCursor(true);

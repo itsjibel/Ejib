@@ -293,11 +293,11 @@ bool Editor::updateViewport()
 {
     int biggestNumberLine = biggestLineNumber();
     bool updated=false;
-    while (lineSelected - startPrintLine > TerminalLine - 3) {
+    while (lineSelected + 2 - startPrintLine > TerminalLine - 3) {
         startPrintLine++;
         updated=true;
     }
-    while (lineSelected - startPrintLine < 0) {
+    while (lineSelected + 2 - startPrintLine < 2) {
         startPrintLine--;
         updated=true;
     }
@@ -334,6 +334,7 @@ void Editor::reSizeTerminal()
             system("clear");
             #endif
             printInfo();
+            printTabs();
             printText(input, -1, -1, -1);
             sizeChanged=true;
             ShowConsoleCursor(true);
@@ -342,6 +343,7 @@ void Editor::reSizeTerminal()
         if (sizeChanged)
         {
             printInfo();
+            printTabs();
             printText(input, -1, -1, -1);
         }
 
@@ -411,13 +413,14 @@ void Editor::EDIT_SYSTEM()
                     PASTE(lineSelected, columnSelected, input);
                     something_happen_in_text_view=true;
                     break;
-                case 19:
-                    if (!fileSystem("save", input))
-                    {
-                        system("cls");
-                        printInfo();
-                        printText(input, -1, -1, -1);
-                    }
+                case 6:
+                    mode = "file";
+                    fileSystem("save", input);
+                    system("clear");
+                    printInfo();
+                    printTabs();
+                    printText(input, -1, -1, -1);
+                    mode = "visual";
                     break;
                 case 24:
                     DELETE_LINE(lineSelected, columnSelected, input);
@@ -500,13 +503,14 @@ void Editor::EDIT_SYSTEM()
             PASTE(lineSelected, columnSelected, input);
             something_happen_in_text_view=true;
             break;
-        case 19:
-            if (!fileSystem("save", input))
-            {
-                system("clear");
-                printInfo();
-                printText(input, -1, -1, -1);
-            }
+        case 6:
+            mode = "file";
+            fileSystem("save", input);
+            system("clear");
+            printInfo();
+            printTabs();
+            printText(input, -1, -1, -1);
+            mode = "edit";
             break;
         case 24:
             DELETE_LINE(lineSelected, columnSelected, input);

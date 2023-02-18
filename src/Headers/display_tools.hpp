@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <limits.h>
 #include <string>
@@ -28,6 +29,8 @@
 #endif
 
 using std::cout;
+using std::cerr;
+using std::ifstream;
 using std::string;
 using std::to_string;
 using std::vector;
@@ -322,4 +325,25 @@ vector<int> getTerminaLine_Column()
     TerminalSize.push_back(w.ws_col);
     #endif
     return TerminalSize;
+}
+
+void loadLogo()
+{
+    string line;
+    ifstream myfile ("../EjibTextLogo.txt");
+    if (myfile.is_open())
+    {
+        while (getline(myfile, line))
+        {
+            cout<<line<<'\n';
+        }
+    } else {
+        #if (defined (LINUX) || defined (__linux__))
+        setColor(31);
+        #endif
+        #if (defined (_WIN32) || defined (_WIN64))
+        setColor(4);
+        #endif
+        cerr<<"[Path Error]: Unable to open logo file\n";
+    }
 }

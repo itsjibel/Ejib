@@ -30,7 +30,7 @@ class Ejib_System: public VisualCommand
                     #endif
                     #if (defined (LINUX) || defined (__linux__))
                     setColor(37);
-                    setColor(43);
+                    setColor(44);
                     #endif
                     cout<<modeView;
                     setColor(0);
@@ -49,6 +49,7 @@ int main()
     #if (defined (LINUX) || defined (__linux__))
     system("clear");
     #endif
+    loadLogo();
 	Ejib_System Ejib;
     std::thread get_TerminalColumnTheread = std::thread(&Editor::reSizeTerminal, Ejib);
 	Ejib.runSystem();
