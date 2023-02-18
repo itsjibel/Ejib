@@ -9,22 +9,23 @@
 
 class Editor: public CommandLine {
 	public:
-		void getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text);
-        void backspace   (int &line, int &column,       vector<vector<char>> &text);
-        void _delete     (int &line, int &column,       vector<vector<char>> &text);
-        void deleteLine  (int &line, int &column,       vector<vector<char>> &text);
-        void enter       (int &line, int &column,       vector<vector<char>> &text);
-        void tab         (int &line, int &column,       vector<vector<char>> &text);
-        void paste       (int &line, int &column,       vector<vector<char>> &text);
-        void up          (int &line, int &column, const vector<vector<char>> &text);
-        void left        (int &line, int &column, const vector<vector<char>> &text);
-        void down        (int &line, int &column, const vector<vector<char>> &text);
-        void right       (int &line, int &column, const vector<vector<char>> &text);
+		void INPUT_CHARACTER  (char characterInput, int &line,  int &column, vector<vector<char>> &text);
+        void BACKSPACE        (int &line,           int &column,             vector<vector<char>> &text);
+        void DELETE           (int &line,           int &column,             vector<vector<char>> &text);
+        void DELETE_LINE      (int &line,           int &column,             vector<vector<char>> &text);
+        void ENTER            (int &line,           int &column,             vector<vector<char>> &text);
+        void TAB              (int &line,           int &column,             vector<vector<char>> &text);
+        void PASTE            (int &line,           int &column,             vector<vector<char>> &text);
+        void UP               (int &line,           int &column,       const vector<vector<char>> &text);
+        void LEFT             (int &line,           int &column,       const vector<vector<char>> &text);
+        void DOWN             (int &line,           int &column,       const vector<vector<char>> &text);
+        void RIGHT            (int &line,           int &column,       const vector<vector<char>> &text);
+        int  biggestLineNumber();
+        bool updateViewport();
         void reSizeTerminal();
         void EDIT_SYSTEM();
 };
-
-void Editor::getCharacter(char characterInput, int &line, int &column, vector<vector<char>> &text) {
+void Editor::INPUT_CHARACTER(char characterInput, int &line, int &column, vector<vector<char>> &text) {
     if (int(characterInput) > 31 && int(characterInput) < 127) {
         RedoStack.clear();
         AddTrackToUndoStack (true, line, column, characterInput, "CharacterInput");
@@ -49,7 +50,7 @@ void Editor::getCharacter(char characterInput, int &line, int &column, vector<ve
     }
 }
 
-void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
+void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text) {
     int numberLines[10000] = {0}, biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
 
@@ -89,7 +90,7 @@ void Editor::backspace(int &line, int &column, vector<vector<char>> &text) {
     }
 }
 
-void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
+void Editor::DELETE(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() != 0) {
         if (text.at(line).size() > column) {
             RedoStack.clear();
@@ -114,7 +115,7 @@ void Editor::_delete(int &line, int &column, vector<vector<char>> &text) {
     }
 }
 
-void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
+void Editor::DELETE_LINE(int &line, int &column, vector<vector<char>> &text) {
     if (text.size() > line) {
         RedoStack.clear();
         string cutLineChange;
@@ -138,7 +139,7 @@ void Editor::deleteLine(int &line, int &column, vector<vector<char>> &text) {
         text.push_back(emptyVector);
 }
 
-void Editor::enter(int &line, int &column, vector<vector<char>> &text) {
+void Editor::ENTER(int &line, int &column, vector<vector<char>> &text) {
     RedoStack.clear();
     vector<char> part1, part2;
 
@@ -155,7 +156,7 @@ void Editor::enter(int &line, int &column, vector<vector<char>> &text) {
     column=0;
 }
 
-void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
+void Editor::TAB(int &line, int &column, vector<vector<char>> &text) {
     RedoStack.clear();
 
     for (int i = 0; i < 4; i++)
@@ -166,12 +167,12 @@ void Editor::tab(int &line, int &column, vector<vector<char>> &text) {
     column += 4;
 }
 
-void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
+void Editor::PASTE(int &line, int &column, vector<vector<char>> &text) {
     string copiedText;
 
     if (GetCopiedText (copiedText)) {
         RedoStack.clear();
-        cleaningText(copiedText);
+        modificationText(copiedText);
         text.push_back(emptyVector);
         AddTrackToUndoStack (true, line, column, copiedText, "Paste");
         vector<char> linkToEnd;
@@ -203,14 +204,14 @@ void Editor::paste(int &line, int &column, vector<vector<char>> &text) {
     }
 }
 
-void Editor::up(int &line, int &column, const vector<vector<char>> &text) {
+void Editor::UP(int &line, int &column, const vector<vector<char>> &text) {
     if (line > 0) {
         line--;
         column = column > text.at(line).size() ? text.at(line).size() : column;
     }
 }
 
-void Editor::left(int &line, int &column, const vector<vector<char>> &text) {
+void Editor::LEFT(int &line, int &column, const vector<vector<char>> &text) {
     column = column - 1 > -1 ? column - 1 : -1;
 
     if (column < 0)
@@ -222,7 +223,7 @@ void Editor::left(int &line, int &column, const vector<vector<char>> &text) {
         }
 }
 
-void Editor::right(int &line, int &column, const vector<vector<char>> &text) {
+void Editor::RIGHT(int &line, int &column, const vector<vector<char>> &text) {
     column++;
     if (column > text.at(line).size()) {
 
@@ -236,11 +237,50 @@ void Editor::right(int &line, int &column, const vector<vector<char>> &text) {
     }
 }
 
-void Editor::down(int &line, int &column, const vector<vector<char>> &text) {
+void Editor::DOWN(int &line, int &column, const vector<vector<char>> &text) {
     if (line < text.size() - 1) {
         line++;
         column = column > text.at(line).size() ? text.at(line).size() : column;
     }
+}
+
+int Editor::biggestLineNumber() {
+    int numberLines[10000] = {0}, biggestNumberLine=0,
+        range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
+
+    for (int i=startPrintLine; i<range; i++)
+        numberLines[i - startPrintLine] = i + 1;
+
+    for (int i=0; i<TerminalLine - 2; i++)
+        if (numberLines[i] > biggestNumberLine)
+            biggestNumberLine = numberLines[i];
+
+    return biggestNumberLine;
+}
+
+bool Editor::updateViewport() {
+    int biggestNumberLine = biggestLineNumber();
+    bool updated=false;
+    while (lineSelected - startPrintLine > TerminalLine - 3) {
+        startPrintLine++;
+        updated=true;
+    }
+    while (lineSelected - startPrintLine < 0) {
+        startPrintLine--;
+        updated=true;
+    }
+    while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 > TerminalColumn - 1)
+    {
+        startPrintColumn++;
+        updated=true;
+    }
+    
+    while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 < floor(log10(biggestNumberLine) + 1) + 1)
+    {
+        startPrintColumn--;
+        updated=true;
+    }
+    return updated;
 }
 
 void Editor::EDIT_SYSTEM() {
@@ -251,25 +291,77 @@ void Editor::EDIT_SYSTEM() {
         case 0:
             case 0xE0:
                 switch(ch = getch()) {
-                    case 72:  up(lineSelected,      columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 75:  left(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 77:  right(lineSelected,   columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 80:  down(lineSelected,    columnSelected, input);          something_happen_in_text_view=true; break;
-                    case 83: _delete(lineSelected, columnSelected, input);          something_happen_in_text_view=true; break;
-                    default:  getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
+                    case 72:
+                        UP(lineSelected, columnSelected, input);
+                        something_happen_in_text_view=true;
+                        break;
+                    case 75:
+                        LEFT(lineSelected,    columnSelected, input);
+                        something_happen_in_text_view=true;
+                        break;
+                    case 77:
+                        RIGHT(lineSelected,   columnSelected, input);
+                        something_happen_in_text_view=true;
+                        break;
+                    case 80:
+                        DOWN(lineSelected, columnSelected, input);
+                        something_happen_in_text_view=true;
+                        break;
+                    case 83:
+                        DELETE(lineSelected, columnSelected, input);
+                        something_happen_in_text_view=true;
+                        break;
+                    default:
+                        getCharacter(ch, lineSelected, columnSelected, input);
+                        something_happen_in_text_view=true;
                 }
                 break;
-                case 8:  backspace(lineSelected, columnSelected, input);        something_happen_in_text_view=true;      break;
-                case 2:  mode = "visual";                                                                                break;
-                case 13: enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
-                case 9:  tab(lineSelected, columnSelected, input);              something_happen_in_text_view=true;      break;
-                case 22: paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
-                case 19: if (!fileSystem("save", input)) { system("cls"); printInfo(); printText(input, -1, -1, -1); }   break;
-                case 24: deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
-                case 16: mode = "command";                                      SetConsoleTextAttribute(hConsole, 7);    break;
-                case 21: undo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
-                case 18:  redo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
-                default: getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
+                case 8:
+                    BACKSPACE(lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
+                    break;
+                case 2:
+                    mode = "visual";
+                    break;
+                case 13:
+                    ENTER(lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
+                    break;
+                case 9:
+                    TAB(lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
+                    break;
+                case 22:
+                    PASTE(lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
+                    break;
+                case 19:
+                    if (!fileSystem("save", input))
+                    {
+                        system("cls");
+                        printInfo();
+                        printText(input, -1, -1, -1);
+                    }
+                    break;
+                case 24:
+                    DELETE_LINE(lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
+                    break;
+                case 16:
+                    mode = "command";
+                    SetConsoleTextAttribute(hConsole, 7);
+                    break;
+                case 21:
+                    UNDO(lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
+                    break;
+                case 18:
+                    REDO(lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
+                    break;
+                default:
+                    INPUT_CHARACTER(ch, lineSelected, columnSelected, input);
+                    something_happen_in_text_view=true;
     }
     #endif
     #if (defined (LINUX) || defined (__linux__))
@@ -278,13 +370,28 @@ void Editor::EDIT_SYSTEM() {
             switch(ch = getch()) {
                 case 91:
                     switch(ch = getch()) {
-                        case 65:  up     (lineSelected, columnSelected, input); something_happen_in_text_view=true; break;
-                        case 68:  left   (lineSelected, columnSelected, input); something_happen_in_text_view=true; break;
-                        case 67:  right  (lineSelected, columnSelected, input); something_happen_in_text_view=true; break;
-                        case 66:  down   (lineSelected, columnSelected, input); something_happen_in_text_view=true; break;
+                        case 65:
+                            UP(lineSelected, columnSelected, input);
+                            something_happen_in_text_view=true;
+                            break;
+                        case 68:
+                            LEFT(lineSelected, columnSelected, input);
+                            something_happen_in_text_view=true;
+                            break;
+                        case 67:
+                            RIGHT(lineSelected, columnSelected, input);
+                            something_happen_in_text_view=true;
+                            break;
+                        case 66:
+                            DOWN(lineSelected, columnSelected, input);
+                            something_happen_in_text_view=true;
+                            break;
                         case 51:
                             switch(ch = getch()) {
-                                case 126:  _delete(lineSelected, columnSelected, input); something_happen_in_text_view=true; break;
+                                case 126: 
+                                    DELETE(lineSelected, columnSelected, input);
+                                    something_happen_in_text_view=true;
+                                    break;
                                 default: ;
                             }
                             break;
@@ -294,39 +401,56 @@ void Editor::EDIT_SYSTEM() {
                 default: ;
             }
             break;
-        case 127: backspace(lineSelected, columnSelected, input);        something_happen_in_text_view=true;      break;
-        case 2:   mode = "visual";                                                                                break;
-        case 10:  enter(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
-        case 9:   tab(lineSelected, columnSelected, input);              something_happen_in_text_view=true;      break;
-        case 22:  paste(lineSelected, columnSelected, input);            something_happen_in_text_view=true;      break;
-        case 19:  if (!fileSystem("save", input)) { system("clear"); printInfo(); printText(input, -1, -1, -1); } break;
-        case 24:  deleteLine(lineSelected, columnSelected, input);       something_happen_in_text_view=true;      break;
-        case 16:  mode = "command";                                      setColor(37);                            break;
-        case 21:  undo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
-        case 18:  redo(lineSelected, columnSelected, input);             something_happen_in_text_view=true;      break;
-        default:  getCharacter(ch, lineSelected, columnSelected, input); something_happen_in_text_view=true;
+        case 127:
+            BACKSPACE(lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        case 2:
+            mode = "visual";
+            break;
+        case 10:
+            ENTER(lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        case 9:
+            TAB(lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        case 22:
+            PASTE(lineSelected, columnSelected, input);               something_happen_in_text_view=true;   break;
+        case 19:
+            if (!fileSystem("save", input))
+            {
+                system("clear");
+                printInfo();
+                printText(input, -1, -1, -1);
+            }
+            break;
+        case 24:
+            DELETE_LINE(lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        case 16:
+            mode = "command";
+            system("clear");
+            setColor(37);
+            break;
+        case 21:
+            UNDO(lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        case 18:
+            UNDO(lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        default:
+            INPUT_CHARACTER(ch, lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
     }
     #endif
-    int numberLines[10000] = {0}, biggestNumberLine=0,
-        range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
-    for (int i=startPrintLine; i<range; i++)
-        numberLines[i - startPrintLine] = i + 1;
 
-    for (int i=0; i<TerminalLine - 2; i++)
-        if (numberLines[i] > biggestNumberLine)
-            biggestNumberLine = numberLines[i];
-
-    while (lineSelected - startPrintLine > TerminalLine - 3)
-        startPrintLine++;
-
-    while (lineSelected - startPrintLine < 0)
-        startPrintLine--;
-
-    while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 > TerminalColumn - 1)
-        startPrintColumn++;
-
-    while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 < floor(log10(biggestNumberLine) + 1) + 1)
-        startPrintColumn--;
+    if (updateViewport())
+        something_happen_in_text_view=true;
 
     if (something_happen_in_text_view) {
         printInfo();
@@ -351,14 +475,8 @@ void Editor::reSizeTerminal() {
         #endif
         if (mode == "visual" || mode == "edit") {
             if (TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp) {
-                int numberLines[10000] = {0}, biggestNumberLine=0,
-                    range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
-                for (int i=startPrintLine; i<range; i++)
-                    numberLines[i - startPrintLine] = i + 1;
+                int biggestNumberLine = biggestLineNumber();
 
-                for (int i=0; i<TerminalLine - 2; i++)
-                    if (numberLines[i] > biggestNumberLine)
-                        biggestNumberLine = numberLines[i];
                 while (lineSelected - startPrintLine > TerminalLine - 3)
                     startPrintLine++;
                 while (lineSelected - startPrintLine < 0)
@@ -388,286 +506,3 @@ void Editor::reSizeTerminal() {
         #endif
     }
 }
-
-
-class EditCommand: public Editor {
-    private:
-        vector<vector<char>> _editCommand;
-        int _columnSelected=0, line=0;
-        bool _something_happen_in_text_view=false;
-        string _string_editCommand;
-
-    protected:
-        bool search(string key, vector<vector<char>> &text, int &line, int &column) {
-            int previousColumn=column, tempLine=line, firstCatchColumn, firstCatchLine;
-            bool first_time=true, anythingFound=false;
-            column=-1; line=0;
-            do {
-                string s;
-                for (char ch : text.at(line))
-                    s.push_back(ch);
-                column = s.find(key, column + 1);
-                    
-                if (column != string::npos) {
-                    if (anythingFound == false) {
-                        firstCatchColumn = column;
-                        firstCatchLine = line;
-                    }
-                    anythingFound=true;
-                }
-                
-                while (column < 0) {
-                    if (text.size() > line + 1) {
-                        line++;
-                    } else {
-                        if (anythingFound) {
-                            line=firstCatchLine;
-                            column=firstCatchColumn;
-                            break;
-                        } else {
-                            column = previousColumn;
-                            line = tempLine;
-                            return false;
-                        }
-                    }
-                    s.clear();
-
-                    for (char ch : text.at(line))
-                        s.push_back(ch);
-
-                    column = s.find(key, 0);
-
-                    if (column != string::npos) {
-                        if (anythingFound == false) {
-                            firstCatchColumn = column;
-                            firstCatchLine = line;
-                        }
-                        anythingFound=true;
-                    }
-                }
-
-                column = column + key.size();
-
-                int numberLines[10000] = {0}, biggestNumberLine=0,
-                    range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
-                if (!(input.size() == 1 && input.at(0).size() == 0))
-                    for (int i=startPrintLine; i<range; i++)
-                        numberLines[i - startPrintLine] = i + 1;
-                for (int i=0; i<TerminalLine - 2; i++)
-                    if (numberLines[i] > biggestNumberLine)
-                        biggestNumberLine = numberLines[i];
-                while (lineSelected - startPrintLine > 27)
-                    startPrintLine++;
-                while (lineSelected - startPrintLine < 0)
-                    startPrintLine--;
-                while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 + key.size() > TerminalColumn - 1)
-                    startPrintColumn++;
-                while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 - key.size() < floor(log10(biggestNumberLine) + 1) + 1)
-                    startPrintColumn--;
-                    
-                ShowConsoleCursor(false);
-                printInfo();
-                printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line);
-            } while (getch() != 27);
-            mode = "edit";
-            return true;
-        }
-        void editCommand() {
-            bool enter=false;
-            while (!enter) {
-                int ch;
-
-                if (_editCommand.size() == 0)
-                    _editCommand.push_back(emptyVector);
-
-                _columnSelected = _columnSelected > _editCommand.at(0).size() ? _editCommand.at(0).size() : _columnSelected;
-
-                #if (defined (_WIN32) || defined (_WIN64))
-                switch (ch = getch()) {
-                    case 0:
-                        case 0xE0:
-                            switch(ch = getch()) {
-                                case 75:  left        (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                                case 77:  right       (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                                case 'S': _delete     (    line, _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                                default: getCharacter (ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
-                            }
-                            break;
-                            case 8:  backspace   (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
-                            case 9:  tab         (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
-                            case 22: paste       (line, _columnSelected, _editCommand);     _something_happen_in_text_view=true; break;
-                            case 13: enter = true;                                                                               break;
-                            default: getCharacter(ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
-                }
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                switch (ch = getch()) {
-                    case 27:
-                        switch(ch = getch()) {
-                            case 91:
-                                switch(ch = getch()) {
-                                    case 68:  left   (line, _columnSelected, _editCommand); break;
-                                    case 67:  right  (line, _columnSelected, _editCommand); break;
-                                    case 51:
-                                        switch(ch = getch()) {
-                                            case 126:  _delete(line, _columnSelected, _editCommand); break;
-                                            default: ;
-                                        }
-                                        break;
-                                    default: ;
-                                }
-                                break;
-                            default: ;
-                        }
-                        break;
-                    case 127: backspace     (line,     _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                    case 9:   tab           (line,     _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                    case 22:  paste         (line,     _columnSelected, _editCommand); _something_happen_in_text_view=true; break;
-                    case 10:  enter = true;                                                                                 break;
-                    default:  getCharacter  (ch, line, _columnSelected, _editCommand); _something_happen_in_text_view=true;
-                }
-                #endif
-                bool showBigCommandWarning=false;
-
-                while (_editCommand.at(0).size() > 32) {
-                    _editCommand.at(0).pop_back();
-                    showBigCommandWarning=true;
-                }
-                
-                ShowConsoleCursor(false);
-                gotoxy (0, TerminalLine - 1);
-                #if (defined (_WIN32) || defined (_WIN64))
-                setColor(10);
-                cout<<"cmd@edit: ";
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                setColor(32);
-                cout<<"\e[1mcmd@edit: \e[0m";
-                setColor(32);
-                #endif
-                if (showBigCommandWarning) {
-                    #if (defined (_WIN32) || defined (_WIN64))
-                    setColor(6);
-                    #endif
-                    #if (defined (LINUX) || defined (__linux__))
-                    setColor(33);
-                    #endif
-                    gotoxy (44, TerminalLine - 1);
-                    cout<<"[B]";
-                }
-
-                _string_editCommand="";
-
-                for (int i=0; i<_editCommand.at(0).size(); i++)
-                    _string_editCommand+=_editCommand.at(0).at(i);
-
-                gotoxy(10, TerminalLine - 1);
-                cout<<_string_editCommand;
-                int8_t range = _string_editCommand.length() == 32 ? 0 :  32 - _string_editCommand.length() % 32;
-                
-                for (int i=0; i<range; i++)
-                    cout<<' ';
-
-                _columnSelected = _string_editCommand.size() == 0 ? _columnSelected - 1 :_columnSelected;
-                _columnSelected = _columnSelected > 32 ? 32 : _columnSelected;
-                _columnSelected = _columnSelected < 0 ? 0 : _columnSelected;
-                ShowConsoleCursor(true);
-                gotoxy (10 + _columnSelected, TerminalLine - 1);
-                TerminalColumnTemp = TerminalColumn;
-                TerminalLineTemp = TerminalLine;
-            }
-        };
-
-        void showMassage(string massageType) {
-            if (massageType == "accept") {
-                #if (defined (_WIN32) || defined (_WIN64))
-                setColor(10);
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                setColor(32);
-                #endif
-                gotoxy (44, TerminalLine - 1);
-                cout<<"[+]";
-            } else if (massageType == "command not found") {
-                #if (defined (_WIN32) || defined (_WIN64))
-                setColor(4);
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                setColor(31);
-                #endif
-                gotoxy (44, TerminalLine - 1);
-                cout<<"[!]";
-            } else if (massageType == "nothing found") {
-                #if (defined (_WIN32) || defined (_WIN64))
-                setColor(4);
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                setColor(31);
-                #endif
-                gotoxy (44, TerminalLine - 1);
-                cout<<"[?]";
-            }
-            
-        }
-
-        void editLine() {
-            editCommand();
-            _editCommand.clear();
-            gotoxy (10, TerminalLine - 1);
-            cout<<"                                     ";
-
-            if (_string_editCommand == "edit" || _string_editCommand == "E") {
-
-                showMassage("accept");
-                mode = "edit";
-                printInfo();
-                printText(input, -1, -1, -1);
-            
-            } else if (_string_editCommand == "text -D" || _string_editCommand == "text --delete") {
-
-                showMassage("accept");
-                clearEditFile();
-                printInfo();
-                printText(input, -1, -1, -1);
-                ShowConsoleCursor (false);
-
-                #if (defined (_WIN32) || defined (_WIN64))
-                setColor(10);
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                setColor(32);
-                #endif
-
-                gotoxy (44, TerminalLine - 1);
-                cout<<"[+]";
-
-            } else if (_string_editCommand.find("text -S \"") == 0 || _string_editCommand.find("text --search \"") == 0) {
-                string key;
-                bool isKey=false;
-                for (char ch : _string_editCommand) {
-                    if (isKey && ch != '\"')
-                        key += ch;
-                    if (isKey && ch == '\"')
-                        isKey=false;
-                    if (ch == '\"')
-                        isKey=true;
-                }
-                if (!search(key, input, lineSelected, columnSelected)) {
-                    showMassage("nothing found");
-                }
-            } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
-                mode = "file";
-                if (!fileSystem("save", input)) {
-                    system("clear");
-                    printInfo();
-                    printText(input, -1, -1, -1);
-                }
-                mode = "visual";
-            } else {
-                showMassage("command not found");
-                gotoxy (10, TerminalLine - 1);
-                _columnSelected=0;
-                _string_editCommand="";
-            }
-        }
-};

@@ -46,7 +46,7 @@ Track GetRedoTrack() {
     return RedoStack.at(RedoStack.size() - 1);
 }
 
-void undo(int &line, int &column, vector<vector<char>> &text) {
+void UNDO(int &line, int &column, vector<vector<char>> &text) {
     if (UndoStack.size() > 0) {
         RedoStack.push_back(UndoStack.back());
         column = GetUndoTrack().startActioncolumn;
@@ -113,7 +113,7 @@ void undo(int &line, int &column, vector<vector<char>> &text) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-void redo(int &line, int &column, vector<vector<char>> &text) {
+void REDO(int &line, int &column, vector<vector<char>> &text) {
     if (RedoStack.size() > 0) {
         UndoStack.push_back(RedoStack.back());
         bool isMultipleLine=false, first_line=true;

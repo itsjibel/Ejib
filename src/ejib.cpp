@@ -1,29 +1,18 @@
-#include "Headers/user_input.hpp"
+#include "Headers/visual_commands.hpp"
 
 #if (defined (_WIN32) || defined (_WIN64))
 #include "Headers/mingw.thread.hpp"
 #endif
-using std::ref;
-using std::thread;
 
 class Ejib_System: public EditCommand {
-    private:
-        bool _enterToCommantMode=false;
-
     public:
         void runSystem() {
             while (1) {
-                if (mode == "edit") {
+                if (mode == "edit")
                     EDIT_SYSTEM();
-                    _enterToCommantMode= true;
-                }
 
-                if (mode == "command") {
-                    if (_enterToCommantMode)
-                        system ("clear");
-                    _enterToCommantMode=false;
+                if (mode == "command")
                     commandLine();
-                }
 
                 if (mode == "visual") {
                     ShowConsoleCursor(false);
@@ -51,7 +40,7 @@ class Ejib_System: public EditCommand {
 };
 int main() {
 	Ejib_System Ejib;
-    thread get_TerminalColumnTheread = thread(&Editor::reSizeTerminal, Ejib);
+    std::thread get_TerminalColumnTheread = std::thread(&Editor::reSizeTerminal, Ejib);
 	Ejib.runSystem();
     get_TerminalColumnTheread.join();
 }
