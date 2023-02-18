@@ -4,7 +4,7 @@
 #include "Headers/mingw.thread.hpp"
 #endif
 
-class Ejib_System: public EditCommand
+class Ejib_System: public VisualCommand
 {
     public:
         void runSystem() {
@@ -36,13 +36,19 @@ class Ejib_System: public EditCommand
                     setColor(0);
                     ShowConsoleCursor(true);
                     gotoxy (10, TerminalLine - 1);
-                    editLine();
+                    VisualEdit();
                 }
             }
         }
 };
 int main()
 {
+    #if (defined (_WIN32) || defined (_WIN64))
+    system("cls");
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
+    system("clear");
+    #endif
 	Ejib_System Ejib;
     std::thread get_TerminalColumnTheread = std::thread(&Editor::reSizeTerminal, Ejib);
 	Ejib.runSystem();

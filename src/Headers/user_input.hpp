@@ -322,8 +322,10 @@ void Editor::reSizeTerminal()
         bool sizeChanged=false;
         TerminalLine = getTerminaLine_Column().at(0);
         TerminalColumn = getTerminaLine_Column().at(1);
+
         if ((TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp)
-            && (mode == "visual" || mode == "edit")) {
+            && (mode == "visual" || mode == "edit"))
+        {
             updateViewport();
             #if (defined (_WIN32) || defined (_WIN64))
             system("cls");
@@ -334,11 +336,15 @@ void Editor::reSizeTerminal()
             printInfo();
             printText(input, -1, -1, -1);
             sizeChanged=true;
+            ShowConsoleCursor(true);
         }
-        if (sizeChanged) {
+
+        if (sizeChanged)
+        {
             printInfo();
             printText(input, -1, -1, -1);
         }
+
         TerminalColumnTemp = TerminalColumn;
         TerminalLineTemp = TerminalLine;
         #if (defined (_WIN32) || defined (_WIN64))
