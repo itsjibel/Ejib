@@ -282,10 +282,12 @@ void Editor::RIGHT(int &line, int &column, const vector<vector<char>> &text)
 
 void Editor::QUICK_UP(int &line, int &column, const vector<vector<char>> &text)
 {
-    if (line > 0)
-    {
-        line--;
-        column = column > text.at(line).size() ? text.at(line).size() : column;
+    for (int i=0; i<5; i++) {
+        if (line > 0)
+        {
+            line--;
+            column = column > text.at(line).size() ? text.at(line).size() : column;
+        }
     }
 }
 
@@ -309,10 +311,12 @@ void Editor::QUICK_LEFT(int &line, int &column, const vector<vector<char>> &text
 
 void Editor::QUICK_DOWN(int &line, int &column, const vector<vector<char>> &text)
 {
-    if (line < text.size() - 1)
-    {
-        line++;
-        column = column > text.at(line).size() ? text.at(line).size() : column;
+    for (int i=0; i<5; i++) {
+        if (line < text.size() - 1)
+        {
+            line++;
+            column = column > text.at(line).size() ? text.at(line).size() : column;
+        }
     }
 }
 
@@ -553,6 +557,14 @@ void Editor::EDIT_SYSTEM()
                                                     break;
                                                 case 67:
                                                     QUICK_RIGHT(lineSelected, columnSelected, input);
+                                                    something_happen_in_text_view=true;
+                                                    break;
+                                                case 65:
+                                                    QUICK_UP(lineSelected, columnSelected, input);
+                                                    something_happen_in_text_view=true;
+                                                    break;
+                                                case 66:
+                                                    QUICK_DOWN(lineSelected, columnSelected, input);
                                                     something_happen_in_text_view=true;
                                                     break;
                                                 default: ;
