@@ -82,7 +82,7 @@ class CommandLine : public File
             }
         }
 
-        void commandLine()
+        void COMMAND_LINE()
         {
             string cmd;
 
@@ -170,25 +170,19 @@ class CommandLine : public File
 };
 
 void CommandLine::printTabs() {
-    if (!haveFilePath) {
-        gotoxy (0, 0);
-        cout<<"  ";
-        setColor(44);
-        cout<<"  ";
-        setColor(0);
-        cout<<" \e[1mUntitled.txt\e[0m ";
-        setColor(44);
-        cout<<"  ";
-    } else {
-        gotoxy (0, 0);
-        cout<<"  ";
-        setColor(44);
-        cout<<"  ";
-        setColor(0);
-        cout<<" \e[1m"<<fileName<<"\e[0m ";
-        setColor(44);
-        cout<<"  ";
-    }
+    gotoxy (0, 0);
+    cout<<"  ";
+    setColor(44);
+    cout<<"  ";
+    setColor(0);
+    cout<<" \e[1m"<<fileName<<"\e[0m ";
+    setColor(44);
+    cout<<"  ";
+    setColor(0);
+
+    for (int i=8 + fileName.size(); i<TerminalColumn; i++)
+        cout<<" ";
+
     string bar;
     for (int i=0; i<TerminalColumn; i++) bar+=" ";
     gotoxy(0, 1);
@@ -205,7 +199,7 @@ void CommandLine::printTabs() {
 void CommandLine::printText(const vector<vector<char>> &text, const int &selectedCharacterStart,
                             const int &selectedCharacterEnd, const int line)
 {
-    int index=0, numberLines[10000] = {0};
+    int VisableLines=0, numberLines[10000] = {0};
     string blankView, lines[10000];
     int range = startPrintLine + TerminalLine - 2 <= text.size() ? startPrintLine + TerminalLine - 2 : text.size();
 
@@ -219,18 +213,18 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             {
                 if (countOfCharacters > TerminalColumn - 1) 
                 {
-                    index++;
+                    VisableLines++;
                     break;
                 }
-                lines[index] += text.at(i).at(j);
-                index = j == text.at(i).size() - 1 ? index + 1 : index;
+                lines[VisableLines] += text.at(i).at(j);
+                VisableLines = j == text.at(i).size() - 1 ? VisableLines + 1 : VisableLines;
                 countOfCharacters++;
             }
-            index = countOfCharacters == 0 ? index + 1 : index;
+            VisableLines = countOfCharacters == 0 ? VisableLines + 1 : VisableLines;
         }
         
-    if ((text.at(0).size() > 0 && index == 0))
-        index++;
+    if ((text.at(0).size() > 0 && VisableLines == 0))
+        VisableLines++;
 
     int biggestNumberLine=0, indexBiggestNumberLine=0;
 
@@ -245,7 +239,7 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
     gotoxy(0, 2);
 
     for (int j=0; j<TerminalLine - 4; j++)
-        if (j<index)
+        if (j<VisableLines)
         {
             for (int l=lines[j].size() % TerminalColumn; l<TerminalColumn; l++)
                 if (!(lines[j].size() % TerminalColumn == 0 && lines[j].size() > 0))
@@ -283,7 +277,7 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             setColor(0);
             colourizeText(lines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine);
         } else {
-            blankView += "$";
+            blankView += "~";
             for (int i=0; i<TerminalColumn - 1; i++) blankView += " ";
         }
 
@@ -291,17 +285,19 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
     setColor(5);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    setColor(35);
+    setColor(33);
     #endif
-    
+
     cout<<blankView;
     ShowConsoleCursor(true);
 
     if (text.at(0).size() == 0 && text.size() == 1)
         gotoxy (0, 2);
     else
-        gotoxy (columnSelected - startPrintColumn + numberDigits_Of_LargestLineNumber + 1, lineSelected - startPrintLine + 2);
+        gotoxy (columnSelected - startPrintColumn + numberDigits_Of_LargestLineNumber + 1,
+                lineSelected - startPrintLine + 2);
 }
+
 void CommandLine::printInfo()
 {
     ShowConsoleCursor(false);
@@ -310,7 +306,7 @@ void CommandLine::printInfo()
     
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
     modeView += "-- INSERT --";
-    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+    for (int i=0; i<TerminalColumn/2-5; i++) modeView+=" ";
 
     #if (defined (_WIN32) || defined (_WIN64))
     setColor(7);

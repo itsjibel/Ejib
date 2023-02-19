@@ -522,11 +522,19 @@ void Editor::EDIT_SYSTEM()
             setColor(37);
             break;
         case 21:
-            UNDO(lineSelected, columnSelected, input);
+            UNDO(1, lineSelected, columnSelected, input);
             something_happen_in_text_view=true;
             break;
         case 18:
-            UNDO(lineSelected, columnSelected, input);
+            REDO(1, lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        case 25:
+            UNDO(5, lineSelected, columnSelected, input);
+            something_happen_in_text_view=true;
+            break;
+        case 5:
+            REDO(5, lineSelected, columnSelected, input);
             something_happen_in_text_view=true;
             break;
         default:

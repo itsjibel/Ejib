@@ -16,6 +16,8 @@ using std::vector;
 #define mb 1048576
 #define kb 1024
 
+string filePath, fileName="untitled";
+
 void modificationText (string &text)
 {
     for (int i=0; i<text.size(); i++)
@@ -79,7 +81,6 @@ char getche(void)
 class File
 {
     public:
-        string filePath, fileName;
         bool haveFilePath=false;
         bool agreeFileSize=true;
         string byteConverter(long long int bytes)

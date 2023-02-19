@@ -4,17 +4,17 @@
 #include "Headers/mingw.thread.hpp"
 #endif
 
-class Ejib_System: public VisualCommand
+class EditorSystem: public VisualCommand
 {
     public:
-        void runSystem() {
+        void SYSTEM() {
             while (1)
             {
                 if (mode == "edit")
                     EDIT_SYSTEM();
 
                 if (mode == "command")
-                    commandLine();
+                    COMMAND_LINE();
 
                 if (mode == "visual")
                 {
@@ -41,6 +41,7 @@ class Ejib_System: public VisualCommand
             }
         }
 };
+
 int main()
 {
     #if (defined (_WIN32) || defined (_WIN64))
@@ -50,8 +51,8 @@ int main()
     system("clear");
     #endif
     loadLogo();
-	Ejib_System Ejib;
+	EditorSystem Ejib;
     std::thread get_TerminalColumnTheread = std::thread(&Editor::reSizeTerminal, Ejib);
-	Ejib.runSystem();
+	Ejib.SYSTEM();
     get_TerminalColumnTheread.join();
 }
