@@ -8,20 +8,26 @@
 class Editor: public CommandLine
 {
 	public:
-		void INPUT_CHARACTER  (char characterInput, int &line,  int &column, vector<vector<char>> &text);
-        void BACKSPACE        (int &line,           int &column,             vector<vector<char>> &text);
-        void DELETE           (int &line,           int &column,             vector<vector<char>> &text);
-        void DELETE_LINE      (int &line,           int &column,             vector<vector<char>> &text);
-        void ENTER            (int &line,           int &column,             vector<vector<char>> &text);
-        void TAB              (int &line,           int &column,             vector<vector<char>> &text);
-        void PASTE            (int &line,           int &column,             vector<vector<char>> &text);
-        void UP               (int &line,           int &column,       const vector<vector<char>> &text);
-        void LEFT             (int &line,           int &column,       const vector<vector<char>> &text);
-        void DOWN             (int &line,           int &column,       const vector<vector<char>> &text);
-        void RIGHT            (int &line,           int &column,       const vector<vector<char>> &text);
+		void INPUT_CHARACTER (char characterInput, int &line, int &column, vector<vector<char>> &text);
+        void BACKSPACE       (int &line, int &column, vector<vector<char>> &text);
+        void DELETE          (int &line, int &column, vector<vector<char>> &text);
+        void DELETE_LINE     (int &line, int &column, vector<vector<char>> &text);
+        void ENTER           (int &line, int &column, vector<vector<char>> &text);
+        void TAB             (int &line, int &column, vector<vector<char>> &text);
+        void PASTE           (int &line, int &column, vector<vector<char>> &text);
+
+        void UP          (int &line, int &column,  const vector<vector<char>> &text);
+        void LEFT        (int &line, int &column,  const vector<vector<char>> &text);
+        void DOWN        (int &line, int &column,  const vector<vector<char>> &text);
+        void RIGHT       (int &line, int &column,  const vector<vector<char>> &text);
+        void QUICK_UP    (int &line, int &column,  const vector<vector<char>> &text);
+        void QUICK_LEFT  (int &line, int &column,  const vector<vector<char>> &text);
+        void QUICK_DOWN  (int &line, int &column,  const vector<vector<char>> &text);
+        void QUICK_RIGHT (int &line, int &column,  const vector<vector<char>> &text);
+        
         int  biggestLineNumber();
         bool updateViewport();
-        void reSizeTerminal();
+        void AdjustingViewportWithSizeOfTerminal();
         void EDIT_SYSTEM();
 };
 
@@ -252,6 +258,15 @@ void Editor::LEFT(int &line, int &column, const vector<vector<char>> &text)
         }
 }
 
+void Editor::DOWN(int &line, int &column, const vector<vector<char>> &text)
+{
+    if (line < text.size() - 1)
+    {
+        line++;
+        column = column > text.at(line).size() ? text.at(line).size() : column;
+    }
+}
+
 void Editor::RIGHT(int &line, int &column, const vector<vector<char>> &text)
 {
     column++;
@@ -265,13 +280,58 @@ void Editor::RIGHT(int &line, int &column, const vector<vector<char>> &text)
     }
 }
 
-void Editor::DOWN(int &line, int &column, const vector<vector<char>> &text)
+void Editor::QUICK_UP(int &line, int &column, const vector<vector<char>> &text)
+{
+    if (line > 0)
+    {
+        line--;
+        column = column > text.at(line).size() ? text.at(line).size() : column;
+    }
+}
+
+void Editor::QUICK_LEFT(int &line, int &column, const vector<vector<char>> &text)
+{
+    do
+    {
+        column = column - 1 > -1 ? column - 1 : -1;
+        if (column < 0) {
+            if (line > 0)
+            {
+                line--;
+                column = text.at(line).size();
+            } else {
+                column=0;
+            }
+            return;
+        }
+    } while (!IsSeparatorCharacter(text.at(line).at(column)));
+}
+
+void Editor::QUICK_DOWN(int &line, int &column, const vector<vector<char>> &text)
 {
     if (line < text.size() - 1)
     {
         line++;
         column = column > text.at(line).size() ? text.at(line).size() : column;
     }
+}
+
+void Editor::QUICK_RIGHT(int &line, int &column, const vector<vector<char>> &text)
+{
+    do
+    {
+        column++;
+        if (column > text.at(line).size()) {
+            if (line < text.size() - 1)
+            {
+                line++;
+                column = 0;
+            } else {
+                column = text.at(line).size();
+            }
+            return;
+        }
+    } while (!IsSeparatorCharacter(text.at(line).at(column - 1)));
 }
 
 int Editor::biggestLineNumber()
@@ -315,7 +375,7 @@ bool Editor::updateViewport()
     return updated;
 }
 
-void Editor::reSizeTerminal()
+void Editor::AdjustingViewportWithSizeOfTerminal()
 {
     while(1)
     {
@@ -474,6 +534,32 @@ void Editor::EDIT_SYSTEM()
                                 case 126: 
                                     DELETE(lineSelected, columnSelected, input);
                                     something_happen_in_text_view=true;
+                                    break;
+                                default: ;
+                            }
+                            break;
+                        case 49:
+                            switch(ch = getch())
+                            {
+                                case 59: 
+                                    switch(ch = getch())
+                                    {
+                                        case 53:
+                                            switch(ch = getch())
+                                            {
+                                                case 68:
+                                                    QUICK_LEFT(lineSelected, columnSelected, input);
+                                                    something_happen_in_text_view=true;
+                                                    break;
+                                                case 67:
+                                                    QUICK_RIGHT(lineSelected, columnSelected, input);
+                                                    something_happen_in_text_view=true;
+                                                    break;
+                                                default: ;
+                                            }
+                                            break;
+                                        default: ;
+                                    }
                                     break;
                                 default: ;
                             }

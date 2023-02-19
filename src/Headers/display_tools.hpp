@@ -347,3 +347,22 @@ void loadLogo()
         cerr<<"[Path Error]: Unable to open logo file\n";
     }
 }
+
+bool IsSeparatorCharacter (char character) {
+    if
+    (
+        character == ' ' || character == '.' ||
+        character == '(' || character == ')' ||
+        character == '{' || character == '}' ||
+        character == '[' || character == ']' ||
+        character == '\''|| character == '\"'||
+        character == '<' || character == '>' ||
+        character == ':' || character == ';' ||
+        character == '+' || character == '-' ||
+        character == '/' || character == '*' ||
+        character == '^' || character == '='
+    )
+        return true;
+    else
+        return false;
+}

@@ -52,7 +52,7 @@ int main()
     #endif
     loadLogo();
 	EditorSystem Ejib;
-    std::thread get_TerminalColumnTheread = std::thread(&Editor::reSizeTerminal, Ejib);
+    std::thread ContorlViewportWithTerminalSize = std::thread(&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
 	Ejib.SYSTEM();
-    get_TerminalColumnTheread.join();
+    ContorlViewportWithTerminalSize.join();
 }
