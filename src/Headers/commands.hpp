@@ -139,10 +139,12 @@ class CommandLine : public File
             } else if (cmd == "help") {
                 showHelpFile("help.txt");
                 _firstError = true;
-            } else if (cmd == "file -H" || cmd == "file --help") {
+            } else if (cmd == "help -F" || cmd == "help --file") {
                 showHelpFile("file_help.txt");
-            } else if (cmd == "visual -H" || cmd == "visual --help") {
+            } else if (cmd == "help -V" || cmd == "help --visual") {
                 showHelpFile("visual_mode_help.txt");
+            } else if (cmd == "help -S" || cmd == "help --shortcuts") {
+                showHelpFile("shortcuts_help.txt");
             } else if (cmd == "") {} else {
                 if (_firstError)
                 {

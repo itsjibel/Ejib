@@ -1,0 +1,8 @@
+[ctrl + B] Go to visual command
+[ctrl + V] Paste to text
+[ctrl + U] Undo the text you wrote or deleted
+[ctrl + R] Redo the text you wrote or deleted
+[ctrl + Y] Fast Undo
+[ctrl + E] Fast Redo
+[ctrl + X] Delete current line
+[ctrl + P] Go to command mode
