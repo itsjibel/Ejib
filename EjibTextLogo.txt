@@ -11,6 +11,6 @@
 |         EEEEEEEEEEEEE       JJJJJ       IIIIIIII       BBBBBBBBBBBBBB          |
 |         EEEEEEEEEEEEE       JJJJJ       IIIIIIII       BBBBBBBBBBBBB           |
 |                            JJJJJ                                               |
-|                         JJJJJJJ                                        V0.8.0  |
+|                         JJJJJJJ                                        V1.0.0  |
 |________________________________________________________________________________|
 
