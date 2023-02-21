@@ -164,7 +164,7 @@ class File
                             setColor(4);
                             #endif
 
-                            cout<<"Unable to open file! (Make sure the path is correct)\n";
+                            cout<<"[Path Error]: Unable to open file! (Make sure the path is correct)\n";
 
                             #if (defined (LINUX) || defined (__linux__))
                             setColor(33);
@@ -173,7 +173,7 @@ class File
                             setColor(6);
                             #endif
 
-                            cout<<"Try again? [y/*] ";
+                            cout<<"[Warning]: Try again? [y/*] ";
                             tryAgain = getch() == 'y' ? true : false;
                             if (!tryAgain) return false;
                         }
@@ -213,7 +213,7 @@ class File
                         setColor(4);
                         #endif
 
-                        cout<<"Unable to open file! (Make sure the path is correct)\n";
+                        cout<<"[Path Error]: Unable to open file! (Make sure the path is correct)\n";
 
                         #if (defined (LINUX) || defined (__linux__))
                         setColor(33);
@@ -222,7 +222,7 @@ class File
                         setColor(6);
                         #endif
                         
-                        cout<<"Try again? [y/*] ";
+                        cout<<"[Warning]: Try again? [y/*] ";
                         tryAgain = getch() == 'y' ? true : false;
                         if (!tryAgain) return false;
 
@@ -281,7 +281,7 @@ bool File::loadFile(string filePath, string fileName, vector<vector<char>> &outp
         #if (defined (_WIN32) || defined (_WIN64))
         setColor(6);
         #endif
-        cout<<"Are you sure you want to open a "<<byteConverter((end-begin))<<" file? [y/*]";
+        cout<<"[Warning]: Are you sure you want to open a "<<byteConverter((end-begin))<<" file? [y/*]";
         if (getch() == 'y')
         {
             vector<char> emptyVector;

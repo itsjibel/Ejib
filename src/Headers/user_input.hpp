@@ -399,7 +399,7 @@ void Editor::AdjustingViewportWithSizeOfTerminal()
             #endif
             printInfo();
             printTabs();
-            printText(input, -1, -1, -1);
+            printText(input, -1, -1, lineSelected, columnSelected);
             sizeChanged=true;
             ShowConsoleCursor(true);
         }
@@ -408,7 +408,7 @@ void Editor::AdjustingViewportWithSizeOfTerminal()
         {
             printInfo();
             printTabs();
-            printText(input, -1, -1, -1);
+            printText(input, -1, -1, lineSelected, columnSelected);
         }
 
         TerminalColumnTemp = TerminalColumn;
@@ -483,7 +483,7 @@ void Editor::EDIT_SYSTEM()
                     system("clear");
                     printInfo();
                     printTabs();
-                    printText(input, -1, -1, -1);
+                    printText(input, -1, -1, lineSelected);
                     mode = "visual";
                     break;
                 case 24:
@@ -607,7 +607,7 @@ void Editor::EDIT_SYSTEM()
             system("clear");
             printInfo();
             printTabs();
-            printText(input, -1, -1, -1);
+            printText(input, -1, -1, lineSelected, columnSelected);
             mode = "edit";
             break;
         case 24:
@@ -647,6 +647,6 @@ void Editor::EDIT_SYSTEM()
     if (something_happen_in_text_view)
     {
         printInfo();
-        printText(input, -1, -1, -1);
+        printText(input, -1, -1, lineSelected, columnSelected);
     }
 }

@@ -16,7 +16,8 @@ class CommandLine : public File
         int8_t temp = 108;
 
     public:
-        void printText(const vector<vector<char>> &text, const int &selectedCharacterStart, const int &selectedCharacterEnd, const int line);
+        void printText(const vector<vector<char>> &text, const int &selectedCharacterStart,
+                       const int &selectedCharacterEnd,  const int &line, const int column);
         void printTabs();
         void printInfo();
 
@@ -108,7 +109,7 @@ class CommandLine : public File
                 #endif
                 printInfo();
                 printTabs();
-                printText(input, -1, -1, -1);
+                printText(input, -1, -1, lineSelected, columnSelected);
                 gotoxy (0, 2);
                 _firstError = true;
             } else if (cmd == "file -O" || cmd == "file --open") {
@@ -116,7 +117,7 @@ class CommandLine : public File
                     mode = "edit";
                     printInfo();
                     printTabs();
-                    printText(input, -1, -1, -1);
+                    printText(input, -1, -1, lineSelected, columnSelected);
                 } else {
                     #if (defined (_WIN32) || defined (_WIN64))
                     system ("cls");
@@ -199,7 +200,7 @@ void CommandLine::printTabs() {
 }
 
 void CommandLine::printText(const vector<vector<char>> &text, const int &selectedCharacterStart,
-                            const int &selectedCharacterEnd, const int line)
+                            const int &selectedCharacterEnd,  const int &line, const int column)
 {
     int VisableLines=0, numberLines[10000] = {0};
     string blankView, lines[10000];
@@ -277,7 +278,7 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
 
             cout<<" ";
             setColor(0);
-            colourizeText(lines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine);
+            colourizeText(lines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine, column);
         } else {
             blankView += "~";
             for (int i=0; i<TerminalColumn - 1; i++) blankView += " ";

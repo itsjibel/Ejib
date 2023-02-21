@@ -218,14 +218,14 @@ void VisualCommand::VisualEdit()
         showMassage("accept");
         mode = "edit";
         printInfo();
-        printText(input, -1, -1, -1);
+        printText(input, -1, -1, lineSelected, columnSelected);
     
     } else if (_string_editCommand == "text -D" || _string_editCommand == "text --delete") {
 
         showMassage("accept");
         clearEditFile();
         printInfo();
-        printText(input, -1, -1, -1);
+        printText(input, -1, -1, lineSelected, columnSelected);
         ShowConsoleCursor (false);
 
         #if (defined (_WIN32) || defined (_WIN64))
@@ -261,7 +261,7 @@ void VisualCommand::VisualEdit()
         system("clear");
         printInfo();
         printTabs();
-        printText(input, -1, -1, -1);
+        printText(input, -1, -1, lineSelected, columnSelected);
         mode = "visual";
     } else {
         showMassage("command not found");
@@ -338,7 +338,7 @@ bool VisualCommand::search(string key, vector<vector<char>> &text, int &line, in
         updateViewport();
         ShowConsoleCursor(false);
         printInfo();
-        printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line);
+        printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line, column);
     } while (getch() != 27);
 
     mode = "edit";
