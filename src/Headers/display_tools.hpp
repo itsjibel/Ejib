@@ -193,7 +193,7 @@ bool IsSeparatorCharacter (char character) {
         return false;
 }
 
-bool ScopeCharacterIsOpen=false, ScopeCharacterIsClose=false;
+bool ScopeCharacterIsOpen=false, ScopeCharacterIsClose=false, tempScopeCharacterIsClose=false;
 
 void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
                     const int &selectedLine, const int &currentLine, const int &column)
@@ -253,41 +253,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     character == '}' || character == '[' || character == ']') &&
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea) {
-            if (((column == index && selectedLine == currentLine) ||
-                  ScopeCharacterIsClose) && character == '{')
-            {
-                #if (defined (_WIN32) || defined (_WIN64))
-                color = 3;
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                color = 46;
-                #endif
-                ScopeCharacterIsOpen=true;
-                ScopeCharacterIsClose=false;
-            } else if (((column == index && selectedLine == currentLine) ||
-                         ScopeCharacterIsOpen) && character == '}') {
-
-                #if (defined (_WIN32) || defined (_WIN64))
-                color = 3;
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                color = 46;
-                #endif
-
-                if (ScopeCharacterIsOpen)
-                    ScopeCharacterIsOpen=false;
-                if (column == index)
-                    ScopeCharacterIsClose=true;
-            } else {
-                #if (defined (_WIN32) || defined (_WIN64))
-                color = 3;
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                color = 36;
-                #endif
-            }
-
-
+            color = 36;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -373,6 +339,23 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                 #endif
             }
         }
+
+        if (((column == index && selectedLine == currentLine) ||
+                ScopeCharacterIsClose) && character == '{')
+        {
+            color = 46;
+            if (column == index && selectedLine == currentLine)
+                ScopeCharacterIsOpen=true;
+            ScopeCharacterIsClose=false;
+        } else if (((column == index && selectedLine == currentLine) ||
+                        ScopeCharacterIsOpen) && character == '}') {
+            color = 46;
+            if (ScopeCharacterIsOpen)
+                ScopeCharacterIsOpen=false;
+            if (column == index)
+                ScopeCharacterIsClose=true;
+        }
+
         sharpArea = character == '#' ? true : sharpArea;
 
         if (color != tempColor)

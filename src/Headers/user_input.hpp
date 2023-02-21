@@ -648,5 +648,10 @@ void Editor::EDIT_SYSTEM()
     {
         printInfo();
         printText(input, -1, -1, lineSelected, columnSelected);
+
+        if (ScopeCharacterIsClose != tempScopeCharacterIsClose)
+            printText(input, -1, -1, lineSelected, columnSelected);
+
+        tempScopeCharacterIsClose = ScopeCharacterIsClose;
     }
 }
