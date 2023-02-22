@@ -24,8 +24,12 @@ void modificationText (string &text)
         if (text.at(i) == '\r' || text.at(i) == '\t' ||
             text.at(i) == '\v' || text.at(i) == '\0' ||
             text.at(i) == '\f' || text.at(i) == '\a' ||
-            text.at(i) == '\e' || text.at(i) == '\b')
-            text.erase(text.begin() + i);
+            text.at(i) == '\e' || text.at(i) == '\b') {
+                if (text.at(i) == '\t') {
+                    text.erase(text.begin() + i);
+                    text.insert(text.begin() + i, {' ', ' ', ' ', ' '});
+                } else text.erase(text.begin() + i);
+            }
 }
 
 #if (defined (LINUX) || defined (__linux__))

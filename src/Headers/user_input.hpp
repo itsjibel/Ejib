@@ -36,7 +36,8 @@ void Editor::INPUT_CHARACTER(char characterInput, int &line, int &column, vector
     if (int(characterInput) > 31 && int(characterInput) < 127)
     {
         RedoStack.clear();
-        AddTrackToUndoStack (true, line, column, characterInput, "CharacterInput");
+        if (mode != "visual")
+            AddTrackToUndoStack (true, line, column, characterInput, "CharacterInput");
 
         if (column != text.at(line).size())
         {
@@ -81,7 +82,8 @@ void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text)
     if (column > 0)
     {
         RedoStack.clear();
-        AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), "Backspace");
+        if (mode != "visual")
+            AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), "Backspace");
         text.at(line).erase (text.at(line).begin() + column - 1);
         column--;
     } else {
@@ -92,8 +94,8 @@ void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text)
 
             for (int i=0; i<text.at(line).size(); i++)
                 cutLineChange.push_back (text.at(line).at(i));
-
-            AddTrackToUndoStack (false, line - 1, column, '\n' + cutLineChange, "Backspace");
+            if (mode != "visual")
+                AddTrackToUndoStack (false, line - 1, column, '\n' + cutLineChange, "Backspace");
             line--;
             column = text.at(line).size();
             vector<char> linkToEnd;
@@ -117,7 +119,8 @@ void Editor::DELETE(int &line, int &column, vector<vector<char>> &text)
         if (text.at(line).size() > column)
         {
             RedoStack.clear();
-            AddTrackToUndoStack (false, line, column, text.at(line).at(column), "Delete");
+            if (mode != "visual")
+                AddTrackToUndoStack (false, line, column, text.at(line).at(column), "Delete");
             text.at(line).erase (text.at(line).begin() + column);
         } else {
             RedoStack.clear();
@@ -127,8 +130,8 @@ void Editor::DELETE(int &line, int &column, vector<vector<char>> &text)
 
                 for (int i=0; i<text.at(line + 1).size(); i++)
                     cutLineChange.push_back (text.at(line + 1).at(i));
-
-                AddTrackToUndoStack (false, line, column, '\n' + cutLineChange, "Delete");
+                if (mode != "visual")
+                    AddTrackToUndoStack (false, line, column, '\n' + cutLineChange, "Delete");
 
                 for (int i=0; i<text.at(line + 1).size(); i++)
                     text.at(line).push_back(text.at(line + 1).at(i));
@@ -150,9 +153,11 @@ void Editor::DELETE_LINE(int &line, int &column, vector<vector<char>> &text)
             cutLineChange.push_back (text.at(line).at(i));
 
         if (line >= 1)
-            AddTrackToUndoStack (false, line - 1, column, '\n' + cutLineChange, "Delete Line");
+            if (mode != "visual")
+                AddTrackToUndoStack (false, line - 1, column, '\n' + cutLineChange, "Delete Line");
         else
-            AddTrackToUndoStack (false, 0, column, cutLineChange, "Delete Line");
+            if (mode != "visual")
+                AddTrackToUndoStack (false, 0, column, cutLineChange, "Delete Line");
 
         text.erase(text.begin() + line);
         column=0;
@@ -177,7 +182,8 @@ void Editor::ENTER(int &line, int &column, vector<vector<char>> &text)
 
     text.at(line) = part1;
     text.insert (text.begin() + line + 1, part2);
-    AddTrackToUndoStack (true, line, column, '\n', "Enter");
+    if (mode != "visual")
+        AddTrackToUndoStack (true, line, column, '\n', "Enter");
     line++;
     column=0;
 }
@@ -188,8 +194,8 @@ void Editor::TAB(int &line, int &column, vector<vector<char>> &text)
 
     for (int i = 0; i < 4; i++)
         text.at(line).insert (text.at(line).begin() + column, ' ');
-
-    AddTrackToUndoStack (true, line, column, "    ", "Tab");
+    if (mode != "visual")
+        AddTrackToUndoStack (true, line, column, "    ", "Tab");
 
     column += 4;
 }
@@ -203,7 +209,8 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text)
         RedoStack.clear();
         modificationText(copiedText);
         text.push_back(emptyVector);
-        AddTrackToUndoStack (true, line, column, copiedText, "Paste");
+        if (mode != "visual")
+            AddTrackToUndoStack (true, line, column, copiedText, "Paste");
         vector<char> linkToEnd;
 
         for (int j=column; j<text.at(line).size(); j++)
