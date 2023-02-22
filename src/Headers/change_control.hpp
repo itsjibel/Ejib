@@ -57,10 +57,10 @@ void UNDO(int howManyTimes, int &line, int &column, vector<vector<char>> &text)
             RedoStack.push_back(UndoStack.back());
             column = GetUndoTrack().startActioncolumn;
             line   = GetUndoTrack().startActionLine;
-            vector<char> lastLineDeleted;
             bool isMultipleLine=false;
 
             if (GetUndoTrack().isWirte) {
+                vector<char> lastLineDeleted;
                 for (int i=0; i<GetUndoTrack().changeString.size(); i++)
                 {
                     if (GetUndoTrack().changeString.at(i) == '\n')
@@ -134,6 +134,8 @@ void REDO(int howManyTimes, int &line, int &column, vector<vector<char>> &text)
         if (RedoStack.size() > 0)
         {
             UndoStack.push_back(RedoStack.back());
+            column = GetUndoTrack().startActioncolumn;
+            line   = GetUndoTrack().startActionLine;
             bool isMultipleLine=false, first_line=true;
             if (GetRedoTrack().isWirte)
             {
