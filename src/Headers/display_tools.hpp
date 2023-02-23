@@ -52,9 +52,9 @@ void ShowConsoleCursor (bool showFlag)
     SetConsoleCursorInfo (hConsole, &cursorInfo);
 }
 
-void setColor(int textColor)
+void setColor(int ColorCode)
 {
-    SetConsoleTextAttribute (hConsole, textColor);
+    SetConsoleTextAttribute (hConsole, ColorCode);
 }
 #endif
 
@@ -64,9 +64,25 @@ void gotoxy(int x, int y)
     printf("%c[%d;%df", 0x1B, y + 1, x + 1);
 }
 
-void setColor(int textColor)
+void setColor(int ColorCode)
 {
-    cout<<"\033[" + to_string (textColor) + "m";
+    ColorCode = ColorCode == 1 ? 34 : ColorCode;
+    ColorCode = ColorCode == 2 ? 32 : ColorCode;
+    ColorCode = ColorCode == 3 ? 36 : ColorCode;
+    ColorCode = ColorCode == 4 ? 31 : ColorCode;
+    ColorCode = ColorCode == 5 ? 35 : ColorCode;
+    ColorCode = ColorCode == 6 ? 33 : ColorCode;
+    ColorCode = ColorCode == 7 ? 37 : ColorCode;
+    ColorCode = ColorCode == 8 ? 90 : ColorCode;
+    ColorCode = ColorCode == 9 ? 94 : ColorCode;
+    ColorCode = ColorCode == 10 ? 92 : ColorCode;
+    ColorCode = ColorCode == 11 ? 96 : ColorCode;
+    ColorCode = ColorCode == 12 ? 91 : ColorCode;
+    ColorCode = ColorCode == 13 ? 95 : ColorCode;
+    ColorCode = ColorCode == 14 ? 93 : ColorCode;
+    ColorCode = ColorCode == 15 ? 97 : ColorCode;
+    ColorCode = ColorCode == 16 ? 100 : ColorCode;
+    cout<<"\033[" + to_string (ColorCode) + "m";
 }
 
 void ShowConsoleCursor (bool showFlag)
@@ -164,12 +180,7 @@ void loadLogo()
             cout<<line<<'\n';
         }
     } else {
-        #if (defined (LINUX) || defined (__linux__))
-        setColor(31);
-        #endif
-        #if (defined (_WIN32) || defined (_WIN64))
         setColor(4);
-        #endif
         cerr<<"[Path Error]: Unable to open logo file\n";
     }
 }

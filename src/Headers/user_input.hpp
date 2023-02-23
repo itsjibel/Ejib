@@ -619,7 +619,6 @@ void Editor::EDIT_SYSTEM()
         case 16:
             mode = "command";
             clearTerminal();
-            setColor(37);
             break;
         case 21:
             UNDO(1, lineSelected, columnSelected, input);

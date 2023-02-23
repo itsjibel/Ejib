@@ -140,12 +140,7 @@ void VisualCommand::VisualCommandInput()
 
         if (showBigCommandWarning)
         {
-            #if (defined (_WIN32) || defined (_WIN64))
             setColor(6);
-            #endif
-            #if (defined (LINUX) || defined (__linux__))
-            setColor(33);
-            #endif
             gotoxy (44, TerminalLine - 1);
             cout<<"[B]";
         }
@@ -175,30 +170,15 @@ void VisualCommand::VisualCommandInput()
 void showMassage(string massageType) {
     if (massageType == "accept")
     {
-        #if (defined (_WIN32) || defined (_WIN64))
-        setColor(10);
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
-        setColor(32);
-        #endif
+        setColor(2);
         gotoxy (44, TerminalLine - 1);
         cout<<"[+]";
     } else if (massageType == "command not found") {
-        #if (defined (_WIN32) || defined (_WIN64))
         setColor(4);
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
-        setColor(31);
-        #endif
         gotoxy (44, TerminalLine - 1);
         cout<<"[!]";
     } else if (massageType == "nothing found") {
-        #if (defined (_WIN32) || defined (_WIN64))
         setColor(4);
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
-        setColor(31);
-        #endif
         gotoxy (44, TerminalLine - 1);
         cout<<"[?]";
     }
@@ -227,14 +207,7 @@ void VisualCommand::VisualEdit()
         printInfo();
         printText(input, -1, -1, lineSelected, columnSelected);
         ShowConsoleCursor (false);
-
-        #if (defined (_WIN32) || defined (_WIN64))
-        setColor(10);
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
-        setColor(32);
-        #endif
-
+        setColor(2);
         gotoxy (44, TerminalLine - 1);
         cout<<"[+]";
 

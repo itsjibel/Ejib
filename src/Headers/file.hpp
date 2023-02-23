@@ -125,12 +125,7 @@ class File
                 {
                     ShowConsoleCursor(false);
                     clearTerminal();
-                    #if (defined (LINUX) || defined (__linux__))
-                    setColor(32);
-                    #endif
-                    #if (defined (_WIN32) || defined (_WIN64))
                     setColor(2);
-                    #endif
                     clearTerminal();
                     gotoxy (0, 0);
                     cout<<"Enter file name(With extension): ";
@@ -154,25 +149,17 @@ class File
                             tryAgain=true;
                             agreeFileSize=true;
                         } else {
-                            #if (defined (LINUX) || defined (__linux__))
-                            setColor(31);
-                            #endif
-                            #if (defined (_WIN32) || defined (_WIN64))
                             setColor(4);
-                            #endif
-
                             cout<<"[Path Error]: Unable to open file! (Make sure the path is correct)\n";
-
-                            #if (defined (LINUX) || defined (__linux__))
-                            setColor(33);
-                            #endif
-                            #if (defined (_WIN32) || defined (_WIN64))
                             setColor(6);
-                            #endif
-
                             cout<<"[Warning]: Try again? [y/*] ";
                             tryAgain = getch() == 'y' ? true : false;
-                            if (!tryAgain) return false;
+
+                            if (!tryAgain)
+                            {
+                                fileName = "untitled";
+                                return false;
+                            }
                         }
                     }
                 }
@@ -182,20 +169,10 @@ class File
                     ShowConsoleCursor(false);
                     if (saveFile (filePath, fileName, outputText) == true)
                     {
-                        #if (defined (LINUX) || defined (__linux__))
-                        setColor(32);
-                        #endif
-                        #if (defined (_WIN32) || defined (_WIN64))
                         setColor(10);
-                        #endif
                         if (haveFilePath)
                         {
-                            #if (defined (LINUX) || defined (__linux__))
-                            setColor(31);
-                            #endif
-                            #if (defined (_WIN32) || defined (_WIN64))
                             setColor(4);
-                            #endif
                             gotoxy (44, 29);
                             cout<<"[+]";
                             gotoxy(10, 29);
@@ -203,30 +180,24 @@ class File
                         haveFilePath=true;
                         return true;
                     } else {
-                        #if (defined (LINUX) || defined (__linux__))
-                        setColor(31);
-                        #endif
-                        #if (defined (_WIN32) || defined (_WIN64))
                         setColor(4);
-                        #endif
-
                         cout<<"[Path Error]: Unable to open file! (Make sure the path is correct)\n";
-
-                        #if (defined (LINUX) || defined (__linux__))
-                        setColor(33);
-                        #endif
-                        #if (defined (_WIN32) || defined (_WIN64))
                         setColor(6);
-                        #endif
-                        
                         cout<<"[Warning]: Try again? [y/*] ";
                         tryAgain = getch() == 'y' ? true : false;
-                        if (!tryAgain) return false;
+
+                        if (!tryAgain)
+                        {
+                            fileName = "untitled";
+                            return false;
+                        }
+
                         clearTerminal();
                     }
                     ShowConsoleCursor(true);
                 }
             }
+            fileName = "untitled";
             return false;
         }
 };
@@ -250,7 +221,10 @@ bool File::saveFile(string filePath, string fileName, const vector<vector<char>>
         }
         myfile.close();
         return true;
-    } else return false;
+    } else {
+        fileName = "untitled";
+        return false;
+    }
 }
 
 bool File::loadFile(string filePath, string fileName, vector<vector<char>> &outputText)
@@ -266,12 +240,7 @@ bool File::loadFile(string filePath, string fileName, vector<vector<char>> &outp
         file.seekg (0, ios::end);
         end = file.tellg();
         file.close();
-        #if (defined (LINUX) || defined (__linux__))
-        setColor(33);
-        #endif
-        #if (defined (_WIN32) || defined (_WIN64))
         setColor(6);
-        #endif
         cout<<"[Warning]: Are you sure you want to open a "<<byteConverter((end-begin))<<" file? [y/*]";
         if (getch() == 'y')
         {
@@ -290,7 +259,11 @@ bool File::loadFile(string filePath, string fileName, vector<vector<char>> &outp
             return true;
         } else {
             agreeFileSize=false;
+            fileName = "untitled";
             return false;
         }
-    } else return false;
+    } else {
+        fileName = "untitled";
+        return false;
+    }
 }
