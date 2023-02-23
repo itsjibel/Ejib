@@ -124,21 +124,14 @@ class File
                 if (!haveFilePath)
                 {
                     ShowConsoleCursor(false);
-
-                    #if (defined (LINUX) || defined (__linux__))
-                    system("clear");
-                    #endif
-                    #if (defined (_WIN32) || defined (_WIN64))
-                    system("cls");
-                    #endif
-
+                    clearTerminal();
                     #if (defined (LINUX) || defined (__linux__))
                     setColor(32);
                     #endif
                     #if (defined (_WIN32) || defined (_WIN64))
                     setColor(2);
                     #endif
-                    system("clear");
+                    clearTerminal();
                     gotoxy (0, 0);
                     cout<<"Enter file name(With extension): ";
                     ShowConsoleCursor(true);
@@ -229,13 +222,7 @@ class File
                         cout<<"[Warning]: Try again? [y/*] ";
                         tryAgain = getch() == 'y' ? true : false;
                         if (!tryAgain) return false;
-
-                        #if (defined (LINUX) || defined (__linux__))
-                        system("clear");
-                        #endif
-                        #if (defined (_WIN32) || defined (_WIN64))
-                        system("cls");
-                        #endif
+                        clearTerminal();
                     }
                     ShowConsoleCursor(true);
                 }

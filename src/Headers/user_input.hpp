@@ -398,12 +398,7 @@ void Editor::AdjustingViewportWithSizeOfTerminal()
             && (mode == "visual" || mode == "edit"))
         {
             updateViewport();
-            #if (defined (_WIN32) || defined (_WIN64))
-            system("cls");
-            #endif
-            #if (defined (LINUX) || defined (__linux__))
-            system("clear");
-            #endif
+            clearTerminal();
             printInfo();
             printTabs();
             printText(input, -1, -1, lineSelected, columnSelected);
@@ -487,7 +482,7 @@ void Editor::EDIT_SYSTEM()
                 case 6:
                     mode = "file";
                     fileSystem("save", input);
-                    system("clear");
+                    clearTerminal();
                     printInfo();
                     printTabs();
                     printText(input, -1, -1, lineSelected);
@@ -611,7 +606,7 @@ void Editor::EDIT_SYSTEM()
         case 6:
             mode = "file";
             fileSystem("save", input);
-            system("clear");
+            clearTerminal();
             printInfo();
             printTabs();
             printText(input, -1, -1, lineSelected, columnSelected);
@@ -623,7 +618,7 @@ void Editor::EDIT_SYSTEM()
             break;
         case 16:
             mode = "command";
-            system("clear");
+            clearTerminal();
             setColor(37);
             break;
         case 21:

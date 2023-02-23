@@ -426,3 +426,12 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
     cout<<textPart;
     setColor(0);
 }
+
+void clearTerminal() {
+    #if (defined (_WIN32) || defined (_WIN64))
+    system("cls");
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
+    system("clear");
+    #endif
+}

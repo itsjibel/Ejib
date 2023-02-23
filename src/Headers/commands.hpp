@@ -101,12 +101,7 @@ class CommandLine : public File
             if (cmd == "file -N" || cmd == "file --new") {
                 mode = "edit";
                 clearEditFile();
-                #if (defined (_WIN32) || defined (_WIN64))
-                system ("cls");
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                system ("clear");
-                #endif
+                clearTerminal();
                 printInfo();
                 printTabs();
                 printText(input, -1, -1, lineSelected, columnSelected);
@@ -119,21 +114,11 @@ class CommandLine : public File
                     printTabs();
                     printText(input, -1, -1, lineSelected, columnSelected);
                 } else {
-                    #if (defined (_WIN32) || defined (_WIN64))
-                    system ("cls");
-                    #endif
-                    #if (defined (LINUX) || defined (__linux__))
-                    system ("clear");
-                    #endif
+                    clearTerminal();
                 }
                 _firstError = true;
             } else if (cmd == "clear") {
-                #if (defined (_WIN32) || defined (_WIN64))
-                system ("cls");
-                #endif
-                #if (defined (LINUX) || defined (__linux__))
-                system ("clear");
-                #endif
+                clearTerminal();
                 _firstError = true;
             } else if (cmd == "exit") {
                 exit (0);

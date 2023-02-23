@@ -258,7 +258,7 @@ void VisualCommand::VisualEdit()
     } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
         mode = "file";
         fileSystem("save", input);
-        system("clear");
+        clearTerminal();
         printInfo();
         printTabs();
         printText(input, -1, -1, lineSelected, columnSelected);

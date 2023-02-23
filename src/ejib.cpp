@@ -44,12 +44,7 @@ class EditorSystem: public VisualCommand
 
 int main()
 {
-    #if (defined (_WIN32) || defined (_WIN64))
-    system("cls");
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
-    system("clear");
-    #endif
+    clearTerminal();
     loadLogo();
 	EditorSystem Ejib;
     std::thread ContorlViewportWithTerminalSize = std::thread(&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
