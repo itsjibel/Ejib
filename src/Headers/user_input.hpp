@@ -162,8 +162,11 @@ void Editor::DELETE_LINE(int &line, int &column, vector<vector<char>> &text)
         text.erase(text.begin() + line);
         column=0;
     }
-    
-    line = text.size() <= line && line - 1 > 0 ? line - 1 : 0;
+    if (line - 1 > 0) {
+        if (text.size() <= line)
+            line--;
+    } else
+        line=0;
 
     if (text.size() == 0)
         text.push_back(emptyVector);
@@ -203,21 +206,21 @@ void Editor::TAB(int &line, int &column, vector<vector<char>> &text)
 void Editor::PASTE(int &line, int &column, vector<vector<char>> &text)
 {
     string copiedText;
+    vector<char> linkToEndOfPaste;
 
-    if (GetCopiedText (copiedText))
+    for (int i=column; i<text.at(line).size(); i++)
+        linkToEndOfPaste.push_back(text.at(line).at(i));
+    for (int i=0; i<linkToEndOfPaste.size(); i++)
+        text.at(line).pop_back();
+
+    if (GetCopiedText(copiedText))
     {
         RedoStack.clear();
         modificationText(copiedText);
-        text.push_back(emptyVector);
+        if (text.size() == 0)
+            text.insert(text.begin() + line + 1, emptyVector);
         if (mode != "visual")
             AddTrackToUndoStack (true, line, column, copiedText, "Paste");
-        vector<char> linkToEnd;
-
-        for (int j=column; j<text.at(line).size(); j++)
-            linkToEnd.push_back(text.at(line).at(j));
-
-        for (int j=0; j<linkToEnd.size(); j++)
-            text.at(line).pop_back();
 
         for (int i=0; i<copiedText.size(); i++)
         {
@@ -226,20 +229,17 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text)
 
             column++;
 
-            if (copiedText.at(i) == '\n' || i == copiedText.size() - 1)
+            if (copiedText.at(i) == '\n')
             {
-                if (i != copiedText.size() - 1)
-                    column=0;
-                text.push_back(emptyVector);
-                line = i != copiedText.size() - 1 ? line + 1 : line;
+                column=0;
+                text.insert(text.begin() + line + 1, emptyVector);
+                line++;
             }
         }
-
-        for (char ch : linkToEnd)
-            text.at(line).push_back(ch);
-
-        for (int i=0; i<2; i++) text.pop_back();
     }
+
+    for (int i=0; i<linkToEndOfPaste.size(); i++)
+        text.at(line).push_back(linkToEndOfPaste.at(i));
 }
 
 void Editor::UP(int &line, int &column, const vector<vector<char>> &text)
