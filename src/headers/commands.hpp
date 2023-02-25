@@ -206,7 +206,8 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
 
     int numberDigits_Of_LargestLineNumber = floor(log10(biggestNumberLine) + 1);
     gotoxy(0, 2);
-
+    NumberOfOpenScopes=0;
+    NumberOfCloseScopes=0;
     for (int j=0; j<TerminalLine - 4; j++)
         if (j<VisableLines)
         {
@@ -256,7 +257,8 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             blankView += "~";
             for (int i=0; i<TerminalColumn - 1; i++) blankView += " ";
         }
-
+    NumberOfOpenScopes=0;
+    NumberOfCloseScopes=0;
     setColor(6);
     cout<<blankView;
     ShowConsoleCursor(true);

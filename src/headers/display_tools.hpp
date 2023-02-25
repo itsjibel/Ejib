@@ -206,18 +206,15 @@ bool IsSeparatorCharacter (char character) {
 
 bool ScopeCharacterIsOpen=false, ScopeCharacterIsClose=false,
      tempScopeCharacterIsClose=false;
-int CloseScopeIndex=0, CloseScopeLine=0, OpenScopeIndex=0, OpenScopeLine=0;
+int CloseScopeIndex=0, CloseScopeLine=0,
+    OpenScopeIndex=0, OpenScopeLine=0,
+    NumberOfOpenScopes=0, NumberOfCloseScopes=0;
 
 void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
                     const int &selectedLine, const int &currentLine, const int &column)
 {
     string textPart;
-    #if (defined (_WIN32) || defined (_WIN64))
     int8_t color=7, tempColor=7;
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
-    int8_t color=37, tempColor=37;
-    #endif
     int index=0;
     bool sharpArea=false,   quotationArea=false, angleBracketsArea=false,
          commentArea=false, selectedArea=false;
@@ -267,7 +264,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea) {
             if (((column == index && selectedLine == currentLine) ||
-                ScopeCharacterIsClose) && character == '{')
+                  ScopeCharacterIsClose) && character == '{')
             {
                 if (ScopeCharacterIsClose && !(column == index && selectedLine == currentLine)) {
                     if (CloseScopeLine >= currentLine)
@@ -298,7 +295,8 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     }
                 }
             } else if (((column == index && selectedLine == currentLine) ||
-                            ScopeCharacterIsOpen) && character == '}') {
+                            ScopeCharacterIsOpen) && character == '}' &&
+                            NumberOfOpenScopes == 1) {
                 if (ScopeCharacterIsOpen && !(column == index && selectedLine == currentLine)) {
                     if (OpenScopeLine <= currentLine)
                     {
@@ -329,6 +327,12 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                 }
             } else
                 color = 36;
+            if (character == '{' && ScopeCharacterIsOpen && selectedLine <= currentLine) {
+                NumberOfOpenScopes++;
+            }
+            if (character == '}' && ScopeCharacterIsOpen && selectedLine <= currentLine) {
+                NumberOfOpenScopes--;
+            }
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
