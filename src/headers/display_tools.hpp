@@ -323,8 +323,8 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     }
                 }
             } else if (((column == index && selectedLine == currentLine) ||
-                            ScopeCharacterIsOpen) && character == '}' &&
-                            NumberOfOpenScopes == 1) {
+                        (ScopeCharacterIsOpen && NumberOfOpenScopes == 1)) &&
+                        character == '}') {
                 if (ScopeCharacterIsOpen && !(column == index && selectedLine == currentLine)) {
                     if (OpenScopeLine <= currentLine)
                     {
