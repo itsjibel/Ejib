@@ -177,7 +177,35 @@ void loadLogo()
     {
         while (getline(myfile, line))
         {
-            cout<<line<<'\n';
+            bool ColorIsChangable=true;
+            for (char ch : line) {
+                if (ColorIsChangable)
+                    if (ch == 'E')
+                        setColor(14);
+                    else if (ch == 'B')
+                        setColor(12);
+                    else if (ch == 'J' || ch == 'I' || ch == '#' || ch == '=')
+                        setColor(13);
+                    else if (ch == '|' || ch == '_')
+                        setColor(1);
+                    else if (ch == '(') {
+                        ColorIsChangable=false;
+                        setColor(6);
+                    } else if (ch == '\'') {
+                        ColorIsChangable=false;
+                        setColor(3);
+                    }
+                    else
+                        setColor(0);
+                else if (ch == '|')
+                    setColor(1);
+                else if (ch == 'v')
+                    setColor(7);
+                else if (ch == '\'')
+                    setColor(3);
+                cout<<ch;
+            }
+            cout<<'\n';
         }
     } else {
         setColor(4);

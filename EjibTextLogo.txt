@@ -1,19 +1,22 @@
- _______________________________________________________________________________
-|                                                                               |
-| (Copyleft)                                                                    |
-|                           JJJJJJJJJJ#####IIIIIIIIII                           | 
-|        EEEEEEEEEEEEEE     JJ      JJ#####II      II     BBBBBBBBBBBBB         |
-|        EE          EE     JJJJ  JJJJ#####IIII  IIII     BB          BB        |
-|        EE  EEEEEEEEEE       JJ  JJ         II  II       BB  BBBBBB   BB       |
-|        EE  EE               JJ  JJ         II  II       BB  BB   BB   BB      |
-|        EE  EEEEEEEEEE       JJ  JJ         II  II       BB  BBBBBB   BB       |
-|        EE          EE       JJ  JJ         II  II       BB          BB        |
-|        EE  EEEEEEEEEE       JJ  JJ         II  II       BB  BBBBBB   BB       |
-|        EE  EE               JJ  JJ         II  II       BB  BB   BB   BB      |
-|        EE  EEEEEEEEEE       JJ  JJ       IIII  IIII     BB  BBBBBB   BB       |
-|        EE          EE       JJ  JJ       II      II     BB          BB        |
-|        EEEEEEEEEEEEEE     JJJ   JJ       IIIIIIIIII     BBBBBBBBBBBBB         |
-|                         JJ     JJ                                             |
-|                       JJJJJJJJJJ                                    V1.0.6    |
-|_______________________________________________________________________________|
+  ____________________________________________________________________________
+ |                                                                            |
+ |  (Copyleft)    'Pi is Very small but has infinite decimals'                |
+ |                                                                            |
+ |                         JJJJJJJJJJ#====#IIIIIIIIII                         | 
+ |        EEEEEEEEEEEEEE   JJ      JJ#====#II      II   BBBBBBBBBBBBBB        |
+ |        EE          EE   JJJJ  JJJJ#====#IIII  IIII   BB           BB       |
+ |        EE  EEEEEEEEEE     JJ  JJ          II  II     BB  BBBBBB    BB      |
+ |        EE  EE             JJ  JJ          II  II     BB  BB   BB   BB      |
+ |        EE  EEEEEEEEEE     JJ  JJ          II  II     BB  BBBBBB   BB       |
+ |        EE          EE     JJ  JJ          II  II     BB          BB        |
+ |        EE  EEEEEEEEEE     JJ  JJ          II  II     BB  BBBBBB   BB       |
+ |        EE  EE             JJ  JJ          II  II     BB  BB   BB   BB      |
+ |        EE  EEEEEEEEEE     JJ  JJ          II  II     BB  BBBBBB    BB      |
+ |        EE          EE     JJ  JJ        IIII  IIII   BB           BB       |
+ |        EEEEEEEEEEEEEE    JJJ  JJ        II      II   BBBBBBBBBBBBBB        |
+ |                        JJJ   JJ         IIIIIIIIII                         |
+ |                      JJJJJJJJJ                                             |
+ |                                                                            |
+ |                'Ejib editor is light but has many features'        v1.0.6  |
+ |____________________________________________________________________________|
 
