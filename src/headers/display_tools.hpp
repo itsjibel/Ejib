@@ -205,7 +205,7 @@ bool IsSeparatorCharacter (char character) {
 }
 
 bool ScopeCharacterIsOpen=false, ScopeCharacterIsClose=false,
-     tempScopeCharacterIsClose=false;
+     tempScopeCharacterIsClose=false, tempScopeCharacterIsOpen=false;
 int CloseScopeIndex=0, CloseScopeLine=0,
     OpenScopeIndex=0, OpenScopeLine=0,
     NumberOfOpenScopes=0, NumberOfCloseScopes=0;
@@ -328,10 +328,25 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
             } else
                 color = 36;
             if (character == '{' && ScopeCharacterIsOpen && selectedLine <= currentLine) {
-                NumberOfOpenScopes++;
+                if (selectedLine == currentLine)
+                {
+                    if (index >= OpenScopeIndex)
+                    {
+                        tempScopeCharacterIsOpen = !ScopeCharacterIsOpen;
+                        NumberOfOpenScopes++;
+                    }
+                } else
+                    NumberOfOpenScopes++;
             }
             if (character == '}' && ScopeCharacterIsOpen && selectedLine <= currentLine) {
-                NumberOfOpenScopes--;
+                if (selectedLine == currentLine)
+                {
+                    if (index > OpenScopeIndex)
+                    {
+                        NumberOfOpenScopes--;
+                    }
+                } else
+                    NumberOfOpenScopes--;
             }
             sharpArea=false;
             angleBracketsArea=false;

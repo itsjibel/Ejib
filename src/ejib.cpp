@@ -271,10 +271,12 @@ void EditorSystem::EDIT_SYSTEM()
         printInfo();
         printText(input, -1, -1, lineSelected, columnSelected);
 
-        if (ScopeCharacterIsClose != tempScopeCharacterIsClose)
+        if (ScopeCharacterIsClose != tempScopeCharacterIsClose ||
+            ScopeCharacterIsOpen != tempScopeCharacterIsOpen)
             printText(input, -1, -1, lineSelected, columnSelected);
 
         tempScopeCharacterIsClose = ScopeCharacterIsClose;
+        tempScopeCharacterIsOpen = ScopeCharacterIsOpen;
     }
 }
 
