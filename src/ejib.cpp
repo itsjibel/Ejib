@@ -268,9 +268,14 @@ void EditorSystem::EDIT_SYSTEM()
 
     if (something_happen_in_text_view)
     {
+        open=-1;
+        NumberOfOpenScopes=0;
+        NumberOfCloseScopes=0;
+        scopesAreScaned=false;
         printInfo();
         printText(input, -1, -1, lineSelected, columnSelected);
-
+        scopesAreScaned=true;
+        open=0;
         if (ScopeCharacterIsClose != tempScopeCharacterIsClose ||
             ScopeCharacterIsOpen != tempScopeCharacterIsOpen)
             printText(input, -1, -1, lineSelected, columnSelected);

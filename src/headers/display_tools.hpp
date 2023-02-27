@@ -233,10 +233,12 @@ bool IsSeparatorCharacter (char character) {
 }
 
 bool ScopeCharacterIsOpen=false, ScopeCharacterIsClose=false,
-     tempScopeCharacterIsClose=false, tempScopeCharacterIsOpen=false;
+     tempScopeCharacterIsClose=false, tempScopeCharacterIsOpen=false,
+     scopesAreScaned=false;
 int CloseScopeIndex=0, CloseScopeLine=0,
     OpenScopeIndex=0, OpenScopeLine=0,
-    NumberOfOpenScopes=0, NumberOfCloseScopes=0;
+    NumberOfOpenScopes=0, NumberOfCloseScopes=0,
+    open=0;
 
 void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
                     const int &selectedLine, const int &currentLine, const int &column)
@@ -291,41 +293,20 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     character == '}' || character == '[' || character == ']') &&
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea) {
-            if (((column == index && selectedLine == currentLine) ||
-                  ScopeCharacterIsClose) && character == '{')
+            if ((column == index && selectedLine == currentLine) && character == '{')
             {
-                if (ScopeCharacterIsClose && !(column == index && selectedLine == currentLine)) {
-                    if (CloseScopeLine >= currentLine)
-                    {
-                        if (CloseScopeLine == currentLine)
-                        {
-                            if (CloseScopeIndex > index)
-                            {
-                                color = 46;
-                                ScopeCharacterIsClose=false;
-                            } else {
-                                color = 36;
-                            }
-                        } else {
-                            color = 46;
-                            ScopeCharacterIsClose=false;
-                        }
-                    } else {
-                        color = 36;
-                    }
-                } else {
-                    color = 46;
-                    if (column == index && selectedLine == currentLine)
-                    {
-                        ScopeCharacterIsOpen=true;
-                        OpenScopeIndex = index;
-                        OpenScopeLine = currentLine;
-                    }
+                color = 46;
+                if (column == index && selectedLine == currentLine)
+                {
+                    ScopeCharacterIsOpen = true;
+                    OpenScopeIndex = index;
+                    OpenScopeLine = currentLine;
                 }
             } else if (((column == index && selectedLine == currentLine) ||
                         (ScopeCharacterIsOpen && NumberOfOpenScopes == 1)) &&
                         character == '}') {
-                if (ScopeCharacterIsOpen && !(column == index && selectedLine == currentLine)) {
+                if (ScopeCharacterIsOpen)
+                {
                     if (OpenScopeLine <= currentLine)
                     {
                         if (OpenScopeLine == currentLine)
@@ -348,33 +329,95 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     color = 46;
                     if (column == index && selectedLine == currentLine)
                     {
-                        ScopeCharacterIsClose=true;
+                        ScopeCharacterIsClose = true;
                         CloseScopeIndex = index;
                         CloseScopeLine = currentLine;
                     }
                 }
             } else
                 color = 36;
-            if (character == '{' && ScopeCharacterIsOpen && selectedLine <= currentLine) {
-                if (selectedLine == currentLine)
+
+            if (character == '{')
+            {
+                if (ScopeCharacterIsOpen && selectedLine <= currentLine)
                 {
-                    if (index >= OpenScopeIndex)
+                    if (selectedLine == currentLine)
                     {
-                        tempScopeCharacterIsOpen = !ScopeCharacterIsOpen;
+                        if (index >= OpenScopeIndex)
+                        {
+                            tempScopeCharacterIsOpen = !ScopeCharacterIsOpen;
+                            NumberOfOpenScopes++;
+                        }
+                    } else
                         NumberOfOpenScopes++;
-                    }
-                } else
-                    NumberOfOpenScopes++;
-            }
-            if (character == '}' && ScopeCharacterIsOpen && selectedLine <= currentLine) {
-                if (selectedLine == currentLine)
+                }
+                if (selectedLine >= currentLine)
                 {
-                    if (index > OpenScopeIndex)
+                    if (selectedLine == currentLine)
                     {
-                        NumberOfOpenScopes--;
+                        if (index <= CloseScopeIndex)
+                        {
+                            tempScopeCharacterIsClose = !ScopeCharacterIsClose;
+                            if (!scopesAreScaned)
+                                NumberOfCloseScopes++;
+                            open++;
+                        }
+                    } else {
+                        if (!scopesAreScaned)
+                            NumberOfCloseScopes++;
+                        open++;
                     }
-                } else
-                    NumberOfOpenScopes--;
+                }
+            }
+            if (character == '}')
+            {
+                if (ScopeCharacterIsOpen && selectedLine <= currentLine)
+                {
+                    if (selectedLine == currentLine)
+                    {
+                        if (index > OpenScopeIndex)
+                        {
+                            NumberOfOpenScopes--;
+                        }
+                    } else
+                        NumberOfOpenScopes--;
+                }
+                if (selectedLine >= currentLine)
+                {
+                    if (selectedLine == currentLine)
+                    {
+                        if (index <= CloseScopeIndex)
+                        {
+                            if (!scopesAreScaned)
+                                NumberOfCloseScopes--;
+                        }
+                    } else {
+                        if (!scopesAreScaned)
+                            NumberOfCloseScopes--;
+                    }
+                } 
+            }
+
+            if (ScopeCharacterIsClose && NumberOfCloseScopes == open - 1 && scopesAreScaned)
+            {
+                if (CloseScopeLine >= currentLine)
+                {
+                    if (CloseScopeLine == currentLine)
+                    {
+                        if (CloseScopeIndex >= index)
+                        {
+                            color = 46;
+                            ScopeCharacterIsClose=false;
+                        } else {
+                            color = 36;
+                        }
+                    } else {
+                        color = 46;
+                        ScopeCharacterIsClose=false;
+                    }
+                } else {
+                    color = 36;
+                }
             }
             sharpArea=false;
             angleBracketsArea=false;
