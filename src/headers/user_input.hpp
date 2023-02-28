@@ -1,7 +1,6 @@
 #include "commands.hpp"
 #if (defined (LINUX) || defined (__linux__))
 #include <stdio.h>
-#include <thread>
 #endif
 
 class Editor: public CommandLine
@@ -640,11 +639,6 @@ void Editor::AdjustingViewportWithSizeOfTerminal()
 
         TerminalColumnTemp = TerminalColumn;
         TerminalLineTemp = TerminalLine;
-        #if (defined (_WIN32) || defined (_WIN64))
         Sleep(1);
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        #endif
     }
 }
