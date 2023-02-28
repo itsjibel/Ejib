@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <vector>
 #include <X11/Xlib.h>
+#include <thread>
 
 #if (defined (LINUX) || defined (__linux__))
 #define RST  "\x1B[0m"
@@ -27,6 +28,12 @@
 #define BOLD(x) "\x1B[1m" x RST
 #define UNDL(x) "\x1B[4m" x RST
 #endif
+
+#define pb 1125899906842624
+#define tb 1099511627776
+#define gb 1073741824
+#define mb 1048576
+#define kb 1024
 
 using std::cout;
 using std::cerr;
@@ -92,7 +99,36 @@ void ShowConsoleCursor (bool showFlag)
     else
         printf("\e[?25l");
 }
+
+void Sleep(int milliseconds)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
 #endif
+
+string byteConverter(long long int bytes)
+{
+    string convertedSize;
+    if (bytes >= pb)
+        return to_string ((float)bytes/pb) + " PB";
+
+    else if (bytes >= tb && bytes < pb)
+        return to_string ((float)bytes/tb) + " TB";
+
+    else if (bytes >= gb && bytes < tb)
+        return to_string ((float)bytes / gb) + " GB";
+
+    else if (bytes >= mb && bytes < gb)
+        return to_string ((float)bytes/mb) + " MB";
+
+    else if (bytes >= kb && bytes < mb)
+        return to_string ((float)bytes/kb) + " KB";
+
+    else if (bytes < kb)
+        return to_string(bytes) + " Bytes";
+
+    return "Unknown size";
+}
 
 Bool PrintSelection(Display *display, Window window, const char *bufname,
                     const char *fmtname, string &text)
