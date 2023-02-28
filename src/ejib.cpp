@@ -268,17 +268,22 @@ void EditorSystem::EDIT_SYSTEM()
 
     if (something_happen_in_text_view)
     {
-        open=-1;
+        open=0;
         NumberOfOpenScopes=0;
         NumberOfCloseScopes=0;
         scopesAreScaned=false;
         printInfo();
         printText(input, -1, -1, lineSelected, columnSelected);
         scopesAreScaned=true;
-        open=0;
+
         if (ScopeCharacterIsClose != tempScopeCharacterIsClose ||
             ScopeCharacterIsOpen != tempScopeCharacterIsOpen)
+        {
+            open=0;
             printText(input, -1, -1, lineSelected, columnSelected);
+            open=0;
+            printText(input, -1, -1, lineSelected, columnSelected);
+        }
 
         tempScopeCharacterIsClose = ScopeCharacterIsClose;
         tempScopeCharacterIsOpen = ScopeCharacterIsOpen;

@@ -363,12 +363,14 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                             open++;
                         }
                     } else {
+                        tempScopeCharacterIsClose = !ScopeCharacterIsClose;
                         if (!scopesAreScaned)
                             NumberOfCloseScopes++;
                         open++;
                     }
                 }
             }
+
             if (character == '}')
             {
                 if (ScopeCharacterIsOpen && selectedLine <= currentLine)
@@ -388,10 +390,12 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     {
                         if (index <= CloseScopeIndex)
                         {
+                            tempScopeCharacterIsClose = !ScopeCharacterIsClose;
                             if (!scopesAreScaned)
                                 NumberOfCloseScopes--;
                         }
                     } else {
+                        tempScopeCharacterIsClose = !ScopeCharacterIsClose;
                         if (!scopesAreScaned)
                             NumberOfCloseScopes--;
                     }
@@ -404,12 +408,15 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                 {
                     if (CloseScopeLine == currentLine)
                     {
-                        if (CloseScopeIndex >= index)
+                        if (CloseScopeIndex > index)
                         {
                             color = 46;
                             ScopeCharacterIsClose=false;
                         } else {
-                            color = 36;
+                            if (CloseScopeIndex == index)
+                                color = 46;
+                            else
+                                color = 36;
                         }
                     } else {
                         color = 46;
@@ -419,6 +426,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
                     color = 36;
                 }
             }
+
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;

@@ -259,10 +259,6 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
     setColor(6);
     cout<<blankView;
     ShowConsoleCursor(true);
-
-    gotoxy(10, 10);
-    cout<<"-"<<NumberOfCloseScopes<<"|"<<open<<"-";
-
     if (text.at(0).size() == 0 && text.size() == 1)
         gotoxy (0, 2);
     else
