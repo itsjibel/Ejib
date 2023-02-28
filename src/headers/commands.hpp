@@ -1,4 +1,5 @@
 #include <cmath>
+#include "consumption_info.hpp"
 #include "file.hpp"
 
 vector<char> emptyVector;
@@ -137,7 +138,7 @@ void CommandLine::printTabs() {
     #if (defined (LINUX) || defined (__linux__))
     setColor(44);
     #endif
-    cout<<"  ";
+    cout<<" ";
     setColor(0);
     cout<<" \e[1m"<<fileName<<"\e[0m ";
     #if (defined (_WIN32) || defined (_WIN64))
@@ -146,21 +147,21 @@ void CommandLine::printTabs() {
     #if (defined (LINUX) || defined (__linux__))
     setColor(44);
     #endif
-    cout<<"  ";
+    cout<<" ";
     setColor(0);
 
-    for (int i=8 + fileName.size(); i<TerminalColumn; i++)
+    for (int i=6 + fileName.size(); i<TerminalColumn; i++)
         cout<<" ";
 
     string bar;
     for (int i=0; i<TerminalColumn; i++) bar+=" ";
-    gotoxy(0, 1);
     #if (defined (_WIN32) || defined (_WIN64))
     setColor(97);
     #endif
     #if (defined (LINUX) || defined (__linux__))
     setColor(44);
     #endif
+    gotoxy(0, 1);
     cout<<bar;
     setColor(0);
 }
@@ -227,14 +228,14 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
             gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(numberLines[j]) + 1), j + 2);
 
             #if (defined (_WIN32) || defined (_WIN64))
-            if (j + startPrintColumn == line)
+            if (j + startPrintLine == line)
                 setColor(15);
             else
                 setColor(8);
             cout<<numberLines[j];
             #endif
             #if (defined (LINUX) || defined (__linux__))
-            if (j + startPrintColumn == line)
+            if (j + startPrintLine == line)
                 cout<<BOLD(FWHT("\e[1m" + to_string(numberLines[j]) + "\e[0m"));
             else {
                 setColor(90);
