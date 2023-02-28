@@ -1,4 +1,3 @@
-#include "display_tools.hpp"
 #include <fstream>
 #include <vector>
 
@@ -9,12 +8,6 @@ using std::ifstream;
 using std::ofstream;
 using std::streampos;
 using std::vector;
-
-#define pb 1125899906842624
-#define tb 1099511627776
-#define gb 1073741824
-#define mb 1048576
-#define kb 1024
 
 string filePath, fileName="untitled";
 
@@ -84,32 +77,9 @@ char getche(void)
 
 class File
 {
-    public:
+    protected:
         bool haveFilePath=false;
         bool agreeFileSize=true;
-        string byteConverter(long long int bytes)
-        {
-            string convertedSize;
-            if (bytes >= pb)
-                return to_string ((float)bytes/pb) + " PB";
-
-            else if (bytes >= tb && bytes < pb)
-                return to_string ((float)bytes/tb) + " TB";
-
-            else if (bytes >= gb && bytes < tb)
-                return to_string ((float)bytes / gb) + " GB";
-
-            else if (bytes >= mb && bytes < gb)
-                return to_string ((float)bytes/mb) + " MB";
-
-            else if (bytes >= kb && bytes < mb)
-                return to_string ((float)bytes/kb) + " KB";
-
-            else if (bytes < kb)
-                return to_string(bytes) + " Bytes";
-
-            return "Unknown size";
-        }
 
     public:
         bool saveFile(string filePath, string fileName, const vector<vector<char>> &text);
