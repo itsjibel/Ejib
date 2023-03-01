@@ -36,7 +36,6 @@
 #define kb 1024
 
 using std::cout;
-using std::cerr;
 using std::ifstream;
 using std::string;
 using std::to_string;
@@ -186,6 +185,14 @@ bool GetCopiedText(string &copiedText)
     #endif
 }
 
+template <class T>
+void ColourizePrint(T text, int color)
+{
+    setColor(color);
+    cout<<text;
+    setColor(0);
+}
+
 vector<int> getTerminaLine_Column()
 {
     vector<int> TerminalSize;
@@ -244,8 +251,7 @@ void loadLogo()
             cout<<'\n';
         }
     } else {
-        setColor(4);
-        cerr<<"[Path Error]: Unable to open logo file\n";
+        ColourizePrint("[Path Error]: Unable to open logo file\n", 4);
     }
 }
 
@@ -552,9 +558,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
 
         if (color != tempColor)
         {
-            setColor(tempColor);
-            cout<<textPart;
-            setColor(0);
+            ColourizePrint(textPart, tempColor);
             textPart.clear();
             textPart += character;
         } else textPart += character;
@@ -567,9 +571,7 @@ void colourizeText (const string &text, const int &selectedCharacterStart, const
             selectedArea=false;
 
     }
-    setColor(color);
-    cout<<textPart;
-    setColor(0);
+    ColourizePrint(textPart, color);
 }
 
 void clearTerminal() {

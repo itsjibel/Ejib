@@ -17,23 +17,12 @@ class Editor: public CommandLine
 
         vector<Track> UndoStack, RedoStack;
 
+        template <class T>
         void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColumn,
-                                 string changeString, string changeMode)
+                                 T changeString, string changeMode)
         {
             Track TrackForAdd;
             TrackForAdd.changeString = changeString;
-            TrackForAdd.startActioncolumn = startActionColumn;
-            TrackForAdd.startActionLine = startActionLine;
-            TrackForAdd.isWirte = isWirte;
-            TrackForAdd.changeMode = changeMode;
-            UndoStack.push_back(TrackForAdd);
-        }
-
-        void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColumn,
-                                 char changeCharacter, string changeMode)
-        {
-            Track TrackForAdd;
-            TrackForAdd.changeString = changeCharacter;
             TrackForAdd.startActioncolumn = startActionColumn;
             TrackForAdd.startActionLine = startActionLine;
             TrackForAdd.isWirte = isWirte;
@@ -571,13 +560,14 @@ void Editor::REDO(int howManyTimes, int &line, int &column, vector<vector<char>>
 
 int Editor::biggestLineNumber()
 {
-    int numberLines[10000] = {0}, biggestNumberLine=0,
+    int biggestNumberLine=0,
         range = startPrintLine + TerminalLine - 2 <= input.size() ? startPrintLine + TerminalLine - 2 : input.size();
+    vector<int> numberLines;
 
     for (int i=startPrintLine; i<range; i++)
-        numberLines[i - startPrintLine] = i + 1;
+        numberLines.push_back(i + 1);
 
-    for (int i=0; i<TerminalLine - 2; i++)
+    for (int i=0; i<numberLines.size(); i++)
         if (numberLines[i] > biggestNumberLine)
             biggestNumberLine = numberLines[i];
 

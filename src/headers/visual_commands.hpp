@@ -129,20 +129,16 @@ void VisualCommand::VisualCommandInput()
         ShowConsoleCursor(false);
         gotoxy (0, TerminalLine - 1);
         #if (defined (_WIN32) || defined (_WIN64))
-        setColor(10);
-        cout<<"cmd@edit: ";
+        ColourizePrint("cmd@edit: ", 10);
         #endif
         #if (defined (LINUX) || defined (__linux__))
-        setColor(32);
-        cout<<"\e[1mcmd@edit: \e[0m";
-        setColor(32);
+        ColourizePrint("\e[1mcmd@edit: \e[0m", 32);
         #endif
 
         if (showBigCommandWarning)
         {
-            setColor(6);
             gotoxy (44, TerminalLine - 1);
-            cout<<"[B]";
+            ColourizePrint("[B]", 6);
         }
 
         _string_editCommand="";
@@ -170,17 +166,14 @@ void VisualCommand::VisualCommandInput()
 void showMassage(string massageType) {
     if (massageType == "accept")
     {
-        setColor(2);
         gotoxy (44, TerminalLine - 1);
-        cout<<"[+]";
+        ColourizePrint("[+]", 2);
     } else if (massageType == "command not found") {
-        setColor(4);
         gotoxy (44, TerminalLine - 1);
-        cout<<"[!]";
+        ColourizePrint("[!]", 4);
     } else if (massageType == "nothing found") {
-        setColor(4);
         gotoxy (44, TerminalLine - 1);
-        cout<<"[?]";
+        ColourizePrint("[?]", 4);
     }
     
 }
@@ -207,10 +200,8 @@ void VisualCommand::VisualEdit()
         printInfo();
         printText(input, -1, -1, lineSelected, columnSelected);
         ShowConsoleCursor (false);
-        setColor(2);
         gotoxy (44, TerminalLine - 1);
-        cout<<"[+]";
-
+        ColourizePrint("[+]", 2);
     } else if (_string_editCommand.find("text -S \"")       == 0 ||
                 _string_editCommand.find("text --search \"") == 0) {
         string key;

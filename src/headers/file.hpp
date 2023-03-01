@@ -14,10 +14,7 @@ string filePath, fileName="untitled";
 void modificationText (string &text)
 {
     for (int i=0; i<text.size(); i++)
-        if (text.at(i) == '\r' || text.at(i) == '\t' ||
-            text.at(i) == '\v' || text.at(i) == '\0' ||
-            text.at(i) == '\f' || text.at(i) == '\a' ||
-            text.at(i) == '\e' || text.at(i) == '\b') {
+        if (text.at(i) == '\r' || text.at(i) == '\t') {
                 if (text.at(i) == '\t') {
                     text.erase(text.begin() + i);
                     text.insert(text.begin() + i, {' ', ' ', ' ', ' '});
@@ -95,14 +92,13 @@ class File
                 {
                     ShowConsoleCursor(false);
                     clearTerminal();
-                    setColor(2);
                     clearTerminal();
                     gotoxy (0, 0);
-                    cout<<"Enter file name(With extension): ";
+                    ColourizePrint("Enter file name(With extension): ", 2);
                     ShowConsoleCursor(true);
                     getline (cin, fileName);
                     ShowConsoleCursor(false);
-                    cout<<"Enter file path: ";
+                    ColourizePrint("Enter file path: ", 2);
                     ShowConsoleCursor(true);
                     getline (cin, filePath);
                 }
@@ -119,10 +115,8 @@ class File
                             tryAgain=true;
                             agreeFileSize=true;
                         } else {
-                            setColor(4);
-                            cout<<"[Path Error]: Unable to open file! (Make sure the path is correct)\n";
-                            setColor(6);
-                            cout<<"[Warning]: Try again? [y/*] ";
+                            ColourizePrint("[Path Error]: Unable to open file! (Make sure the path is correct)\n", 4);
+                            ColourizePrint("[Warning]: Try again? [y/*] ", 6);
                             tryAgain = getch() == 'y' ? true : false;
 
                             if (!tryAgain)
@@ -139,21 +133,17 @@ class File
                     ShowConsoleCursor(false);
                     if (saveFile (filePath, fileName, outputText) == true)
                     {
-                        setColor(10);
                         if (haveFilePath)
                         {
-                            setColor(4);
                             gotoxy (44, 29);
-                            cout<<"[+]";
+                            ColourizePrint("[+]", 4);
                             gotoxy(10, 29);
                         }
                         haveFilePath=true;
                         return true;
                     } else {
-                        setColor(4);
-                        cout<<"[Path Error]: Unable to open file! (Make sure the path is correct)\n";
-                        setColor(6);
-                        cout<<"[Warning]: Try again? [y/*] ";
+                        ColourizePrint("[Path Error]: Unable to open file! (Make sure the path is correct)\n", 4);
+                        ColourizePrint("[Warning]: Try again? [y/*] ", 6);
                         tryAgain = getch() == 'y' ? true : false;
 
                         if (!tryAgain)
@@ -210,8 +200,7 @@ bool File::loadFile(string filePath, string fileName, vector<vector<char>> &outp
         file.seekg (0, ios::end);
         end = file.tellg();
         file.close();
-        setColor(6);
-        cout<<"[Warning]: Are you sure you want to open a "<<byteConverter((end-begin))<<" file? [y/*]";
+        ColourizePrint("[Warning]: Are you sure you want to open a " + byteConverter((end-begin)) + " file? [y/*]", 6);
         if (getch() == 'y')
         {
             vector<char> emptyVector;

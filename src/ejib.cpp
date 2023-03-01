@@ -23,21 +23,20 @@ class EditorSystem: public VisualCommand
                 if (mode == "visual")
                 {
                     ShowConsoleCursor(false);
-                    gotoxy (0, TerminalLine - 2);
                     string modeView;
 
                     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
                     modeView += "-- VISUAL --";
                     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+
+                    gotoxy (0, TerminalLine - 2);
+                    setColor(7);
                     #if (defined (_WIN32) || defined (_WIN64))
-                    setColor(97);
+                    ColourizePrint(modeView, 97);
                     #endif
                     #if (defined (LINUX) || defined (__linux__))
-                    setColor(37);
-                    setColor(44);
+                    ColourizePrint(modeView, 44);
                     #endif
-                    cout<<modeView;
-                    setColor(0);
                     ShowConsoleCursor(true);
                     gotoxy (10, TerminalLine - 1);
                     VisualEdit();
@@ -274,6 +273,7 @@ void EditorSystem::EDIT_SYSTEM()
         NumberOfCloseScopes=0;
         scopesAreScaned=false;
         printInfo();
+        printTabs();
         printText(input, -1, -1, lineSelected, columnSelected);
         scopesAreScaned=true;
 
@@ -296,9 +296,9 @@ int main()
     clearTerminal();
     loadLogo();
 	EditorSystem Ejib;
-    std::thread ContorlViewportWithTerminalSize = std::thread(&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
-    std::thread DisplayConsumption = std::thread(&display_MEM_USAGE, std::ref(mode),
-                                                 std::ref(TerminalColumn), std::ref(TerminalLine));
+    std::thread ContorlViewportWithTerminalSize = std::thread (&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
+    std::thread DisplayConsumption = std::thread (&display_MEM_USAGE, std::ref(mode),
+                                                  std::ref(TerminalColumn), std::ref(TerminalLine));
 	Ejib.SYSTEM();
     ContorlViewportWithTerminalSize.join();
     DisplayConsumption.join();

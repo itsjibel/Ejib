@@ -56,28 +56,23 @@ class CommandLine : public File
                             explanation += ch;
                         else if (ch == ']')
                             startGivingExplain=true;
-                    setColor(6);
-                    cout<<'\t'<<key;
-                    setColor(5);
-                    cout<<explanation<<'\n';
+                    ColourizePrint('\t' + key, 6);
+                    ColourizePrint(explanation + '\n', 5);
                 }
                 myfile.close();
             } else {
-                setColor(4);
-                cout << "\tUnable to open \'"<<helpFileName<<"' file!\n"; 
+                ColourizePrint("\tUnable to open \'" + helpFileName + "' file!\n", 4);
             }
         }
 
         void COMMAND_LINE()
         {
             string cmd;
-            setColor(2);
-
             #if (defined (_WIN32) || defined (_WIN64))
-            cout<<"cmd: ";
+            ColourizePrint("cmd: ", 2)
             #endif
             #if (defined (LINUX) || defined (__linux__))
-            cout<<"\e[1mcmd: \e[0m";
+            ColourizePrint("\e[1mcmd: \e[0m", 2);
             #endif
 
             getline (cin, cmd);
@@ -118,12 +113,10 @@ class CommandLine : public File
             } else if (cmd == "") {} else {
                 if (_firstError)
                 {
-                    setColor(4);
-                    cout<<"[Command Error]: command not found (type \'help\' for help)\n";
+                    ColourizePrint("[Command Error]: command not found (type \'help\' for help)\n", 4);
                     _firstError = false;
                 } else {
-                    setColor(4);
-                    cout<<"[Command Error]: command not found\n";
+                    ColourizePrint("[Command Error]: command not found\n", 4);
                 }
             }
         }
@@ -133,37 +126,31 @@ void CommandLine::printTabs() {
     gotoxy (0, 0);
     cout<<"  ";
     #if (defined (_WIN32) || defined (_WIN64))
-    setColor(91);
+    ColourizePrint(' ', 91);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    setColor(44);
+    ColourizePrint(' ', 44);
     #endif
-    cout<<" ";
-    setColor(0);
-    cout<<" \e[1m"<<fileName<<"\e[0m ";
+    ColourizePrint(" \e[1m" + fileName + "\e[0m ", 7);
     #if (defined (_WIN32) || defined (_WIN64))
-    setColor(91);
+    ColourizePrint(' ', 91);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    setColor(44);
+    ColourizePrint(' ', 44);
     #endif
-    cout<<" ";
-    setColor(0);
 
-    for (int i=6 + fileName.size(); i<TerminalColumn; i++)
-        cout<<" ";
+    for (int i=18 + fileName.size(); i<TerminalColumn; i++)
+        cout<<' ';
 
     string bar;
     for (int i=0; i<TerminalColumn; i++) bar+=" ";
+    gotoxy(0, 1);
     #if (defined (_WIN32) || defined (_WIN64))
-    setColor(97);
+    ColourizePrint(bar, 97);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    setColor(44);
+    ColourizePrint(bar, 44);
     #endif
-    gotoxy(0, 1);
-    cout<<bar;
-    setColor(0);
 }
 
 void CommandLine::printText(const vector<vector<char>> &text, const int &selectedCharacterStart,
@@ -229,36 +216,30 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
 
             #if (defined (_WIN32) || defined (_WIN64))
             if (j + startPrintLine == line)
-                setColor(15);
+                ColourizePrint(numberLines[j], 15);
             else
-                setColor(8);
-            cout<<numberLines[j];
+                ColourizePrint(numberLines[j], 8);
             #endif
             #if (defined (LINUX) || defined (__linux__))
             if (j + startPrintLine == line)
                 cout<<BOLD(FWHT("\e[1m" + to_string(numberLines[j]) + "\e[0m"));
             else {
-                setColor(90);
-                cout<<"\e[1m" + to_string(numberLines[j]) + "\e[0m";
+                ColourizePrint("\e[1m" + to_string(numberLines[j]) + "\e[0m", 90);
             }
             #endif
 
             #if (defined (_WIN32) || defined (_WIN64))
-            setColor(91);
+            ColourizePrint(' ', 91);
             #endif
             #if (defined (LINUX) || defined (__linux__))
-            setColor(44);
+            ColourizePrint(' ', 44);
             #endif
-
-            cout<<" ";
-            setColor(0);
             colourizeText(lines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine, column);
         } else {
             blankView += "~";
             for (int i=0; i<TerminalColumn - 1; i++) blankView += " ";
         }
-    setColor(6);
-    cout<<blankView;
+    ColourizePrint(blankView, 6);
     ShowConsoleCursor(true);
     if (text.at(0).size() == 0 && text.size() == 1)
         gotoxy (0, 2);
@@ -270,27 +251,23 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
 void CommandLine::printInfo()
 {
     ShowConsoleCursor(false);
-    gotoxy (0, TerminalLine - 2);
     string modeView;
     
     for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
     modeView += "-- INSERT --";
     for (int i=0; i<TerminalColumn/2-5; i++) modeView+=" ";
 
+    gotoxy (0, TerminalLine - 2);
     setColor(7);
     #if (defined (_WIN32) || defined (_WIN64))
-    setColor(97);
+    ColourizePrint(modeView, 97);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    setColor(44);
+    ColourizePrint(modeView, 44);
     #endif
-
-    cout<<modeView;
-    setColor(0);
     gotoxy (0, TerminalLine - 1);
-    setColor(2);
+    ColourizePrint("\e[1mcmd@edit:\e[0m", 2);
 
-    cout<<"\e[1mcmd@edit:\e[0m";
     float percentageTextSeen = 100.0 / input.size() * (startPrintLine + TerminalLine - 1) < 100.0 ?\
           percentageTextSeen = 100.0 / input.size() * (startPrintLine + TerminalLine - 1) : 100.0;
 
@@ -299,14 +276,12 @@ void CommandLine::printInfo()
             TerminalLine - 1);
 
     #if (defined (_WIN32) || defined (_WIN64))
-    setColor(11);
-    cout<<"("<<int(percentageTextSeen)<<"%) ";
+    ColourizePrint("(" + int(percentageTextSeen) + "%) ", 11);
     #endif
 
     #if (defined (LINUX) || defined (__linux__))
     cout<<BOLD(FCYN(" ("<<int(percentageTextSeen)<<"%) "));
     #endif
-    setColor(3);
-    cout<<"Ln "<<lineSelected + 1<<", Col "<<columnSelected + 1;
+    ColourizePrint("Ln " + to_string(lineSelected + 1) + ", Col " + to_string(columnSelected + 1), 3);
     ShowConsoleCursor(true);
 }
