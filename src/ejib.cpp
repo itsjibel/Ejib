@@ -11,7 +11,8 @@ class EditorSystem: public VisualCommand
         void EDIT_SYSTEM();
 
     public:
-        void SYSTEM() {
+        void SYSTEM()
+        {
             while (1)
             {
                 if (mode == "edit")
@@ -268,26 +269,9 @@ void EditorSystem::EDIT_SYSTEM()
 
     if (something_happen_in_text_view)
     {
-        open=0;
-        NumberOfOpenScopes=0;
-        NumberOfCloseScopes=0;
-        scopesAreScaned=false;
         printInfo();
         printTabs();
         printText(input, -1, -1, lineSelected, columnSelected);
-        scopesAreScaned=true;
-
-        if (ScopeCharacterIsClose != tempScopeCharacterIsClose ||
-            ScopeCharacterIsOpen != tempScopeCharacterIsOpen)
-        {
-            open=0;
-            printText(input, -1, -1, lineSelected, columnSelected);
-            open=0;
-            printText(input, -1, -1, lineSelected, columnSelected);
-        }
-
-        tempScopeCharacterIsClose = ScopeCharacterIsClose;
-        tempScopeCharacterIsOpen = ScopeCharacterIsOpen;
     }
 }
 

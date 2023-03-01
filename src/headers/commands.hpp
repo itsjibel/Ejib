@@ -194,7 +194,6 @@ void CommandLine::printText(const vector<vector<char>> &text, const int &selecte
 
     int numberDigits_Of_LargestLineNumber = floor(log10(biggestNumberLine) + 1);
     gotoxy(0, 2);
-    NumberOfOpenScopes=0;
     for (int j=0; j<TerminalLine - 4; j++)
         if (j<VisableLines)
         {
