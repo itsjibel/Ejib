@@ -43,6 +43,7 @@ using std::vector;
 
 #if (defined (_WIN32) || defined (_WIN64))
 #include <windows.h>
+#include <conio.h>
 
 HANDLE hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
 void gotoxy (SHORT x, SHORT y)
@@ -65,9 +66,53 @@ void setColor(int ColorCode)
 #endif
 
 #if (defined (LINUX) || defined (__linux__))
+#include <termios.h>
+
 void gotoxy(int x, int y)
 {
     printf("%c[%d;%df", 0x1B, y + 1, x + 1);
+}
+
+static struct termios old, current;
+// Initialize new terminal i/o settings 
+void initTermios(int echo)
+{
+    tcgetattr(0, &old); // grab old terminal i/o settings
+    current = old; // make new settings same as old settings
+    current.c_lflag &= ~ICANON; // disable buffered i/o
+    if (echo)
+        current.c_lflag |= ECHO; // set echo mode
+    else
+        current.c_lflag &= ~ECHO; // set no echo mode
+    tcsetattr(0, TCSANOW, &current); // use these new terminal i/o settings now
+}
+
+// Restore old terminal i/o settings
+void resetTermios(void)
+{
+    tcsetattr(0, TCSANOW, &old);
+}
+
+// Read 1 character - echo defines echo mode
+char getch_(int echo)
+{
+    char ch;
+    initTermios(echo);
+    ch = getchar();
+    resetTermios();
+    return ch;
+}
+
+// Read 1 character without echo
+char getch(void)
+{
+    return getch_(0);
+}
+
+// Read 1 character with echo
+char getche(void)
+{
+    return getch_(1);
 }
 
 void setColor(int ColorCode)
@@ -274,7 +319,7 @@ bool IsSeparatorCharacter (char character) {
         return false;
 }
 
-void clearTerminal() {
+void ClearTerminalScreen() {
     #if (defined (_WIN32) || defined (_WIN64))
     system("cls");
     #endif

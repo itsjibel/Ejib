@@ -1,6 +1,5 @@
 #include <cmath>
 #include "consumption_info.hpp"
-#include "file.hpp"
 
 vector<char> emptyVector;
 vector<vector<char>> input;
@@ -192,7 +191,7 @@ void EditorUI::printTabs()
     #if (defined (LINUX) || defined (__linux__))
     ColourizePrint(' ', 44);
     #endif
-    ColourizePrint(" \e[1m" + fileName + "\e[0m ", 7);
+    ColourizePrint(" \e[1m" + CurrentFileName + "\e[0m ", 7);
     #if (defined (_WIN32) || defined (_WIN64))
     ColourizePrint(' ', 91);
     #endif
@@ -200,7 +199,7 @@ void EditorUI::printTabs()
     ColourizePrint(' ', 44);
     #endif
 
-    for (int i=18 + fileName.size(); i<TerminalColumn; i++)
+    for (int i=18 + CurrentFileName.size(); i<TerminalColumn; i++)
         cout<<' ';
 
     string bar;

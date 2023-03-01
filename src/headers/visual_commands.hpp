@@ -196,7 +196,7 @@ void VisualCommand::VisualEdit()
     } else if (_string_editCommand == "text -D" || _string_editCommand == "text --delete") {
 
         showMassage("accept");
-        clearEditFile();
+        ClearTerminalScreen();
         printInfo();
         printText(input, -1, -1, lineSelected, columnSelected);
         ShowConsoleCursor (false);
@@ -222,7 +222,7 @@ void VisualCommand::VisualEdit()
     } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
         mode = "file";
         fileSystem("save", input);
-        clearTerminal();
+        ClearTerminalScreen();
         printInfo();
         printTabs();
         printText(input, -1, -1, lineSelected, columnSelected);

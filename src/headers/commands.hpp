@@ -1,11 +1,11 @@
-#include "text_interface.hpp"
-class CommandLine : public File, public EditorUI
+#include "file_interface.hpp"
+class CommandLine : public FileSystem, public EditorUI
 {
     private:
         bool _firstError=true;
 
     public:
-        void clearEditFile()
+        void ClearAllEditFileData()
         {
             columnSelected=0;
             lineSelected=0;
@@ -63,8 +63,8 @@ class CommandLine : public File, public EditorUI
             
             if (cmd == "file -N" || cmd == "file --new") {
                 mode = "edit";
-                clearEditFile();
-                clearTerminal();
+                ClearAllEditFileData();
+                ClearTerminalScreen();
                 printInfo();
                 printTabs();
                 printText(input, -1, -1, lineSelected, columnSelected);
@@ -76,12 +76,12 @@ class CommandLine : public File, public EditorUI
                     printInfo();
                     printTabs();
                     printText(input, -1, -1, lineSelected, columnSelected);
-                } else {
-                    clearTerminal();
-                }
+                } else
+                    ClearTerminalScreen();
+
                 _firstError = true;
             } else if (cmd == "clear") {
-                clearTerminal();
+                ClearTerminalScreen();
                 _firstError = true;
             } else if (cmd == "exit") {
                 exit (0);

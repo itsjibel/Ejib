@@ -253,7 +253,7 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text)
     if (GetCopiedText(copiedText))
     {
         RedoStack.clear();
-        modificationText(copiedText);
+        RemoveTextSpoilerCharacters(copiedText);
         if (text.size() == 0)
             text.insert(text.begin() + line + 1, emptyVector);
         if (mode != "visual")
@@ -612,7 +612,7 @@ void Editor::AdjustingViewportWithSizeOfTerminal()
             && (mode == "visual" || mode == "edit"))
         {
             updateViewport();
-            clearTerminal();
+            ClearTerminalScreen();
             printInfo();
             printTabs();
             printText(input, -1, -1, lineSelected, columnSelected);

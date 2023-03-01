@@ -228,7 +228,7 @@ void EditorSystem::EDIT_SYSTEM()
         case 6:
             mode = "file";
             fileSystem("save", input);
-            clearTerminal();
+            ClearTerminalScreen();
             printInfo();
             printTabs();
             printText(input, -1, -1, lineSelected, columnSelected);
@@ -240,7 +240,7 @@ void EditorSystem::EDIT_SYSTEM()
             break;
         case 16:
             mode = "command";
-            clearTerminal();
+            ClearTerminalScreen();
             break;
         case 21:
             UNDO(1, lineSelected, columnSelected, input);
@@ -277,7 +277,7 @@ void EditorSystem::EDIT_SYSTEM()
 
 int main()
 {
-    clearTerminal();
+    ClearTerminalScreen();
     loadLogo();
 	EditorSystem Ejib;
     std::thread ContorlViewportWithTerminalSize = std::thread (&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
