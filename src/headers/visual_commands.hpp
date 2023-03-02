@@ -180,6 +180,23 @@ void showMassage(string massageType) {
 
 void VisualCommand::VisualEdit()
 {
+    ShowConsoleCursor(false);
+    string modeView;
+
+    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+    modeView += "-- VISUAL --";
+    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+
+    gotoxy (0, TerminalLine - 2);
+    setColor(7);
+    #if (defined (_WIN32) || defined (_WIN64))
+    ColorPrint(modeView, 97);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
+    ColorPrint(modeView, 44);
+    #endif
+    ShowConsoleCursor(true);
+    gotoxy (10, TerminalLine - 1);
     VisualCommandInput();
     _VisualCommandText.clear();
     gotoxy (10, TerminalLine - 1);

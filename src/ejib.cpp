@@ -4,49 +4,29 @@
 #include "headers/mingw.thread.hpp"
 #endif
 
-
 class EditorSystem: public VisualCommand
 {
     private:
-        void EDIT_SYSTEM();
+        void TextEditSystem();
 
     public:
-        void SYSTEM()
+        void MainSystem()
         {
             while (1)
             {
                 if (mode == "edit")
-                    EDIT_SYSTEM();
+                    TextEditSystem();
 
-                if (mode == "command")
+                else if (mode == "command")
                     CommandsRouter();
 
-                if (mode == "visual")
-                {
-                    ShowConsoleCursor(false);
-                    string modeView;
-
-                    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
-                    modeView += "-- VISUAL --";
-                    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
-
-                    gotoxy (0, TerminalLine - 2);
-                    setColor(7);
-                    #if (defined (_WIN32) || defined (_WIN64))
-                    ColorPrint(modeView, 97);
-                    #endif
-                    #if (defined (LINUX) || defined (__linux__))
-                    ColorPrint(modeView, 44);
-                    #endif
-                    ShowConsoleCursor(true);
-                    gotoxy (10, TerminalLine - 1);
+                else if (mode == "visual")
                     VisualEdit();
-                }
             }
         }
 };
 
-void EditorSystem::EDIT_SYSTEM()
+void EditorSystem::TextEditSystem()
 {
     int ch;
     bool something_happen_in_text_view=false;
@@ -282,7 +262,7 @@ int main()
 	EditorSystem Ejib;
     std::thread ContorlViewportWithTerminalSize = std::thread (&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
     std::thread DisplayConsumption = std::thread (&DisplayMemoryUsage, std::ref(mode), std::ref(TerminalColumn));
-	Ejib.SYSTEM();
+	Ejib.MainSystem();
     ContorlViewportWithTerminalSize.join();
     DisplayConsumption.join();
 }

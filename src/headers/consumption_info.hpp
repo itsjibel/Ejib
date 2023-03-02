@@ -49,9 +49,12 @@ void DisplayMemoryUsage(string &mode, int &terminalColumn)
                            MemoryUsageRawString[MemoryUsageRawString.size() - 2] +\
                            MemoryUsageRawString[MemoryUsageRawString.size() - 1];
 
+            /*
             ShowConsoleCursor(false);
             gotoxy(terminalColumn - MemoryUseage.size() - 9, 0);
             ColorPrint("| MEM: " + MemoryUseage + " |", 3);
+            */
+           
             Sleep(100);
         } else
             Sleep(1);
