@@ -1,11 +1,8 @@
 #include "file_interface.hpp"
 class CommandLine : public FileSystem, public EditorUI
 {
-    private:
-        bool _firstError=true;
-
     public:
-        void ClearAllEditFileData()
+        void ResetAllEditFileData()
         {
             columnSelected=0;
             lineSelected=0;
@@ -15,21 +12,22 @@ class CommandLine : public FileSystem, public EditorUI
             input.push_back(emptyVector);
         }
 
-        void showHelpFile(string helpFileName)
+        void DisplayHelpFile(string helpFileName)
         {
             string line;
-            ifstream myfile("../helps/" + helpFileName);
+            ifstream HelpFile("../helps/" + helpFileName);
 
-            if (myfile.is_open()) {
-                while(getline (myfile, line))
+            if (HelpFile.is_open())
+            {
+                while(getline (HelpFile, line))
                 {
-                    string key, explanation;
+                    string SwitchName, explanation;
 
                     for (char ch : line)
                         if (ch != ']')
-                            key += ch;
+                            SwitchName += ch;
                         else {
-                            key += ch;
+                            SwitchName += ch;
                             break;
                         }
 
@@ -40,16 +38,16 @@ class CommandLine : public FileSystem, public EditorUI
                             explanation += ch;
                         else if (ch == ']')
                             startGivingExplain=true;
-                    ColorPrint('\t' + key, 6);
+
+                    ColorPrint('\t' + SwitchName, 6);
                     ColorPrint(explanation + '\n', 5);
                 }
-                myfile.close();
-            } else {
+                HelpFile.close();
+            } else
                 ColorPrint("\tUnable to open \'" + helpFileName + "' file!\n", 4);
-            }
         }
 
-        void COMMAND_LINE()
+        void CommandsRouter()
         {
             string cmd;
             #if (defined (_WIN32) || defined (_WIN64))
@@ -63,13 +61,12 @@ class CommandLine : public FileSystem, public EditorUI
             
             if (cmd == "file -N" || cmd == "file --new") {
                 mode = "edit";
-                ClearAllEditFileData();
+                ResetAllEditFileData();
                 ClearTerminalScreen();
                 printInfo();
                 printTabs();
                 printText(input, -1, -1, lineSelected, columnSelected);
                 gotoxy (0, 2);
-                _firstError = true;
             } else if (cmd == "file -O" || cmd == "file --open") {
                 if (fileSystem("open", input) == true) {
                     mode = "edit";
@@ -78,30 +75,32 @@ class CommandLine : public FileSystem, public EditorUI
                     printText(input, -1, -1, lineSelected, columnSelected);
                 } else
                     ClearTerminalScreen();
-
-                _firstError = true;
-            } else if (cmd == "clear") {
-                ClearTerminalScreen();
-                _firstError = true;
-            } else if (cmd == "exit") {
-                exit (0);
-            } else if (cmd == "help") {
-                showHelpFile("help.txt");
-                _firstError = true;
-            } else if (cmd == "help -F" || cmd == "help --file") {
-                showHelpFile("file_help.txt");
-            } else if (cmd == "help -V" || cmd == "help --visual") {
-                showHelpFile("visual_mode_help.txt");
-            } else if (cmd == "help -S" || cmd == "help --shortcuts") {
-                showHelpFile("shortcuts_help.txt");
-            } else if (cmd == "") {} else {
-                if (_firstError)
-                {
-                    ColorPrint("[Command Error]: command not found (type \'help\' for help)\n", 4);
-                    _firstError = false;
-                } else {
-                    ColorPrint("[Command Error]: command not found\n", 4);
-                }
             }
+
+            else if (cmd == "clear")
+                ClearTerminalScreen();
+                
+            else if (cmd == "exit")
+                exit (0);
+
+            else if (cmd == "help")
+                DisplayHelpFile("help.txt");
+
+            else if (cmd == "help -F" ||
+                     cmd == "help --file")
+                DisplayHelpFile("file_help.txt");
+            
+            else if (cmd == "help -V" ||
+                     cmd == "help --visual")
+                DisplayHelpFile("visual_mode_help.txt");
+
+            else if (cmd == "help -S" ||
+                     cmd == "help --shortcuts")
+                DisplayHelpFile("shortcuts_help.txt");
+
+            else if (cmd == "") {}
+
+            else
+                ColorPrint("[Command Error]: command not found\n", 4);
         }
 };

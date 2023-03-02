@@ -19,7 +19,7 @@ class EditorSystem: public VisualCommand
                     EDIT_SYSTEM();
 
                 if (mode == "command")
-                    COMMAND_LINE();
+                    CommandsRouter();
 
                 if (mode == "visual")
                 {
