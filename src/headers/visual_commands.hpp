@@ -3,7 +3,7 @@
 class VisualCommand: public Editor
 {
     private:
-        vector<vector<char>> _editCommand;
+        vector<vector<char>> _VisualCommandText;
         int _columnSelected=0, line=0;
         bool _something_happen_in_text_view=false;
         string _string_editCommand;
@@ -21,10 +21,10 @@ void VisualCommand::VisualCommandInput()
     {
         int ch;
 
-        if (_editCommand.size() == 0)
-            _editCommand.push_back(emptyVector);
+        if (_VisualCommandText.size() == 0)
+            _VisualCommandText.push_back(emptyVector);
 
-        _columnSelected = _columnSelected > _editCommand.at(0).size() ? _editCommand.at(0).size() : _columnSelected;
+        _columnSelected = _columnSelected > _VisualCommandText.at(0).size() ? _VisualCommandText.at(0).size() : _columnSelected;
 
         #if (defined (_WIN32) || defined (_WIN64))
         switch (ch = getch()) {
@@ -79,15 +79,15 @@ void VisualCommand::VisualCommandInput()
                         switch(ch = getch())
                         {
                             case 68:
-                                LEFT(line, _columnSelected, _editCommand);
+                                LEFT(line, _columnSelected, _VisualCommandText);
                                 break;
                             case 67:
-                                RIGHT(line, _columnSelected, _editCommand);
+                                RIGHT(line, _columnSelected, _VisualCommandText);
                                 break;
                             case 51:
                                 switch(ch = getch()) {
                                     case 126:
-                                        DELETE(line, _columnSelected, _editCommand, false);
+                                        DELETE(line, _columnSelected, _VisualCommandText, false);
                                         break;
                                     default: ;
                                 }
@@ -99,52 +99,52 @@ void VisualCommand::VisualCommandInput()
                 }
                 break;
             case 127:
-                BACKSPACE(line, _columnSelected, _editCommand, false);
+                BACKSPACE(line, _columnSelected, _VisualCommandText, false);
                 _something_happen_in_text_view=true;
                 break;
             case 9:
-                TAB(line, _columnSelected, _editCommand);
+                TAB(line, _columnSelected, _VisualCommandText);
                 _something_happen_in_text_view=true;
                 break;
             case 22:
-                PASTE(line, _columnSelected, _editCommand);
+                PASTE(line, _columnSelected, _VisualCommandText);
                 _something_happen_in_text_view=true;
                 break;
             case 10:
                 enter = true;
                 break;
             default:
-                INPUT_CHARACTER(ch, line, _columnSelected, _editCommand);
+                INPUT_CHARACTER(ch, line, _columnSelected, _VisualCommandText);
                 _something_happen_in_text_view=true;
         }
         #endif
         bool showBigCommandWarning=false;
 
-        while (_editCommand.at(0).size() > 32)
+        while (_VisualCommandText.at(0).size() > 32)
         {
-            _editCommand.at(0).pop_back();
+            _VisualCommandText.at(0).pop_back();
             showBigCommandWarning=true;
         }
         
         ShowConsoleCursor(false);
         gotoxy (0, TerminalLine - 1);
         #if (defined (_WIN32) || defined (_WIN64))
-        ColourizePrint("cmd@edit: ", 10);
+        ColorPrint("cmd@edit: ", 10);
         #endif
         #if (defined (LINUX) || defined (__linux__))
-        ColourizePrint("\e[1mcmd@edit: \e[0m", 32);
+        ColorPrint("\e[1mcmd@edit: \e[0m", 32);
         #endif
 
         if (showBigCommandWarning)
         {
             gotoxy (44, TerminalLine - 1);
-            ColourizePrint("[B]", 6);
+            ColorPrint("[B]", 6);
         }
 
         _string_editCommand="";
 
-        for (int i=0; i<_editCommand.at(0).size(); i++)
-            _string_editCommand+=_editCommand.at(0).at(i);
+        for (int i=0; i<_VisualCommandText.at(0).size(); i++)
+            _string_editCommand+=_VisualCommandText.at(0).at(i);
 
         gotoxy(10, TerminalLine - 1);
         cout<<_string_editCommand;
@@ -167,13 +167,13 @@ void showMassage(string massageType) {
     if (massageType == "accept")
     {
         gotoxy (44, TerminalLine - 1);
-        ColourizePrint("[+]", 2);
+        ColorPrint("[+]", 2);
     } else if (massageType == "command not found") {
         gotoxy (44, TerminalLine - 1);
-        ColourizePrint("[!]", 4);
+        ColorPrint("[!]", 4);
     } else if (massageType == "nothing found") {
         gotoxy (44, TerminalLine - 1);
-        ColourizePrint("[?]", 4);
+        ColorPrint("[?]", 4);
     }
     
 }
@@ -181,7 +181,7 @@ void showMassage(string massageType) {
 void VisualCommand::VisualEdit()
 {
     VisualCommandInput();
-    _editCommand.clear();
+    _VisualCommandText.clear();
     gotoxy (10, TerminalLine - 1);
     cout<<"                                     ";
 
@@ -201,7 +201,7 @@ void VisualCommand::VisualEdit()
         printText(input, -1, -1, lineSelected, columnSelected);
         ShowConsoleCursor (false);
         gotoxy (44, TerminalLine - 1);
-        ColourizePrint("[+]", 2);
+        ColorPrint("[+]", 2);
     } else if (_string_editCommand.find("text -S \"")       == 0 ||
                 _string_editCommand.find("text --search \"") == 0) {
         string key;

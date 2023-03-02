@@ -605,8 +605,8 @@ void Editor::AdjustingViewportWithSizeOfTerminal()
     while(1)
     {
         bool sizeChanged=false;
-        TerminalLine = getTerminaLine_Column().at(0);
-        TerminalColumn = getTerminaLine_Column().at(1);
+        TerminalLine = GetTerminal_LineAndColumn().at(0);
+        TerminalColumn = GetTerminal_LineAndColumn().at(1);
 
         if ((TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp)
             && (mode == "visual" || mode == "edit"))

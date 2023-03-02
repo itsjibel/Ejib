@@ -174,8 +174,8 @@ string byteConverter(long long int bytes)
     return "Unknown size";
 }
 
-Bool PrintSelection(Display *display, Window window, const char *bufname,
-                    const char *fmtname, string &text)
+Bool GetLinuxClipboard(Display *display, Window window, const char *bufname,
+                       const char *fmtname, string &text)
 {
     char *result;
     unsigned long ressize, restail;
@@ -215,10 +215,11 @@ bool GetCopiedText(string &copiedText)
     Display *display = XOpenDisplay(NULL);
     unsigned long color = BlackPixel(display, DefaultScreen(display));
     Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0,0, 1,1, 0, color, color);
-    Bool result = PrintSelection(display, window, "CLIPBOARD", "UTF8_STRING", copiedText) || PrintSelection(display, window, "CLIPBOARD", "STRING", copiedText);
+    Bool Clipboard_Info_Received = GetLinuxClipboard(display, window, "CLIPBOARD", "UTF8_STRING", copiedText) ||
+                  GetLinuxClipboard(display, window, "CLIPBOARD", "STRING", copiedText);
     XDestroyWindow(display, window);
     XCloseDisplay(display);
-    return result;
+    return Clipboard_Info_Received;
     #endif
     #if (defined (_WIN32) || defined (_WIN64))
     if (OpenClipboard(NULL))
@@ -231,14 +232,14 @@ bool GetCopiedText(string &copiedText)
 }
 
 template <class T>
-void ColourizePrint(T text, int color)
+void ColorPrint(T text, int color)
 {
     setColor(color);
     cout<<text;
     setColor(0);
 }
 
-vector<int> getTerminaLine_Column()
+vector<int> GetTerminal_LineAndColumn()
 {
     vector<int> TerminalSize;
     #if (defined (_WIN32) || defined (_WIN64))
@@ -248,6 +249,7 @@ vector<int> getTerminaLine_Column()
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
     TerminalSize.push_back(csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
     #endif
+
     #if (defined (LINUX) || defined (__linux__))
     struct winsize w;
     ioctl (STDOUT_FILENO, TIOCGWINSZ, &w);
@@ -260,14 +262,16 @@ vector<int> getTerminaLine_Column()
 void loadLogo()
 {
     string line;
-    ifstream myfile ("../EjibTextLogo.txt");
-    if (myfile.is_open())
+    ifstream TextLogoFile ("../EjibTextLogo.txt");
+    if (TextLogoFile.is_open())
     {
-        while (getline(myfile, line))
+        while (getline(TextLogoFile, line))
         {
             bool ColorIsChangable=true;
-            for (char ch : line) {
+            for (char ch : line)
+            {
                 if (ColorIsChangable)
+                {
                     if (ch == 'E')
                         setColor(14);
                     else if (ch == 'B')
@@ -285,22 +289,24 @@ void loadLogo()
                     }
                     else
                         setColor(0);
+                }
                 else if (ch == '|')
                     setColor(1);
                 else if (ch == 'v')
                     setColor(7);
                 else if (ch == '\'')
                     setColor(3);
+
                 cout<<ch;
             }
             cout<<'\n';
         }
-    } else {
-        ColourizePrint("[Path Error]: Unable to open logo file\n", 4);
-    }
+    } else
+        ColorPrint("[Path Error]: Unable to open logo file\n", 4);
 }
 
-bool IsSeparatorCharacter (char character) {
+bool IsSeparatorCharacter (char character)
+{
     if
     (
         character == ' ' || character == '.' ||

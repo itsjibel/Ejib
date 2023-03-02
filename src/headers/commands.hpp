@@ -40,12 +40,12 @@ class CommandLine : public FileSystem, public EditorUI
                             explanation += ch;
                         else if (ch == ']')
                             startGivingExplain=true;
-                    ColourizePrint('\t' + key, 6);
-                    ColourizePrint(explanation + '\n', 5);
+                    ColorPrint('\t' + key, 6);
+                    ColorPrint(explanation + '\n', 5);
                 }
                 myfile.close();
             } else {
-                ColourizePrint("\tUnable to open \'" + helpFileName + "' file!\n", 4);
+                ColorPrint("\tUnable to open \'" + helpFileName + "' file!\n", 4);
             }
         }
 
@@ -53,10 +53,10 @@ class CommandLine : public FileSystem, public EditorUI
         {
             string cmd;
             #if (defined (_WIN32) || defined (_WIN64))
-            ColourizePrint("cmd: ", 2)
+            ColorPrint("cmd: ", 2)
             #endif
             #if (defined (LINUX) || defined (__linux__))
-            ColourizePrint("\e[1mcmd: \e[0m", 2);
+            ColorPrint("\e[1mcmd: \e[0m", 2);
             #endif
 
             getline (cin, cmd);
@@ -97,10 +97,10 @@ class CommandLine : public FileSystem, public EditorUI
             } else if (cmd == "") {} else {
                 if (_firstError)
                 {
-                    ColourizePrint("[Command Error]: command not found (type \'help\' for help)\n", 4);
+                    ColorPrint("[Command Error]: command not found (type \'help\' for help)\n", 4);
                     _firstError = false;
                 } else {
-                    ColourizePrint("[Command Error]: command not found\n", 4);
+                    ColorPrint("[Command Error]: command not found\n", 4);
                 }
             }
         }

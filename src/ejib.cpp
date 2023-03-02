@@ -33,10 +33,10 @@ class EditorSystem: public VisualCommand
                     gotoxy (0, TerminalLine - 2);
                     setColor(7);
                     #if (defined (_WIN32) || defined (_WIN64))
-                    ColourizePrint(modeView, 97);
+                    ColorPrint(modeView, 97);
                     #endif
                     #if (defined (LINUX) || defined (__linux__))
-                    ColourizePrint(modeView, 44);
+                    ColorPrint(modeView, 44);
                     #endif
                     ShowConsoleCursor(true);
                     gotoxy (10, TerminalLine - 1);
@@ -281,8 +281,7 @@ int main()
     loadLogo();
 	EditorSystem Ejib;
     std::thread ContorlViewportWithTerminalSize = std::thread (&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
-    std::thread DisplayConsumption = std::thread (&display_MEM_USAGE, std::ref(mode),
-                                                  std::ref(TerminalColumn), std::ref(TerminalLine));
+    std::thread DisplayConsumption = std::thread (&DisplayMemoryUsage, std::ref(mode), std::ref(TerminalColumn));
 	Ejib.SYSTEM();
     ContorlViewportWithTerminalSize.join();
     DisplayConsumption.join();

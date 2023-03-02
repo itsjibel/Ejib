@@ -1,9 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include "file_system.hpp"
 
-int parseLine(char* line){
+int parseLine(char* line)
+{
     // This assumes that a digit will be found and the line ends in " Kb".
     int i = strlen(line);
     const char* p = line;
@@ -13,7 +12,7 @@ int parseLine(char* line){
     return i;
 }
 
-string MEM_USAGE()
+string EditorMemoryUsage()
 {
     FILE* file = fopen("/proc/self/status", "r");
     int result = -1;
@@ -31,28 +30,28 @@ string MEM_USAGE()
     return byteConverter(result * 1024);
 }
 
-void display_MEM_USAGE(string &mode, int &terminalColumn, int &terminalLine)
+void DisplayMemoryUsage(string &mode, int &terminalColumn)
 {
     while (1)
     {
         if (mode == "edit")
         {
-            string raw_MEM_USAGE_String = MEM_USAGE();
-            string MemUseage;
+            string MemoryUsageRawString = EditorMemoryUsage();
+            string MemoryUseage;
 
-            for (char ch : raw_MEM_USAGE_String)
+            for (char ch : MemoryUsageRawString)
                 if (ch == '.')
                     break;
                 else
-                    MemUseage += ch;
+                    MemoryUseage += ch;
 
-            MemUseage = MemUseage +\
-                        raw_MEM_USAGE_String[raw_MEM_USAGE_String.size() - 2] +\
-                        raw_MEM_USAGE_String[raw_MEM_USAGE_String.size() - 1];
+            MemoryUseage = MemoryUseage +\
+                           MemoryUsageRawString[MemoryUsageRawString.size() - 2] +\
+                           MemoryUsageRawString[MemoryUsageRawString.size() - 1];
 
             ShowConsoleCursor(false);
-            gotoxy(terminalColumn - MemUseage.size() - 9, 0);
-            ColourizePrint("| MEM: " + MemUseage + " |", 3);
+            gotoxy(terminalColumn - MemoryUseage.size() - 9, 0);
+            ColorPrint("| MEM: " + MemoryUseage + " |", 3);
             Sleep(100);
         } else
             Sleep(1);

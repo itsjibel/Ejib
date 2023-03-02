@@ -165,7 +165,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
 
         if (color != tempColor)
         {
-            ColourizePrint(textPart, tempColor);
+            ColorPrint(textPart, tempColor);
             textPart.clear();
             textPart += character;
         } else textPart += character;
@@ -178,7 +178,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
             selectedArea=false;
 
     }
-    ColourizePrint(textPart, color);
+    ColorPrint(textPart, color);
 }
 
 void EditorUI::printTabs()
@@ -186,17 +186,17 @@ void EditorUI::printTabs()
     gotoxy (0, 0);
     cout<<"  ";
     #if (defined (_WIN32) || defined (_WIN64))
-    ColourizePrint(' ', 91);
+    ColorPrint(' ', 91);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    ColourizePrint(' ', 44);
+    ColorPrint(' ', 44);
     #endif
-    ColourizePrint(" \e[1m" + CurrentFileName + "\e[0m ", 7);
+    ColorPrint(" \e[1m" + CurrentFileName + "\e[0m ", 7);
     #if (defined (_WIN32) || defined (_WIN64))
-    ColourizePrint(' ', 91);
+    ColorPrint(' ', 91);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    ColourizePrint(' ', 44);
+    ColorPrint(' ', 44);
     #endif
 
     for (int i=18 + CurrentFileName.size(); i<TerminalColumn; i++)
@@ -206,10 +206,10 @@ void EditorUI::printTabs()
     for (int i=0; i<TerminalColumn; i++) bar+=" ";
     gotoxy(0, 1);
     #if (defined (_WIN32) || defined (_WIN64))
-    ColourizePrint(bar, 97);
+    ColorPrint(bar, 97);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    ColourizePrint(bar, 44);
+    ColorPrint(bar, 44);
     #endif
 }
 
@@ -275,30 +275,30 @@ void EditorUI::printText(const vector<vector<char>> &text, const int &selectedCh
 
             #if (defined (_WIN32) || defined (_WIN64))
             if (j + startPrintLine == line)
-                ColourizePrint(numberLines[j], 15);
+                ColorPrint(numberLines[j], 15);
             else
-                ColourizePrint(numberLines[j], 8);
+                ColorPrint(numberLines[j], 8);
             #endif
             #if (defined (LINUX) || defined (__linux__))
             if (j + startPrintLine == line)
                 cout<<BOLD(FWHT("\e[1m" + to_string(numberLines[j]) + "\e[0m"));
             else {
-                ColourizePrint("\e[1m" + to_string(numberLines[j]) + "\e[0m", 90);
+                ColorPrint("\e[1m" + to_string(numberLines[j]) + "\e[0m", 90);
             }
             #endif
 
             #if (defined (_WIN32) || defined (_WIN64))
-            ColourizePrint(' ', 91);
+            ColorPrint(' ', 91);
             #endif
             #if (defined (LINUX) || defined (__linux__))
-            ColourizePrint(' ', 44);
+            ColorPrint(' ', 44);
             #endif
             colourizeText(lines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine, column);
         } else {
             blankView += "~";
             for (int i=0; i<TerminalColumn - 1; i++) blankView += " ";
         }
-    ColourizePrint(blankView, 6);
+    ColorPrint(blankView, 6);
     ShowConsoleCursor(true);
     if (text.at(0).size() == 0 && text.size() == 1)
         gotoxy (0, 2);
@@ -319,13 +319,13 @@ void EditorUI::printInfo()
     gotoxy (0, TerminalLine - 2);
     setColor(7);
     #if (defined (_WIN32) || defined (_WIN64))
-    ColourizePrint(modeView, 97);
+    ColorPrint(modeView, 97);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    ColourizePrint(modeView, 44);
+    ColorPrint(modeView, 44);
     #endif
     gotoxy (0, TerminalLine - 1);
-    ColourizePrint("\e[1mcmd@edit:\e[0m", 2);
+    ColorPrint("\e[1mcmd@edit:\e[0m", 2);
 
     float percentageTextSeen = 100.0 / input.size() * (startPrintLine + TerminalLine - 1) < 100.0 ?\
           percentageTextSeen = 100.0 / input.size() * (startPrintLine + TerminalLine - 1) : 100.0;
@@ -341,6 +341,6 @@ void EditorUI::printInfo()
     #if (defined (LINUX) || defined (__linux__))
     cout<<BOLD(FCYN(" ("<<int(percentageTextSeen)<<"%) "));
     #endif
-    ColourizePrint("Ln " + to_string(lineSelected + 1) + ", Col " + to_string(columnSelected + 1), 3);
+    ColorPrint("Ln " + to_string(lineSelected + 1) + ", Col " + to_string(columnSelected + 1), 3);
     ShowConsoleCursor(true);
 }
