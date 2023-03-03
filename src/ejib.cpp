@@ -1,4 +1,4 @@
-#include "headers/visual_commands.hpp"
+#include "headers/visual_mode.hpp"
 
 #if (defined (_WIN32) || defined (_WIN64))
 #include "headers/mingw.thread.hpp"
@@ -223,19 +223,11 @@ void EditorSystem::TextEditSystem()
             ClearTerminalScreen();
             break;
         case 21:
-            UNDO(1, lineSelected, columnSelected, input);
+            UNDO(lineSelected, columnSelected, input);
             something_happen_in_text_view=true;
             break;
         case 18:
-            REDO(1, lineSelected, columnSelected, input);
-            something_happen_in_text_view=true;
-            break;
-        case 25:
-            UNDO(5, lineSelected, columnSelected, input);
-            something_happen_in_text_view=true;
-            break;
-        case 5:
-            REDO(5, lineSelected, columnSelected, input);
+            REDO(lineSelected, columnSelected, input);
             something_happen_in_text_view=true;
             break;
         default:

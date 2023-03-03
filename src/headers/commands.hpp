@@ -1,4 +1,4 @@
-#include "file_interface.hpp"
+#include "UI.hpp"
 class CommandLine : public FileSystem, public EditorUI
 {
     public:

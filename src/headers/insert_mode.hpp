@@ -58,8 +58,8 @@ class Editor: public CommandLine
         void QUICK_DOWN  (int &line, int &column,  const vector<vector<char>> &text);
         void QUICK_RIGHT (int &line, int &column,  const vector<vector<char>> &text);
         
-        void UNDO (int howManyTimes, int &line, int &column, vector<vector<char>> &text);
-        void REDO (int howManyTimes, int &line, int &column, vector<vector<char>> &text);
+        void UNDO (int &line, int &column, vector<vector<char>> &text);
+        void REDO (int &line, int &column, vector<vector<char>> &text);
 
         int  biggestLineNumber();
         bool updateViewport();
@@ -382,9 +382,11 @@ void Editor::QUICK_RIGHT(int &line, int &column, const vector<vector<char>> &tex
     } while (!IsSeparatorCharacter(text.at(line).at(column - 1)));
 }
 
-void Editor::UNDO(int howManyTimes, int &line, int &column, vector<vector<char>> &text)
+void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
 {
-    for (int time=0; time<howManyTimes; time++) {
+    string tempChangeMode = UndoStack.size() > 0 ? GetUndoTrack().changeMode : "";
+    do
+    {
         if (UndoStack.size() > 0)
         {
             RedoStack.push_back(UndoStack.back());
@@ -458,12 +460,19 @@ void Editor::UNDO(int howManyTimes, int &line, int &column, vector<vector<char>>
             }
             UndoStack.pop_back();
         }
-    }
+    } while (
+        UndoStack.size() > 0 &&
+        tempChangeMode == GetUndoTrack().changeMode &&
+        (GetUndoTrack().changeMode == "CharacterInput" ||
+         GetUndoTrack().changeMode == "Backspace"      ||
+         GetUndoTrack().changeMode == "Delete")
+        );
 }
 
-void Editor::REDO(int howManyTimes, int &line, int &column, vector<vector<char>> &text)
+void Editor::REDO(int &line, int &column, vector<vector<char>> &text)
 {
-    for (int time=0; time<howManyTimes; time++)
+    string tempChangeMode = RedoStack.size() > 0 ? GetRedoTrack().changeMode : "";
+    do
     {
         if (RedoStack.size() > 0)
         {
@@ -488,9 +497,10 @@ void Editor::REDO(int howManyTimes, int &line, int &column, vector<vector<char>>
                         vector<char> StringToVector;
                         if (GetRedoTrack().changeMode == "Enter")
                         {
-                            text.insert (text.begin() + line, StringToVector);
-                            column = -1;
+                            text.insert (text.begin() + line + 1, StringToVector);
+                            column = 0;
                             line = line + 1 <= text.size() - 1 ? line + 1 : line;
+                            break;
                         } else {
                             for (int j=saveIndexLine; j<GetRedoTrack().changeString.size(); j++)
                                 if (GetRedoTrack().changeString.at(j) == '\n')
@@ -546,16 +556,21 @@ void Editor::REDO(int howManyTimes, int &line, int &column, vector<vector<char>>
                         line++;
                     BACKSPACE(line, column, text, true);
                 } else if (GetRedoTrack().changeMode == "Delete Line") {
-                    if (line != 0)
-                        line++;
-                    DELETE_LINE(line, column, text, true);
+                    int temp = text.size() == 1 && line == 0 ? 0 : line + 1;
+                    DELETE_LINE(temp, column, text, true);
                 } else if (GetRedoTrack().changeMode == "Delete") {
                     DELETE(line, column, text, true);
                 }
             }
             RedoStack.pop_back();
         }
-    }
+    } while (
+        RedoStack.size() > 0 &&
+        tempChangeMode == GetRedoTrack().changeMode &&
+        (GetRedoTrack().changeMode == "CharacterInput" ||
+         GetRedoTrack().changeMode == "Backspace"      ||
+         GetRedoTrack().changeMode == "Delete")
+        );
 }
 
 int Editor::biggestLineNumber()

@@ -1,4 +1,4 @@
-#include "user_input.hpp"
+#include "insert_mode.hpp"
 
 class VisualCommand: public Editor
 {
