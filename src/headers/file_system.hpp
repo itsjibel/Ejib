@@ -16,7 +16,8 @@ void RemoveTextSpoilerCharacters (string &text)
 {
     for (int i=0; i<text.size(); i++)
     {
-        if (text.at(i) == '\r' || text.at(i) == '\t')
+        if (text.at(i) == '\r' || text.at(i) == '\t' ||
+            (text.at(i) > 31 && text.at(i) < 127))
         {
             if (text.at(i) == '\t')
             {
