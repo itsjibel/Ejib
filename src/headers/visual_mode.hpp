@@ -316,7 +316,7 @@ bool VisualCommand::search(string key, vector<vector<char>> &text, int &line, in
         }
 
         column = column + key.size();
-        updateViewport();
+        UpdateViewport();
         ShowConsoleCursor(false);
         printInfo();
         printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line, column);

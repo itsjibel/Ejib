@@ -236,7 +236,7 @@ void EditorSystem::TextEditSystem()
     }
     #endif
 
-    if (updateViewport())
+    if (UpdateViewport())
         something_happen_in_text_view=true;
 
     if (something_happen_in_text_view)
