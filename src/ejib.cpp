@@ -28,7 +28,7 @@ class EditorSystem: public VisualCommand
 
 void EditorSystem::TextEditSystem()
 {
-    int ch;
+    char ch;
     bool something_happen_in_text_view=false;
     #if (defined (_WIN32) || defined (_WIN64))
     switch (ch = getch())
@@ -194,15 +194,15 @@ void EditorSystem::TextEditSystem()
             mode = "visual";
             break;
         case 10:
-            ENTER(lineSelected, columnSelected, input);
+            ENTER(lineSelected, columnSelected, input, false);
             something_happen_in_text_view=true;
             break;
         case 9:
-            TAB(lineSelected, columnSelected, input);
+            TAB(lineSelected, columnSelected, input, false);
             something_happen_in_text_view=true;
             break;
         case 22:
-            PASTE(lineSelected, columnSelected, input);
+            PASTE(lineSelected, columnSelected, input, false);
             something_happen_in_text_view=true;
             break;
         case 6:
@@ -231,7 +231,7 @@ void EditorSystem::TextEditSystem()
             something_happen_in_text_view=true;
             break;
         default:
-            INPUT_CHARACTER(ch, lineSelected, columnSelected, input);
+            INSERT_CHARACTER(ch, lineSelected, columnSelected, input, false);
             something_happen_in_text_view=true;
     }
     #endif

@@ -19,7 +19,7 @@ void VisualCommand::VisualCommandInput()
     bool enter=false;
     while (!enter)
     {
-        int ch;
+        char ch;
 
         if (_VisualCommandText.size() == 0)
             _VisualCommandText.push_back(emptyVector);
@@ -103,18 +103,18 @@ void VisualCommand::VisualCommandInput()
                 _something_happen_in_text_view=true;
                 break;
             case 9:
-                TAB(line, _columnSelected, _VisualCommandText);
+                TAB(line, _columnSelected, _VisualCommandText, false);
                 _something_happen_in_text_view=true;
                 break;
             case 22:
-                PASTE(line, _columnSelected, _VisualCommandText);
+                PASTE(line, _columnSelected, _VisualCommandText, false);
                 _something_happen_in_text_view=true;
                 break;
             case 10:
                 enter = true;
                 break;
             default:
-                INPUT_CHARACTER(ch, line, _columnSelected, _VisualCommandText);
+                INSERT_CHARACTER(ch, line, _columnSelected, _VisualCommandText, false);
                 _something_happen_in_text_view=true;
         }
         #endif
