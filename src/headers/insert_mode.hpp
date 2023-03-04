@@ -392,7 +392,8 @@ void Editor::QUICK_RIGHT(int &line, int &column, const vector<vector<char>> &tex
 
 void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
 {
-    string tempChangeMode = UndoStack.size() > 0 ? GetLastUndoTrack().changeMode : "";
+    string tempChangeMode = UndoStack.size() > 0 ? GetLastUndoTrack().changeMode : "",
+           lastChangeString;
     do
     {
         if (UndoStack.size() > 0)
@@ -468,12 +469,15 @@ void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
                     }
                 }
             }
+            lastChangeString = GetLastUndoTrack().changeString;
             UndoStack.pop_back();
         }
     } while (
         UndoStack.size() > 0 &&
         tempChangeMode == GetLastUndoTrack().changeMode &&
-        ((GetLastUndoTrack().changeMode == "CharacterInput" && GetLastRedoTrack().changeString.at(0) != ' ') ||
+        ((GetLastUndoTrack().changeMode == "CharacterInput" &&
+          !(GetLastUndoTrack().changeString.at(0) == ' ' || lastChangeString.at(0) == ' ')) ||
+         (GetLastUndoTrack().changeString.at(0) == ' ' && lastChangeString.at(0) == ' ') ||
          GetLastUndoTrack().changeMode == "Backspace" ||
          GetLastUndoTrack().changeMode == "Delete")
         );
@@ -481,7 +485,8 @@ void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
 
 void Editor::REDO(int &line, int &column, vector<vector<char>> &text)
 {
-    string tempChangeMode = RedoStack.size() > 0 ? GetLastRedoTrack().changeMode : "";
+    string tempChangeMode = RedoStack.size() > 0 ? GetLastRedoTrack().changeMode : "",
+           lastChangeString;
     do
     {
         if (RedoStack.size() > 0)
@@ -516,12 +521,15 @@ void Editor::REDO(int &line, int &column, vector<vector<char>> &text)
                     DELETE(line, column, text, true);
                 }
             }
+            lastChangeString = GetLastRedoTrack().changeString;
             RedoStack.pop_back();
         }
     } while (
         RedoStack.size() > 0 &&
         tempChangeMode == GetLastRedoTrack().changeMode &&
-        ((GetLastRedoTrack().changeMode == "CharacterInput" && GetLastRedoTrack().changeString.at(0) != ' ') ||
+        ((GetLastRedoTrack().changeMode == "CharacterInput" &&
+          !(GetLastRedoTrack().changeString.at(0) == ' ' || lastChangeString.at(0) == ' ')) ||
+         (GetLastRedoTrack().changeString.at(0) == ' ' && lastChangeString.at(0) == ' ') ||
          GetLastRedoTrack().changeMode == "Backspace" ||
          GetLastRedoTrack().changeMode == "Delete")
         );
