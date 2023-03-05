@@ -607,23 +607,23 @@ void Editor::AdjustingViewportWithSizeOfTerminal()
 {
     while(1)
     {
-        bool sizeChanged=false;
+        bool sizeIsChanged=false;
         TerminalLine = GetTerminal_LineAndColumn().at(0);
         TerminalColumn = GetTerminal_LineAndColumn().at(1);
 
-        if ((TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp)
-            && (mode == "visual" || mode == "edit"))
+        if ((TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp) &&
+            (mode == "visual" || mode == "edit"))
         {
             UpdateViewport();
             ClearTerminalScreen();
             printInfo();
             printTabs();
             printText(input, -1, -1, lineSelected, columnSelected);
-            sizeChanged=true;
+            sizeIsChanged=true;
             ShowConsoleCursor(true);
         }
 
-        if (sizeChanged)
+        if (sizeIsChanged)
         {
             printInfo();
             printTabs();
