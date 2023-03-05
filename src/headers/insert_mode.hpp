@@ -11,13 +11,23 @@ class Editor: public CommandLine
             int startActionLine;
             int startActioncolumn;
             string changeString;
-            string changeMode;
+            char changeMode;
         };
-
+        /*
+         *Change Modes:
+         *'C' = 'Character'
+         *'S' = 'Space'
+         *'T' = 'Tab'
+         *'P' = 'Paste'
+         *'E' = 'Enter'
+         *'B' = 'Backspace'
+         *'D' = 'Delete'
+         *'L' = 'Delete Line'
+         */
         vector<Track> UndoStack, RedoStack;
         template <class T>
         void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColumn,
-                                 T changeString, string changeMode)
+                                 T changeString, char changeMode)
         {
             Track TrackForAdd;
             TrackForAdd.changeString = changeString;
@@ -72,7 +82,10 @@ void Editor::INSERT_CHARACTER(char &characterInput, int &line, int &column,
     {
         if (mode != "visual" && !USE_FOR_REDO)
         {
-            AddTrackToUndoStack (true, line, column, characterInput, "CharacterInput");
+            if (characterInput == ' ')
+                AddTrackToUndoStack (true, line, column, characterInput, 'S');
+            else
+                AddTrackToUndoStack (true, line, column, characterInput, 'C');
             RedoStack.clear();
         }
         if (column != text.at(line).size())
@@ -103,12 +116,15 @@ void Editor::INSERT_CHARACTER(char &characterInput, int &line, int &column,
 
 void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO)
 {
+    if (text.size() == 1 && text.at(0).size() == 0)
+        return;
+
     if (column > 0)
     {
         if (mode != "visual" && !USE_FOR_REDO)
         {
             RedoStack.clear();
-            AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), "Backspace");
+            AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'B');
         }
         text.at(line).erase (text.at(line).begin() + column - 1);
         column--;
@@ -120,9 +136,11 @@ void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text, bool 
                 string LineForAppending;
                 for (int i=0; i<text.at(line).size(); i++)
                     LineForAppending.push_back (text.at(line).at(i));
+
                 RedoStack.clear();
-                AddTrackToUndoStack (false, line - 1, column, '\n' + LineForAppending, "Backspace");
+                AddTrackToUndoStack (false, line - 1, column, '\n' + LineForAppending, 'B');
             }
+
             line--;
             column = text.at(line).size();
             vector<char> AppendCurrentLineToPreviousLine;
@@ -141,6 +159,9 @@ void Editor::BACKSPACE(int &line, int &column, vector<vector<char>> &text, bool 
 
 void Editor::DELETE(int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO)
 {
+    if (text.size() == 1 && text.at(0).size() == 0)
+        return;
+
     if (text.size() != 0)
     {
         if (text.at(line).size() > column)
@@ -148,20 +169,20 @@ void Editor::DELETE(int &line, int &column, vector<vector<char>> &text, bool USE
             if (mode != "visual" && !USE_FOR_REDO)
             {
                 RedoStack.clear();
-                AddTrackToUndoStack (false, line, column, text.at(line).at(column), "Delete");
+                AddTrackToUndoStack (false, line, column, text.at(line).at(column), 'D');
             }
             text.at(line).erase (text.at(line).begin() + column);
         } else {
             if (line < text.size() - 1)
             {
                 string AppendCurrentLineToNextLine;
-
                 for (int i=0; i<text.at(line + 1).size(); i++)
                     AppendCurrentLineToNextLine.push_back (text.at(line + 1).at(i));
+
                 if (mode != "visual" && !USE_FOR_REDO)
                 {
                     RedoStack.clear();
-                    AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, "Delete");
+                    AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, 'D');
                 }
 
                 for (int i=0; i<text.at(line + 1).size(); i++)
@@ -175,27 +196,30 @@ void Editor::DELETE(int &line, int &column, vector<vector<char>> &text, bool USE
 
 void Editor::DELETE_LINE(int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO)
 {
+    if (text.size() == 1 && text.at(0).size() == 0)
+        return;
+
     if (text.size() > line)
     {
         string CurrentLineForDelete;
-
         for (int i=0; i<text.at(line).size(); i++)
             CurrentLineForDelete.push_back (text.at(line).at(i));
 
-        if (line >= 1)
+        if (line > 0)
         {
             if (mode != "visual" && !USE_FOR_REDO)
             {
                 RedoStack.clear();
-                AddTrackToUndoStack (false, line - 1, column, '\n' + CurrentLineForDelete, "Delete Line");
+                AddTrackToUndoStack (false, line - 1, column, '\n' + CurrentLineForDelete, 'L');
             }
         } else {
             if (mode != "visual" && !USE_FOR_REDO)
             {
                 RedoStack.clear();
-                AddTrackToUndoStack (false, 0, column, CurrentLineForDelete, "Delete Line");
+                AddTrackToUndoStack (false, 0, column, CurrentLineForDelete, 'L');
             }
         }
+
         text.erase(text.begin() + line);
         column=0;
     }
@@ -215,7 +239,7 @@ void Editor::ENTER(int &line, int &column, vector<vector<char>> &text, bool USE_
     if (mode != "visual" && !USE_FOR_REDO)
     {
         RedoStack.clear();
-        AddTrackToUndoStack (true, line, column, '\n', "Enter");
+        AddTrackToUndoStack (true, line, column, '\n', 'E');
     }
 
     vector<char> AppentToNextLine;
@@ -236,7 +260,7 @@ void Editor::TAB(int &line, int &column, vector<vector<char>> &text, bool USE_FO
     if (mode != "visual" && !USE_FOR_REDO)
     {
         RedoStack.clear();
-        AddTrackToUndoStack (true, line, column, "    ", "Tab");
+        AddTrackToUndoStack (true, line, column, "    ", 'T');
     }
 
     text.at(line).insert (text.at(line).begin() + column, {' ', ' ', ' ', ' '});
@@ -263,7 +287,7 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text, bool USE_
 
         if (mode != "visual" && !USE_FOR_REDO)
         {
-            AddTrackToUndoStack (true, line, column, copiedText, "Paste");
+            AddTrackToUndoStack (true, line, column, copiedText, 'P');
             RedoStack.clear();
         }
 
@@ -392,8 +416,7 @@ void Editor::QUICK_RIGHT(int &line, int &column, const vector<vector<char>> &tex
 
 void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
 {
-    string tempChangeMode = UndoStack.size() > 0 ? GetLastUndoTrack().changeMode : "",
-           lastChangeString;
+    char tempChangeMode = UndoStack.size() > 0 ? GetLastUndoTrack().changeMode : ' ';
     do
     {
         if (UndoStack.size() > 0)
@@ -424,7 +447,7 @@ void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
                     text.at(line).push_back(ch);
 
                 if (isMultipleLine)
-                    if (GetLastUndoTrack().changeMode == "Paste")
+                    if (GetLastUndoTrack().changeMode == 'P')
                     {
                         int j=GetLastUndoTrack().changeString.size()-1;
 
@@ -440,7 +463,7 @@ void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
                     if (GetLastUndoTrack().changeString.at(i) == '\n')
                     {
                         vector<char> StringToVector;
-                        if (GetLastUndoTrack().changeMode != "Delete Line")
+                        if (GetLastUndoTrack().changeMode != 'L')
                             for (int j=0; j<GetLastUndoTrack().changeString.size() - 1; j++)
                                 text.at(line).pop_back();
 
@@ -450,18 +473,18 @@ void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
                         StringToVector.erase(StringToVector.begin());
                         text.insert (text.begin() + line + 1, StringToVector);
 
-                        if (GetLastUndoTrack().changeMode == "Backspace" ||
-                            GetLastUndoTrack().changeMode == "Delete Line")
+                        if (GetLastUndoTrack().changeMode == 'B' ||
+                            GetLastUndoTrack().changeMode == 'L')
                             line++;
 
                         isMultipleLine=true;
                     }
                     if (!isMultipleLine)
                     {
-                        if (GetLastUndoTrack().changeMode == "Backspace")
+                        if (GetLastUndoTrack().changeMode == 'B')
                             text.at(line).insert (text.at(line).begin() + column - 1, GetLastUndoTrack().changeString.at(0));
 
-                        else if (GetLastUndoTrack().changeMode == "Delete")
+                        else if (GetLastUndoTrack().changeMode == 'D')
                             text.at(line).insert (text.at(line).begin() + column, GetLastUndoTrack().changeString.at(0));
 
                         else
@@ -469,24 +492,21 @@ void Editor::UNDO(int &line, int &column, vector<vector<char>> &text)
                     }
                 }
             }
-            lastChangeString = GetLastUndoTrack().changeString;
             UndoStack.pop_back();
         }
     } while (
         UndoStack.size() > 0 &&
         tempChangeMode == GetLastUndoTrack().changeMode &&
-        ((GetLastUndoTrack().changeMode == "CharacterInput" &&
-          !(GetLastUndoTrack().changeString.at(0) == ' ' || lastChangeString.at(0) == ' ')) ||
-         (GetLastUndoTrack().changeString.at(0) == ' ' && lastChangeString.at(0) == ' ') ||
-         GetLastUndoTrack().changeMode == "Backspace" ||
-         GetLastUndoTrack().changeMode == "Delete")
+        (GetLastUndoTrack().changeMode == 'C' ||
+         GetLastUndoTrack().changeMode == 'S' ||
+         GetLastUndoTrack().changeMode == 'B' ||
+         GetLastUndoTrack().changeMode == 'D')
         );
 }
 
 void Editor::REDO(int &line, int &column, vector<vector<char>> &text)
 {
-    string tempChangeMode = RedoStack.size() > 0 ? GetLastRedoTrack().changeMode : "",
-           lastChangeString;
+    char tempChangeMode = RedoStack.size() > 0 ? GetLastRedoTrack().changeMode : ' ';
     do
     {
         if (RedoStack.size() > 0)
@@ -497,42 +517,40 @@ void Editor::REDO(int &line, int &column, vector<vector<char>> &text)
             bool isMultipleLine=false, first_line=true;
             if (GetLastRedoTrack().isWirte)
             {
-                if (GetLastRedoTrack().changeMode == "Enter")
+                if (GetLastRedoTrack().changeMode == 'E')
                     ENTER(line, column, text, true);
 
-                else if (GetLastRedoTrack().changeMode == "CharacterInput")
+                else if (GetLastRedoTrack().changeMode == 'C' || GetLastRedoTrack().changeMode == 'S')
                     INSERT_CHARACTER(GetLastRedoTrack().changeString.at(0), line, column, text, true);
 
-                else if (GetLastRedoTrack().changeMode == "Paste")
+                else if (GetLastRedoTrack().changeMode == 'P')
                     PASTE(line, column, text, true);
 
-                else if (GetLastRedoTrack().changeMode == "Tab")
+                else if (GetLastRedoTrack().changeMode == 'T')
                     TAB(line, column, text, true);
             } else {
-                if (GetLastRedoTrack().changeMode == "Backspace")
+                if (GetLastRedoTrack().changeMode == 'B')
                 {
                     if (GetLastRedoTrack().changeString[0] == '\n')
                         line++;
                     BACKSPACE(line, column, text, true);
-                } else if (GetLastRedoTrack().changeMode == "Delete Line") {
+                } else if (GetLastRedoTrack().changeMode == 'L') {
                     int temp = text.size() == 1 && line == 0 ? 0 : line + 1;
                     DELETE_LINE(temp, column, text, true);
-                } else if (GetLastRedoTrack().changeMode == "Delete") {
+                } else if (GetLastRedoTrack().changeMode == 'D') {
                     DELETE(line, column, text, true);
                 }
             }
-            lastChangeString = GetLastRedoTrack().changeString;
             RedoStack.pop_back();
         }
     } while (
         RedoStack.size() > 0 &&
         tempChangeMode == GetLastRedoTrack().changeMode &&
-        ((GetLastRedoTrack().changeMode == "CharacterInput" &&
-          !(GetLastRedoTrack().changeString.at(0) == ' ' || lastChangeString.at(0) == ' ')) ||
-         (GetLastRedoTrack().changeString.at(0) == ' ' && lastChangeString.at(0) == ' ') ||
-         GetLastRedoTrack().changeMode == "Backspace" ||
-         GetLastRedoTrack().changeMode == "Delete")
-        );
+        (GetLastRedoTrack().changeMode == 'C' ||
+         GetLastRedoTrack().changeMode == 'S' ||
+         GetLastRedoTrack().changeMode == 'B' ||
+         GetLastRedoTrack().changeMode == 'D')
+    );
 }
 
 unsigned int Editor::GetBiggestLineNumberInViewport()
