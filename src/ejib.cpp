@@ -4,7 +4,7 @@
 #include "headers/mingw.thread.hpp"
 #endif
 
-class EditorSystem: public VisualCommand
+class EditorSystem: public VisualMode
 {
     private:
         void TextEditSystem();
@@ -252,9 +252,7 @@ int main()
     ClearTerminalScreen();
     loadLogo();
 	EditorSystem Ejib;
-    std::thread ContorlViewportWithTerminalSize = std::thread (&Editor::AdjustingViewportWithSizeOfTerminal, Ejib);
-    std::thread DisplayConsumption = std::thread (&DisplayMemoryUsage, std::ref(mode), std::ref(TerminalColumn));
+    std::thread ContorlViewportWithTerminalSize = std::thread (&InsertMode::AdjustingViewportWithSizeOfTerminal, Ejib);
 	Ejib.MainSystem();
     ContorlViewportWithTerminalSize.join();
-    DisplayConsumption.join();
 }
