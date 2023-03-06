@@ -29,34 +29,3 @@ string EditorMemoryUsage()
     fclose(file);
     return byteConverter(result * 1024);
 }
-
-void DisplayMemoryUsage(string &mode, int &terminalColumn)
-{
-    while (1)
-    {
-        if (mode == "edit")
-        {
-            string MemoryUsageRawString = EditorMemoryUsage();
-            string MemoryUseage;
-
-            for (char ch : MemoryUsageRawString)
-                if (ch == '.')
-                    break;
-                else
-                    MemoryUseage += ch;
-
-            MemoryUseage = MemoryUseage +\
-                           MemoryUsageRawString[MemoryUsageRawString.size() - 2] +\
-                           MemoryUsageRawString[MemoryUsageRawString.size() - 1];
-
-            /*
-            ShowConsoleCursor(false);
-            gotoxy(terminalColumn - MemoryUseage.size() - 9, 0);
-            ColorPrint("| MEM: " + MemoryUseage + " |", 3);
-            */
-           
-            Sleep(100);
-        } else
-            Sleep(1);
-    }
-}
