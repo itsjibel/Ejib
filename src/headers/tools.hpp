@@ -133,6 +133,7 @@ void setColor(int ColorCode)
     ColorCode = ColorCode == 14 ? 93 : ColorCode;
     ColorCode = ColorCode == 15 ? 97 : ColorCode;
     ColorCode = ColorCode == 16 ? 100 : ColorCode;
+    ColorCode = ColorCode == 79 ? 41 : ColorCode;
     cout<<"\033[" + to_string (ColorCode) + "m";
 }
 
