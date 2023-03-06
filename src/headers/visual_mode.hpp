@@ -1,6 +1,6 @@
 #include "insert_mode.hpp"
 
-class VisualCommand: public Editor
+class VisualMode: public InsertMode
 {
     private:
         vector<vector<char>> _VisualCommandText;
@@ -14,7 +14,7 @@ class VisualCommand: public Editor
         void VisualEdit();
 };
 
-void VisualCommand::VisualCommandInput()
+void VisualMode::VisualCommandInput()
 {
     bool enter=false;
     while (!enter)
@@ -178,7 +178,7 @@ void showMassage(string massageType) {
     
 }
 
-void VisualCommand::VisualEdit()
+void VisualMode::VisualEdit()
 {
     ShowConsoleCursor(false);
     string modeView;
@@ -252,7 +252,7 @@ void VisualCommand::VisualEdit()
     }
 }
 
-bool VisualCommand::search(string key, vector<vector<char>> &text, int &line, int &column)
+bool VisualMode::search(string key, vector<vector<char>> &text, int &line, int &column)
 {
     int previousColumn=column, tempLine=line, firstCatchColumn, firstCatchLine;
     bool first_time=true, anythingFound=false;
