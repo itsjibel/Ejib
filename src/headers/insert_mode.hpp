@@ -56,7 +56,8 @@ class Editor: public CommandLine
         void DELETE_LINE     (int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO);
         void ENTER           (int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO);
         void TAB             (int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO);
-        void PASTE           (int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO);
+        void PASTE           (int &line, int &column, vector<vector<char>> &text);
+        void PASTE           (int &line, int &column, vector<vector<char>> &text, string stringForPaste);
 
         void UP          (int &line, int &column,  const vector<vector<char>> &text);
         void LEFT        (int &line, int &column,  const vector<vector<char>> &text);
@@ -267,7 +268,7 @@ void Editor::TAB(int &line, int &column, vector<vector<char>> &text, bool USE_FO
     column += 4;
 }
 
-void Editor::PASTE(int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO)
+void Editor::PASTE(int &line, int &column, vector<vector<char>> &text)
 {
     string copiedText;
     vector<char> linkToEndOfPaste;
@@ -285,7 +286,7 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text, bool USE_
         if (text.size() == 0)
             text.insert(text.begin() + line + 1, emptyVector);
 
-        if (mode != "visual" && !USE_FOR_REDO)
+        if (mode != "visual")
         {
             AddTrackToUndoStack (true, line, column, copiedText, 'P');
             RedoStack.clear();
@@ -304,6 +305,38 @@ void Editor::PASTE(int &line, int &column, vector<vector<char>> &text, bool USE_
                 text.insert(text.begin() + line + 1, emptyVector);
                 line++;
             }
+        }
+    }
+
+    for (int i=0; i<linkToEndOfPaste.size(); i++)
+        text.at(line).push_back(linkToEndOfPaste.at(i));
+}
+
+void Editor::PASTE(int &line, int &column, vector<vector<char>> &text, string stringForPaste)
+{
+    vector<char> linkToEndOfPaste;
+
+    for (int i=column; i<text.at(line).size(); i++)
+        linkToEndOfPaste.push_back(text.at(line).at(i));
+
+    for (int i=0; i<linkToEndOfPaste.size(); i++)
+        text.at(line).pop_back();
+
+    if (text.size() == 0)
+        text.insert(text.begin() + line + 1, emptyVector);
+
+    for (int i=0; i<stringForPaste.size(); i++)
+    {
+        if (stringForPaste.at(i) != '\n')
+            text.at(line).insert(text.at(line).begin() + column, stringForPaste.at(i));
+
+        column++;
+
+        if (stringForPaste.at(i) == '\n')
+        {
+            column=0;
+            text.insert(text.begin() + line + 1, emptyVector);
+            line++;
         }
     }
 
@@ -524,7 +557,7 @@ void Editor::REDO(int &line, int &column, vector<vector<char>> &text)
                     INSERT_CHARACTER(GetLastRedoTrack().changeString.at(0), line, column, text, true);
 
                 else if (GetLastRedoTrack().changeMode == 'P')
-                    PASTE(line, column, text, true);
+                    PASTE(line, column, text, GetLastRedoTrack().changeString);
 
                 else if (GetLastRedoTrack().changeMode == 'T')
                     TAB(line, column, text, true);

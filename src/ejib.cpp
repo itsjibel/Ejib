@@ -202,7 +202,7 @@ void EditorSystem::TextEditSystem()
             something_happen_in_text_view=true;
             break;
         case 22:
-            PASTE(lineSelected, columnSelected, input, false);
+            PASTE(lineSelected, columnSelected, input);
             something_happen_in_text_view=true;
             break;
         case 6:

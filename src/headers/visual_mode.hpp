@@ -107,7 +107,7 @@ void VisualCommand::VisualCommandInput()
                 _something_happen_in_text_view=true;
                 break;
             case 22:
-                PASTE(line, _columnSelected, _VisualCommandText, false);
+                PASTE(line, _columnSelected, _VisualCommandText);
                 _something_happen_in_text_view=true;
                 break;
             case 10:
