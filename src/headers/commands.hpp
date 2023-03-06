@@ -1,4 +1,5 @@
 #include "UI.hpp"
+
 class CommandLine : public FileSystem, public EditorUI
 {
     public:
