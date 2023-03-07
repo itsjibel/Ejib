@@ -2,7 +2,7 @@
 
 ![alt text](https://github.com/itsjibel/Ejib/blob/main/EjibLogo.png?raw=true)
 
-## Operating systems supported in the project
+## Operating systems supported
 
 + Linux
 
