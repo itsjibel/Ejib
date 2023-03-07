@@ -532,7 +532,8 @@ void InsertMode::UNDO(int &line, int &column, vector<vector<char>> &text)
         tempChangeMode == GetLastUndoTrack().changeMode &&
         (GetLastUndoTrack().changeMode == 'C' ||
          GetLastUndoTrack().changeMode == 'S' ||
-         GetLastUndoTrack().changeMode == 'B' ||
+         (GetLastUndoTrack().changeMode == 'B' &&
+          GetLastUndoTrack().changeString[0] != '\n') ||
          GetLastUndoTrack().changeMode == 'D')
         );
 }
@@ -581,7 +582,8 @@ void InsertMode::REDO(int &line, int &column, vector<vector<char>> &text)
         tempChangeMode == GetLastRedoTrack().changeMode &&
         (GetLastRedoTrack().changeMode == 'C' ||
          GetLastRedoTrack().changeMode == 'S' ||
-         GetLastRedoTrack().changeMode == 'B' ||
+         (GetLastRedoTrack().changeMode == 'B' &&
+          GetLastRedoTrack().changeString[0] != '\n') ||
          GetLastRedoTrack().changeMode == 'D')
     );
 }
