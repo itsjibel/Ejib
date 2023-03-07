@@ -20,7 +20,7 @@ void VisualMode::VisualCommandInput()
     while (!enter)
     {
         char ch;
-
+        vector<char> emptyVector;
         if (_VisualCommandText.size() == 0)
             _VisualCommandText.push_back(emptyVector);
 
@@ -127,7 +127,7 @@ void VisualMode::VisualCommandInput()
         }
         
         ShowConsoleCursor(false);
-        gotoxy (0, TerminalLine - 1);
+        gotoxy (0, numberOfTerminalLine - 1);
         #if (defined (_WIN32) || defined (_WIN64))
         ColorPrint("cmd@edit: ", 10);
         #endif
@@ -137,7 +137,7 @@ void VisualMode::VisualCommandInput()
 
         if (showBigCommandWarning)
         {
-            gotoxy (44, TerminalLine - 1);
+            gotoxy (44, numberOfTerminalLine - 1);
             ColorPrint("[B]", 6);
         }
 
@@ -146,7 +146,7 @@ void VisualMode::VisualCommandInput()
         for (int i=0; i<_VisualCommandText.at(0).size(); i++)
             _string_editCommand+=_VisualCommandText.at(0).at(i);
 
-        gotoxy(10, TerminalLine - 1);
+        gotoxy(10, numberOfTerminalLine - 1);
         cout<<_string_editCommand;
         int8_t range = _string_editCommand.length() == 32 ? 0 :  32 - _string_editCommand.length() % 32;
         
@@ -157,22 +157,20 @@ void VisualMode::VisualCommandInput()
         _columnSelected = _columnSelected > 32 ? 32 : _columnSelected;
         _columnSelected = _columnSelected < 0 ? 0 : _columnSelected;
         ShowConsoleCursor(true);
-        gotoxy (10 + _columnSelected, TerminalLine - 1);
-        TerminalColumnTemp = TerminalColumn;
-        TerminalLineTemp = TerminalLine;
+        gotoxy (10 + _columnSelected, numberOfTerminalLine - 1);
     }
 };
 
 void showMassage(string massageType) {
     if (massageType == "accept")
     {
-        gotoxy (44, TerminalLine - 1);
+        gotoxy (44, numberOfTerminalLine - 1);
         ColorPrint("[+]", 2);
     } else if (massageType == "command not found") {
-        gotoxy (44, TerminalLine - 1);
+        gotoxy (44, numberOfTerminalLine - 1);
         ColorPrint("[!]", 4);
     } else if (massageType == "nothing found") {
-        gotoxy (44, TerminalLine - 1);
+        gotoxy (44, numberOfTerminalLine - 1);
         ColorPrint("[?]", 4);
     }
     
@@ -183,11 +181,11 @@ void VisualMode::VisualEdit()
     ShowConsoleCursor(false);
     string modeView;
 
-    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) modeView+=" ";
     modeView += "-- VISUAL --";
-    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) modeView+=" ";
 
-    gotoxy (0, TerminalLine - 2);
+    gotoxy (0, numberOfTerminalLine - 2);
     setColor(7);
     #if (defined (_WIN32) || defined (_WIN64))
     ColorPrint(modeView, 97);
@@ -196,28 +194,28 @@ void VisualMode::VisualEdit()
     ColorPrint(modeView, 44);
     #endif
     ShowConsoleCursor(true);
-    gotoxy (10, TerminalLine - 1);
+    gotoxy (10, numberOfTerminalLine - 1);
     VisualCommandInput();
     _VisualCommandText.clear();
-    gotoxy (10, TerminalLine - 1);
+    gotoxy (10, numberOfTerminalLine - 1);
     cout<<"                                     ";
 
     if (_string_editCommand == "edit" || _string_editCommand == "E")
     {
 
         showMassage("accept");
-        mode = "edit";
-        printInfo();
-        printText(input, -1, -1, lineSelected, columnSelected);
+        currentMode = "edit";
+        displayLocationInfo();
+        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
     
     } else if (_string_editCommand == "text -D" || _string_editCommand == "text --delete") {
 
         showMassage("accept");
         ClearTerminalScreen();
-        printInfo();
-        printText(input, -1, -1, lineSelected, columnSelected);
+        displayLocationInfo();
+        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
         ShowConsoleCursor (false);
-        gotoxy (44, TerminalLine - 1);
+        gotoxy (44, numberOfTerminalLine - 1);
         ColorPrint("[+]", 2);
     } else if (_string_editCommand.find("text -S \"")       == 0 ||
                 _string_editCommand.find("text --search \"") == 0) {
@@ -234,19 +232,19 @@ void VisualMode::VisualEdit()
             if (ch == '\"')
                 isKey=true;
         }
-        if (!search(key, input, lineSelected, columnSelected))
+        if (!search(key, mainText, currentLine, currentColumn))
             showMassage("nothing found");
     } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
-        mode = "file";
-        fileSystem("save", input);
+        currentMode = "file";
+        fileSystem("save", mainText);
         ClearTerminalScreen();
-        printInfo();
+        displayLocationInfo();
         printTabs();
-        printText(input, -1, -1, lineSelected, columnSelected);
-        mode = "visual";
+        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+        currentMode = "visual";
     } else {
         showMassage("command not found");
-        gotoxy (10, TerminalLine - 1);
+        gotoxy (10, numberOfTerminalLine - 1);
         _columnSelected=0;
         _string_editCommand="";
     }
@@ -318,10 +316,10 @@ bool VisualMode::search(string key, vector<vector<char>> &text, int &line, int &
         column = column + key.size();
         UpdateViewport();
         ShowConsoleCursor(false);
-        printInfo();
-        printText(input, column - key.size() - startPrintColumn, column - 1 - startPrintColumn, line, column);
+        displayLocationInfo();
+        displayPageOfText(mainText, column - key.size() - startColumnForDisplayPage, column - 1 - startColumnForDisplayPage, line, column);
     } while (getch() != 27);
 
-    mode = "edit";
+    currentMode = "edit";
     return true;
 }

@@ -5,6 +5,10 @@
 
 class InsertMode: public CommandLine
 {
+    private:
+        int tempNumberOfTerminalColumn=0,
+            tempNumberOfTerminalLine=0;
+
     protected:
         struct Track {
             bool isWirte;
@@ -81,7 +85,7 @@ void InsertMode::INSERT_CHARACTER(char &characterInput, int &line, int &column,
 {
     if (characterInput > 31 && characterInput < 127)
     {
-        if (mode != "visual" && !USE_FOR_REDO)
+        if (currentMode != "visual" && !USE_FOR_REDO)
         {
             if (characterInput == ' ')
                 AddTrackToUndoStack (true, line, column, characterInput, 'S');
@@ -122,7 +126,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<vector<char>> &text, b
 
     if (column > 0)
     {
-        if (mode != "visual" && !USE_FOR_REDO)
+        if (currentMode != "visual" && !USE_FOR_REDO)
         {
             RedoStack.clear();
             AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'B');
@@ -132,7 +136,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<vector<char>> &text, b
     } else {
         if (line > 0)
         {
-            if (mode != "visual" && !USE_FOR_REDO)
+            if (currentMode != "visual" && !USE_FOR_REDO)
             {
                 string LineForAppending;
                 for (int i=0; i<text.at(line).size(); i++)
@@ -167,7 +171,7 @@ void InsertMode::DELETE(int &line, int &column, vector<vector<char>> &text, bool
     {
         if (text.at(line).size() > column)
         {
-            if (mode != "visual" && !USE_FOR_REDO)
+            if (currentMode != "visual" && !USE_FOR_REDO)
             {
                 RedoStack.clear();
                 AddTrackToUndoStack (false, line, column, text.at(line).at(column), 'D');
@@ -180,7 +184,7 @@ void InsertMode::DELETE(int &line, int &column, vector<vector<char>> &text, bool
                 for (int i=0; i<text.at(line + 1).size(); i++)
                     AppendCurrentLineToNextLine.push_back (text.at(line + 1).at(i));
 
-                if (mode != "visual" && !USE_FOR_REDO)
+                if (currentMode != "visual" && !USE_FOR_REDO)
                 {
                     RedoStack.clear();
                     AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, 'D');
@@ -208,22 +212,20 @@ void InsertMode::DELETE_LINE(int &line, int &column, vector<vector<char>> &text,
 
         if (line > 0)
         {
-            if (mode != "visual" && !USE_FOR_REDO)
+            if (currentMode != "visual" && !USE_FOR_REDO)
             {
                 RedoStack.clear();
                 AddTrackToUndoStack (false, line - 1, column, '\n' + CurrentLineForDelete, 'L');
             }
-        } else {
-            if (mode != "visual" && !USE_FOR_REDO)
-            {
-                RedoStack.clear();
-                AddTrackToUndoStack (false, 0, column, CurrentLineForDelete, 'L');
-            }
+        } else if (currentMode != "visual" && !USE_FOR_REDO) {
+            RedoStack.clear();
+            AddTrackToUndoStack (false, 0, column, CurrentLineForDelete, 'L');
         }
 
         text.erase(text.begin() + line);
         column=0;
     }
+
     if (line > 0)
     {
         if (text.size() <= line)
@@ -231,13 +233,14 @@ void InsertMode::DELETE_LINE(int &line, int &column, vector<vector<char>> &text,
     } else
         line=0;
 
+    vector<char> emptyVector;
     if (text.size() == 0)
         text.push_back(emptyVector);
 }
 
 void InsertMode::ENTER(int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO)
 {
-    if (mode != "visual" && !USE_FOR_REDO)
+    if (currentMode != "visual" && !USE_FOR_REDO)
     {
         RedoStack.clear();
         AddTrackToUndoStack (true, line, column, '\n', 'E');
@@ -258,7 +261,7 @@ void InsertMode::ENTER(int &line, int &column, vector<vector<char>> &text, bool 
 
 void InsertMode::TAB(int &line, int &column, vector<vector<char>> &text, bool USE_FOR_REDO)
 {
-    if (mode != "visual" && !USE_FOR_REDO)
+    if (currentMode != "visual" && !USE_FOR_REDO)
     {
         RedoStack.clear();
         AddTrackToUndoStack (true, line, column, "    ", 'T');
@@ -282,11 +285,11 @@ void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text)
     if (GetCopiedText(copiedText))
     {
         RemoveTextSpoilerCharacters(copiedText);
-        
+        vector<char> emptyVector;
         if (text.size() == 0)
             text.insert(text.begin() + line + 1, emptyVector);
 
-        if (mode != "visual")
+        if (currentMode != "visual")
         {
             AddTrackToUndoStack (true, line, column, copiedText, 'P');
             RedoStack.clear();
@@ -321,7 +324,7 @@ void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text, strin
 
     for (int i=0; i<linkToEndOfPaste.size(); i++)
         text.at(line).pop_back();
-
+    vector<char> emptyVector;
     if (text.size() == 0)
         text.insert(text.begin() + line + 1, emptyVector);
 
@@ -592,11 +595,11 @@ unsigned int InsertMode::GetBiggestLineNumberInViewport()
 {
     unsigned int BiggestLineNumber=1;
     vector<int> LineNumbers;
-    int range = startPrintLine + TerminalLine - 2 <= input.size() ?\
-                startPrintLine + TerminalLine - 2\
-                : input.size();
+    int range = startLineForDisplayPage + numberOfTerminalLine - 2 <= mainText.size() ?\
+                startLineForDisplayPage + numberOfTerminalLine - 2\
+                : mainText.size();
 
-    for (int i=startPrintLine; i<range; i++)
+    for (int i=startLineForDisplayPage; i<range; i++)
         LineNumbers.push_back(i + 1);
 
     for (int i=0; i<LineNumbers.size(); i++)
@@ -611,27 +614,27 @@ bool InsertMode::UpdateViewport()
     int biggestNumberLine = GetBiggestLineNumberInViewport();
     bool updated=false;
 
-    while (lineSelected + 2 - startPrintLine > TerminalLine - 3)
+    while (currentLine + 2 - startLineForDisplayPage > numberOfTerminalLine - 3)
     {
-        startPrintLine++;
+        startLineForDisplayPage++;
         updated=true;
     }
     
-    while (lineSelected + 2 - startPrintLine < 2)
+    while (currentLine + 2 - startLineForDisplayPage < 2)
     {
-        startPrintLine--;
+        startLineForDisplayPage--;
         updated=true;
     }
 
-    while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 > TerminalColumn - 1)
+    while (currentColumn - startColumnForDisplayPage + floor(log10(biggestNumberLine) + 1) + 1 > numberOfTerminalColumn - 1)
     {
-        startPrintColumn++;
+        startColumnForDisplayPage++;
         updated=true;
     }
     
-    while (columnSelected - startPrintColumn + floor(log10(biggestNumberLine) + 1) + 1 < floor(log10(biggestNumberLine) + 1) + 1)
+    while (currentColumn - startColumnForDisplayPage + floor(log10(biggestNumberLine) + 1) + 1 < floor(log10(biggestNumberLine) + 1) + 1)
     {
-        startPrintColumn--;
+        startColumnForDisplayPage--;
         updated=true;
     }
 
@@ -643,30 +646,31 @@ void InsertMode::AdjustingViewportWithSizeOfTerminal()
     while(1)
     {
         bool sizeIsChanged=false;
-        TerminalLine = GetTerminal_LineAndColumn().at(0);
-        TerminalColumn = GetTerminal_LineAndColumn().at(1);
+        numberOfTerminalLine = GetTerminal_LineAndColumn().at(0);
+        numberOfTerminalColumn = GetTerminal_LineAndColumn().at(1);
 
-        if ((TerminalColumn != TerminalColumnTemp || TerminalLine != TerminalLineTemp) &&
-            (mode == "visual" || mode == "edit"))
+        if ((numberOfTerminalColumn != tempNumberOfTerminalColumn ||
+             numberOfTerminalLine   != tempNumberOfTerminalLine) &&
+            (currentMode == "visual" || currentMode == "edit"))
         {
             UpdateViewport();
             ClearTerminalScreen();
-            printInfo();
+            displayLocationInfo();
             printTabs();
-            printText(input, -1, -1, lineSelected, columnSelected);
+            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
             sizeIsChanged=true;
             ShowConsoleCursor(true);
         }
 
         if (sizeIsChanged)
         {
-            printInfo();
+            displayLocationInfo();
             printTabs();
-            printText(input, -1, -1, lineSelected, columnSelected);
+            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
         }
 
-        TerminalColumnTemp = TerminalColumn;
-        TerminalLineTemp = TerminalLine;
+        tempNumberOfTerminalColumn = numberOfTerminalColumn;
+        tempNumberOfTerminalLine = numberOfTerminalLine;
         Sleep(1);
     }
 }

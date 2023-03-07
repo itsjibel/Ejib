@@ -14,13 +14,13 @@ class EditorSystem: public VisualMode
         {
             while (1)
             {
-                if (mode == "edit")
+                if (currentMode == "edit")
                     TextEditSystem();
 
-                else if (mode == "command")
+                else if (currentMode == "command")
                     CommandsRouter();
 
-                else if (mode == "visual")
+                else if (currentMode == "visual")
                     VisualEdit();
             }
         }
@@ -121,26 +121,26 @@ void EditorSystem::TextEditSystem()
                     switch(ch = getch())
                     {
                         case 65:
-                            UP(lineSelected, columnSelected, input);
+                            UP(currentLine, currentColumn, mainText);
                             something_happen_in_text_view=true;
                             break;
                         case 68:
-                            LEFT(lineSelected, columnSelected, input);
+                            LEFT(currentLine, currentColumn, mainText);
                             something_happen_in_text_view=true;
                             break;
                         case 67:
-                            RIGHT(lineSelected, columnSelected, input);
+                            RIGHT(currentLine, currentColumn, mainText);
                             something_happen_in_text_view=true;
                             break;
                         case 66:
-                            DOWN(lineSelected, columnSelected, input);
+                            DOWN(currentLine, currentColumn, mainText);
                             something_happen_in_text_view=true;
                             break;
                         case 51:
                             switch(ch = getch())
                             {
                                 case 126: 
-                                    DELETE(lineSelected, columnSelected, input, false);
+                                    DELETE(currentLine, currentColumn, mainText, false);
                                     something_happen_in_text_view=true;
                                     break;
                                 default: ;
@@ -156,19 +156,19 @@ void EditorSystem::TextEditSystem()
                                             switch(ch = getch())
                                             {
                                                 case 68:
-                                                    QUICK_LEFT(lineSelected, columnSelected, input);
+                                                    QUICK_LEFT(currentLine, currentColumn, mainText);
                                                     something_happen_in_text_view=true;
                                                     break;
                                                 case 67:
-                                                    QUICK_RIGHT(lineSelected, columnSelected, input);
+                                                    QUICK_RIGHT(currentLine, currentColumn, mainText);
                                                     something_happen_in_text_view=true;
                                                     break;
                                                 case 65:
-                                                    QUICK_UP(lineSelected, columnSelected, input);
+                                                    QUICK_UP(currentLine, currentColumn, mainText);
                                                     something_happen_in_text_view=true;
                                                     break;
                                                 case 66:
-                                                    QUICK_DOWN(lineSelected, columnSelected, input);
+                                                    QUICK_DOWN(currentLine, currentColumn, mainText);
                                                     something_happen_in_text_view=true;
                                                     break;
                                                 default: ;
@@ -187,51 +187,51 @@ void EditorSystem::TextEditSystem()
             }
             break;
         case 127:
-            BACKSPACE(lineSelected, columnSelected, input, false);
+            BACKSPACE(currentLine, currentColumn, mainText, false);
             something_happen_in_text_view=true;
             break;
         case 2:
-            mode = "visual";
+            currentMode = "visual";
             break;
         case 10:
-            ENTER(lineSelected, columnSelected, input, false);
+            ENTER(currentLine, currentColumn, mainText, false);
             something_happen_in_text_view=true;
             break;
         case 9:
-            TAB(lineSelected, columnSelected, input, false);
+            TAB(currentLine, currentColumn, mainText, false);
             something_happen_in_text_view=true;
             break;
         case 22:
-            PASTE(lineSelected, columnSelected, input);
+            PASTE(currentLine, currentColumn, mainText);
             something_happen_in_text_view=true;
             break;
         case 6:
-            mode = "file";
-            fileSystem("save", input);
+            currentMode = "file";
+            fileSystem("save", mainText);
             ClearTerminalScreen();
-            printInfo();
+            displayLocationInfo();
             printTabs();
-            printText(input, -1, -1, lineSelected, columnSelected);
-            mode = "edit";
+            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+            currentMode = "edit";
             break;
         case 24:
-            DELETE_LINE(lineSelected, columnSelected, input, false);
+            DELETE_LINE(currentLine, currentColumn, mainText, false);
             something_happen_in_text_view=true;
             break;
         case 16:
-            mode = "command";
+            currentMode = "command";
             ClearTerminalScreen();
             break;
         case 21:
-            UNDO(lineSelected, columnSelected, input);
+            UNDO(currentLine, currentColumn, mainText);
             something_happen_in_text_view=true;
             break;
         case 18:
-            REDO(lineSelected, columnSelected, input);
+            REDO(currentLine, currentColumn, mainText);
             something_happen_in_text_view=true;
             break;
         default:
-            INSERT_CHARACTER(ch, lineSelected, columnSelected, input, false);
+            INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
             something_happen_in_text_view=true;
     }
     #endif
@@ -241,9 +241,9 @@ void EditorSystem::TextEditSystem()
 
     if (something_happen_in_text_view)
     {
-        printInfo();
+        displayLocationInfo();
         printTabs();
-        printText(input, -1, -1, lineSelected, columnSelected);
+        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
     }
 }
 

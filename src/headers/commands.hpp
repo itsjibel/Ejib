@@ -5,12 +5,13 @@ class CommandLine : public FileSystem, public EditorUI
     public:
         void ResetAllEditFileData()
         {
-            columnSelected=0;
-            lineSelected=0;
-            startPrintLine=0;
-            startPrintColumn=0;
-            input.clear();
-            input.push_back(emptyVector);
+            currentColumn=0;
+            currentLine=0;
+            startLineForDisplayPage=0;
+            startColumnForDisplayPage=0;
+            mainText.clear();
+            vector<char> emptyVector;
+            mainText.push_back(emptyVector);
         }
 
         void DisplayHelpFile(string helpFileName)
@@ -61,19 +62,19 @@ class CommandLine : public FileSystem, public EditorUI
             getline (cin, cmd);
             
             if (cmd == "file -N" || cmd == "file --new") {
-                mode = "edit";
+                currentMode = "edit";
                 ResetAllEditFileData();
                 ClearTerminalScreen();
-                printInfo();
+                displayLocationInfo();
                 printTabs();
-                printText(input, -1, -1, lineSelected, columnSelected);
+                displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
                 gotoxy (0, 2);
             } else if (cmd == "file -O" || cmd == "file --open") {
-                if (fileSystem("open", input) == true) {
-                    mode = "edit";
-                    printInfo();
+                if (fileSystem("open", mainText) == true) {
+                    currentMode = "edit";
+                    displayLocationInfo();
                     printTabs();
-                    printText(input, -1, -1, lineSelected, columnSelected);
+                    displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
                 } else
                     ClearTerminalScreen();
             }

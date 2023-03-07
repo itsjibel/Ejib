@@ -1,37 +1,37 @@
 #include <cmath>
 #include "consumption_info.hpp"
 
-vector<char> emptyVector;
-vector<vector<char>> input;
-string mode="command";
-int TerminalColumn=0,      TerminalLine=0,
-    TerminalColumnTemp=-1, TerminalLineTemp=-1,
-    columnSelected=0,      lineSelected=0,
-    startPrintLine=0,      startPrintColumn=0;
+
+vector<vector<char>> mainText;
+string currentMode="command";
+int numberOfTerminalColumn =0, numberOfTerminalLine     =0,
+    currentColumn          =0, currentLine              =0,
+    startLineForDisplayPage=0, startColumnForDisplayPage=0;
+
 
 class EditorUI
 {
     private:
         void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
-                    const int &selectedLine, const int &currentLine, const int &column);
+                            const int &selectedLine, const int &currentLine, const int &column);
         unsigned int GetBiggestLineNumberInViewport();
 
     public:
-        void printText(const vector<vector<char>> &text, const int &selectedCharacterStart,
+        void displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
                         const int &selectedCharacterEnd,  const int &line, const int column);
         void printTabs();
-        void printInfo();
+        void displayLocationInfo();
 };
 
 unsigned int EditorUI::GetBiggestLineNumberInViewport()
 {
     unsigned int BiggestLineNumber=1;
     vector<int> LineNumbers;
-    int range = startPrintLine + TerminalLine - 2 <= input.size() ?\
-                startPrintLine + TerminalLine - 2\
-                : input.size();
+    int range = startLineForDisplayPage + numberOfTerminalLine - 2 <= mainText.size() ?\
+                startLineForDisplayPage + numberOfTerminalLine - 2\
+                : mainText.size();
 
-    for (int i=startPrintLine; i<range; i++)
+    for (int i=startLineForDisplayPage; i<range; i++)
         LineNumbers.push_back(i + 1);
 
     for (int i=0; i<LineNumbers.size(); i++)
@@ -178,11 +178,11 @@ void EditorUI::printTabs()
     ColorPrint(' ', 44);
     #endif
 
-    for (int i=18 + CurrentFileName.size(); i<TerminalColumn; i++)
+    for (int i=18 + CurrentFileName.size(); i<numberOfTerminalColumn; i++)
         cout<<' ';
 
     string bar;
-    for (int i=0; i<TerminalColumn; i++) bar+=" ";
+    for (int i=0; i<numberOfTerminalColumn; i++) bar+=" ";
     gotoxy(0, 1);
     #if (defined (_WIN32) || defined (_WIN64))
     ColorPrint(bar, 97);
@@ -192,28 +192,29 @@ void EditorUI::printTabs()
     #endif
 }
 
-void EditorUI::printText(const vector<vector<char>> &text, const int &selectedCharacterStart,
+void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
                          const int &selectedCharacterEnd,  const int &line, const int column)
 {
     int numberOfVisableLines=0;
     vector<int> visableNumberLines;
     vector<string> visableLines;
-    int range = startPrintLine + TerminalLine - 2 <= text.size() ? startPrintLine + TerminalLine - 2 : text.size();
+    int range = startLineForDisplayPage + numberOfTerminalLine - 2 <= text.size() ?\
+                startLineForDisplayPage + numberOfTerminalLine - 2 : text.size();
 
-    for (int i=0; i<TerminalLine; i++)
+    for (int i=0; i<numberOfTerminalLine; i++)
         visableLines.push_back("");
 
     ShowConsoleCursor(false);
 
     if (!(text.size() == 1 && text.at(0).size() == 0))
     {
-        for (int i=startPrintLine; i<range; i++)
+        for (int i=startLineForDisplayPage; i<range; i++)
         {
             visableNumberLines.push_back(i + 1);
             int countOfCharacters=0;
-            for (int j=startPrintColumn; j<text.at(i).size(); j++)
+            for (int j=startColumnForDisplayPage; j<text.at(i).size(); j++)
             {
-                if (countOfCharacters > TerminalColumn - 1) 
+                if (countOfCharacters > numberOfTerminalColumn - 1) 
                 {
                     numberOfVisableLines++;
                     break;
@@ -232,15 +233,15 @@ void EditorUI::printText(const vector<vector<char>> &text, const int &selectedCh
 
     int numberDigits_Of_LargestLineNumber = floor(log10(GetBiggestLineNumberInViewport()) + 1);
     gotoxy(0, 2);
-    for (int j=0; j<TerminalLine - 4; j++)
+    for (int j=0; j<numberOfTerminalLine - 4; j++)
     {
         if (j < numberOfVisableLines)
         {
-            for (int l=visableLines[j].size() % TerminalColumn; l<TerminalColumn; l++)
-                if (!(visableLines[j].size() % TerminalColumn == 0 && visableLines[j].size() > 0))
+            for (int l=visableLines[j].size() % numberOfTerminalColumn; l<numberOfTerminalColumn; l++)
+                if (!(visableLines[j].size() % numberOfTerminalColumn == 0 && visableLines[j].size() > 0))
                     visableLines[j]+=' ';
 
-            while (numberDigits_Of_LargestLineNumber + visableLines[j].size() + 1 > TerminalColumn)
+            while (numberDigits_Of_LargestLineNumber + visableLines[j].size() + 1 > numberOfTerminalColumn)
                 visableLines[j].pop_back();
 
             if (numberDigits_Of_LargestLineNumber - floor(log10(visableNumberLines[j]) + 1) != 0)
@@ -253,14 +254,14 @@ void EditorUI::printText(const vector<vector<char>> &text, const int &selectedCh
             gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(visableNumberLines[j]) + 1), j + 2);
 
             #if (defined (_WIN32) || defined (_WIN64))
-            if (j + startPrintLine == line)
+            if (j + startLineForDisplayPage == line)
                 ColorPrint(visableNumberLines[j], 15);
             else
                 ColorPrint(visableNumberLines[j], 8);
             #endif
 
             #if (defined (LINUX) || defined (__linux__))
-            if (j + startPrintLine == line)
+            if (j + startLineForDisplayPage == line)
                 cout<<BOLD(FWHT("\e[1m" + to_string(visableNumberLines[j]) + "\e[0m"));
             else
                 ColorPrint("\e[1m" + to_string(visableNumberLines[j]) + "\e[0m", 90);
@@ -273,10 +274,10 @@ void EditorUI::printText(const vector<vector<char>> &text, const int &selectedCh
             ColorPrint(' ', 44);
             #endif
 
-            colourizeText(visableLines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startPrintLine, column);
+            colourizeText(visableLines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startLineForDisplayPage, column);
         } else {
             string blankLine = "~";
-            for (int i=0; i<TerminalColumn - 1; i++) blankLine += " ";
+            for (int i=0; i<numberOfTerminalColumn - 1; i++) blankLine += " ";
             ColorPrint(blankLine, 6);
         }
     }
@@ -288,20 +289,20 @@ void EditorUI::printText(const vector<vector<char>> &text, const int &selectedCh
     if (text.at(0).size() == 0 && text.size() == 1)
         gotoxy (0, 2);
     else
-        gotoxy (columnSelected - startPrintColumn + numberDigits_Of_LargestLineNumber + 1,
-                lineSelected - startPrintLine + 2);
+        gotoxy (currentColumn - startColumnForDisplayPage + numberDigits_Of_LargestLineNumber + 1,
+                currentLine - startLineForDisplayPage + 2);
 }
 
-void EditorUI::printInfo()
+void EditorUI::displayLocationInfo()
 {
     ShowConsoleCursor(false);
     string modeView;
     
-    for (int i=0; i<TerminalColumn/2-6; i++) modeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) modeView+=" ";
     modeView += "-- INSERT --";
-    for (int i=0; i<TerminalColumn/2-5; i++) modeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 5; i++) modeView+=" ";
 
-    gotoxy (0, TerminalLine - 2);
+    gotoxy (0, numberOfTerminalLine - 2);
     setColor(7);
     #if (defined (_WIN32) || defined (_WIN64))
     ColorPrint(modeView, 97);
@@ -309,15 +310,15 @@ void EditorUI::printInfo()
     #if (defined (LINUX) || defined (__linux__))
     ColorPrint(modeView, 44);
     #endif
-    gotoxy (0, TerminalLine - 1);
+    gotoxy (0, numberOfTerminalLine - 1);
     ColorPrint("\e[1mcmd@edit:\e[0m", 2);
 
-    float percentageTextSeen = 100.0 / input.size() * (startPrintLine + TerminalLine - 1) < 100.0 ?\
-          percentageTextSeen = 100.0 / input.size() * (startPrintLine + TerminalLine - 1) : 100.0;
+    float percentageTextSeen = 100.0 / mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) < 100.0 ?\
+          percentageTextSeen = 100.0 / mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) : 100.0;
 
     percentageTextSeen = percentageTextSeen < 1.0 ? 1.0 : percentageTextSeen;
-    gotoxy (TerminalColumn - 14 - (floor(log10(lineSelected + 1) + 1) + floor(log10(columnSelected + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)),
-            TerminalLine - 1);
+    gotoxy (numberOfTerminalColumn - 14 - (floor(log10(currentLine + 1) + 1) + floor(log10(currentColumn + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)),
+            numberOfTerminalLine - 1);
 
     #if (defined (_WIN32) || defined (_WIN64))
     ColourizePrint("(" + int(percentageTextSeen) + "%) ", 11);
@@ -326,6 +327,6 @@ void EditorUI::printInfo()
     #if (defined (LINUX) || defined (__linux__))
     cout<<BOLD(FCYN(" ("<<int(percentageTextSeen)<<"%) "));
     #endif
-    ColorPrint("Ln " + to_string(lineSelected + 1) + ", Col " + to_string(columnSelected + 1), 3);
+    ColorPrint("Ln " + to_string(currentLine + 1) + ", Col " + to_string(currentColumn + 1), 3);
     ShowConsoleCursor(true);
 }
