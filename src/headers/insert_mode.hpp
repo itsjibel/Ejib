@@ -11,9 +11,9 @@ class InsertMode: public CommandLine
 
     protected:
         struct Track {
-            bool isWirte;
+            bool isWrite;
             int startActionLine;
-            int startActioncolumn;
+            int startActionColumn;
             string changeString;
             char changeMode;
         };
@@ -30,14 +30,14 @@ class InsertMode: public CommandLine
          */
         vector<Track> UndoStack, RedoStack;
         template <class T>
-        void AddTrackToUndoStack(bool isWirte, int startActionLine, int startActionColumn,
+        void AddTrackToUndoStack(bool isWrite, int startActionLine, int startActionColumn,
                                  T changeString, char changeMode)
         {
             Track TrackForAdd;
             TrackForAdd.changeString = changeString;
-            TrackForAdd.startActioncolumn = startActionColumn;
+            TrackForAdd.startActionColumn = startActionColumn;
             TrackForAdd.startActionLine = startActionLine;
-            TrackForAdd.isWirte = isWirte;
+            TrackForAdd.isWrite = isWrite;
             TrackForAdd.changeMode = changeMode;
             UndoStack.push_back(TrackForAdd);
         }
@@ -246,15 +246,15 @@ void InsertMode::ENTER(int &line, int &column, vector<vector<char>> &text, bool 
         AddTrackToUndoStack (true, line, column, '\n', 'E');
     }
 
-    vector<char> AppentToNextLine;
+    vector<char> appendToNextLine;
 
     for (int i=column; i<text.at(line).size(); i++)
-        AppentToNextLine.push_back (text.at(line).at(i));
+        appendToNextLine.push_back (text.at(line).at(i));
 
-    for (int i=0; i<AppentToNextLine.size(); i++)
+    for (int i=0; i<appendToNextLine.size(); i++)
         text.at(line).pop_back();
 
-    text.insert (text.begin() + line + 1, AppentToNextLine);
+    text.insert (text.begin() + line + 1, appendToNextLine);
     line++;
     column=0;
 }
@@ -458,11 +458,11 @@ void InsertMode::UNDO(int &line, int &column, vector<vector<char>> &text)
         if (UndoStack.size() > 0)
         {
             RedoStack.push_back(UndoStack.back());
-            column = GetLastUndoTrack().startActioncolumn;
+            column = GetLastUndoTrack().startActionColumn;
             line   = GetLastUndoTrack().startActionLine;
             bool isMultipleLine=false;
 
-            if (GetLastUndoTrack().isWirte)
+            if (GetLastUndoTrack().isWrite)
             {
                 vector<char> lastLineDeleted;
                 for (int i=0; i<GetLastUndoTrack().changeString.size(); i++)
@@ -549,35 +549,32 @@ void InsertMode::REDO(int &line, int &column, vector<vector<char>> &text)
         if (RedoStack.size() > 0)
         {
             UndoStack.push_back(RedoStack.back());
-            column = GetLastUndoTrack().startActioncolumn;
+            column = GetLastUndoTrack().startActionColumn;
             line   = GetLastUndoTrack().startActionLine;
             bool isMultipleLine=false, first_line=true;
-            if (GetLastRedoTrack().isWirte)
+
+            if (GetLastRedoTrack().isWrite)
             {
                 if (GetLastRedoTrack().changeMode == 'E')
                     ENTER(line, column, text, true);
-
                 else if (GetLastRedoTrack().changeMode == 'C' || GetLastRedoTrack().changeMode == 'S')
                     INSERT_CHARACTER(GetLastRedoTrack().changeString.at(0), line, column, text, true);
-
                 else if (GetLastRedoTrack().changeMode == 'P')
                     PASTE(line, column, text, GetLastRedoTrack().changeString);
-
                 else if (GetLastRedoTrack().changeMode == 'T')
                     TAB(line, column, text, true);
             } else {
                 if (GetLastRedoTrack().changeMode == 'B')
                 {
-                    if (GetLastRedoTrack().changeString[0] == '\n')
-                        line++;
+                    line = GetLastRedoTrack().changeString[0] == '\n' ? line + 1 : line;
                     BACKSPACE(line, column, text, true);
                 } else if (GetLastRedoTrack().changeMode == 'L') {
                     int temp = text.size() == 1 && line == 0 ? 0 : line + 1;
                     DELETE_LINE(temp, column, text, true);
-                } else if (GetLastRedoTrack().changeMode == 'D') {
+                } else if (GetLastRedoTrack().changeMode == 'D')
                     DELETE(line, column, text, true);
-                }
             }
+
             RedoStack.pop_back();
         }
     } while (
