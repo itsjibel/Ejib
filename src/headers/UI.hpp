@@ -184,16 +184,11 @@ void EditorUI::printTabs()
     string bar;
     for (int i=0; i<numberOfTerminalColumn; i++) bar+=" ";
     gotoxy(0, 1);
-    #if (defined (_WIN32) || defined (_WIN64))
     ColorPrint(bar, 97);
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
-    ColorPrint(bar, 44);
-    #endif
 }
 
 void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
-                         const int &selectedCharacterEnd,  const int &line, const int column)
+                                 const int &selectedCharacterEnd,  const int &line, const int column)
 {
     int numberOfVisibleLines=0;
     vector<int> visibleNumberLines;
@@ -294,37 +289,33 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
 void EditorUI::displayLocationInfo()
 {
     ShowConsoleCursor(false);
-    string modeView;
+    string currentModeView;
     
-    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) modeView+=" ";
-    modeView += "-- INSERT --";
-    for (int i=0; i<numberOfTerminalColumn / 2 - 5; i++) modeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView+=" ";
+    currentModeView += "-- INSERT --";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 5; i++) currentModeView+=" ";
 
     gotoxy (0, numberOfTerminalLine - 2);
     setColor(7);
-    #if (defined (_WIN32) || defined (_WIN64))
-    ColorPrint(modeView, 97);
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
-    ColorPrint(modeView, 44);
-    #endif
+    ColorPrint(currentModeView, 97);
     gotoxy (0, numberOfTerminalLine - 1);
     ColorPrint("\e[1mcmd@edit:\e[0m", 2);
-
     float percentageTextSeen = 100.0 / mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) < 100.0 ?\
           percentageTextSeen = 100.0 / mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) : 100.0;
-
     percentageTextSeen = percentageTextSeen < 1.0 ? 1.0 : percentageTextSeen;
-    gotoxy (numberOfTerminalColumn - 14 - (floor(log10(currentLine + 1) + 1) + floor(log10(currentColumn + 1) + 1) + floor(log10(int(percentageTextSeen)) + 1)),
+
+    int columnStartPrintInfoOfCurrentLocation =
+        numberOfTerminalColumn - 12 - (floor(log10(currentLine + 1) + 1) +
+                                       floor(log10(currentColumn + 1) + 1) +
+                                       floor(log10(int(percentageTextSeen)) + 1));
+
+    gotoxy (columnStartPrintInfoOfCurrentLocation,
             numberOfTerminalLine - 1);
 
-    #if (defined (_WIN32) || defined (_WIN64))
-    ColourizePrint("(" + int(percentageTextSeen) + "%) ", 11);
-    #endif
-
-    #if (defined (LINUX) || defined (__linux__))
-    cout<<BOLD(FCYN(" ("<<int(percentageTextSeen)<<"%) "));
-    #endif
+    ColorPrint(to_string(int(percentageTextSeen)) + "% ", 12);
     ColorPrint("Ln " + to_string(currentLine + 1) + ", Col " + to_string(currentColumn + 1), 3);
+    gotoxy(9, numberOfTerminalLine - 1);
+    for (int i=9; i<columnStartPrintInfoOfCurrentLocation; i++)
+        cout<<' ';
     ShowConsoleCursor(true);
 }
