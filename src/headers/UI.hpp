@@ -195,14 +195,14 @@ void EditorUI::printTabs()
 void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
                          const int &selectedCharacterEnd,  const int &line, const int column)
 {
-    int numberOfVisableLines=0;
-    vector<int> visableNumberLines;
-    vector<string> visableLines;
+    int numberOfVisibleLines=0;
+    vector<int> visibleNumberLines;
+    vector<string> visibleLines;
     int range = startLineForDisplayPage + numberOfTerminalLine - 2 <= text.size() ?\
                 startLineForDisplayPage + numberOfTerminalLine - 2 : text.size();
 
     for (int i=0; i<numberOfTerminalLine; i++)
-        visableLines.push_back("");
+        visibleLines.push_back("");
 
     ShowConsoleCursor(false);
 
@@ -210,61 +210,61 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
     {
         for (int i=startLineForDisplayPage; i<range; i++)
         {
-            visableNumberLines.push_back(i + 1);
+            visibleNumberLines.push_back(i + 1);
             int countOfCharacters=0;
             for (int j=startColumnForDisplayPage; j<text.at(i).size(); j++)
             {
                 if (countOfCharacters > numberOfTerminalColumn - 1) 
                 {
-                    numberOfVisableLines++;
+                    numberOfVisibleLines++;
                     break;
                 }
 
-                visableLines.at(numberOfVisableLines).push_back(text.at(i).at(j));
-                numberOfVisableLines = j == text.at(i).size() - 1 ? numberOfVisableLines + 1 : numberOfVisableLines;
+                visibleLines.at(numberOfVisibleLines).push_back(text.at(i).at(j));
+                numberOfVisibleLines = j == text.at(i).size() - 1 ? numberOfVisibleLines + 1 : numberOfVisibleLines;
                 countOfCharacters++;
             }
-            numberOfVisableLines = countOfCharacters == 0 ? numberOfVisableLines + 1 : numberOfVisableLines;
+            numberOfVisibleLines = countOfCharacters == 0 ? numberOfVisibleLines + 1 : numberOfVisibleLines;
         }
     }
    
-    if ((text.at(0).size() > 0 && numberOfVisableLines == 0))
-        numberOfVisableLines++;
+    if ((text.at(0).size() > 0 && numberOfVisibleLines == 0))
+        numberOfVisibleLines++;
 
     int numberDigits_Of_LargestLineNumber = floor(log10(GetBiggestLineNumberInViewport()) + 1);
     gotoxy(0, 2);
     for (int j=0; j<numberOfTerminalLine - 4; j++)
     {
-        if (j < numberOfVisableLines)
+        if (j < numberOfVisibleLines)
         {
-            for (int l=visableLines[j].size() % numberOfTerminalColumn; l<numberOfTerminalColumn; l++)
-                if (!(visableLines[j].size() % numberOfTerminalColumn == 0 && visableLines[j].size() > 0))
-                    visableLines[j]+=' ';
+            for (int l=visibleLines[j].size() % numberOfTerminalColumn; l<numberOfTerminalColumn; l++)
+                if (!(visibleLines[j].size() % numberOfTerminalColumn == 0 && visibleLines[j].size() > 0))
+                    visibleLines[j]+=' ';
 
-            while (numberDigits_Of_LargestLineNumber + visableLines[j].size() + 1 > numberOfTerminalColumn)
-                visableLines[j].pop_back();
+            while (numberDigits_Of_LargestLineNumber + visibleLines[j].size() + 1 > numberOfTerminalColumn)
+                visibleLines[j].pop_back();
 
-            if (numberDigits_Of_LargestLineNumber - floor(log10(visableNumberLines[j]) + 1) != 0)
-                for (int i=0; i<=numberDigits_Of_LargestLineNumber - floor(log10(visableNumberLines[j]) + 1); i++)
+            if (numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1) != 0)
+                for (int i=0; i<=numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1); i++)
                 {
                     gotoxy (i, j + 2);
                     cout<<" ";
                 }
 
-            gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(visableNumberLines[j]) + 1), j + 2);
+            gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1), j + 2);
 
             #if (defined (_WIN32) || defined (_WIN64))
             if (j + startLineForDisplayPage == line)
-                ColorPrint(visableNumberLines[j], 15);
+                ColorPrint(visibleNumberLines[j], 15);
             else
-                ColorPrint(visableNumberLines[j], 8);
+                ColorPrint(visibleNumberLines[j], 8);
             #endif
 
             #if (defined (LINUX) || defined (__linux__))
             if (j + startLineForDisplayPage == line)
-                cout<<BOLD(FWHT("\e[1m" + to_string(visableNumberLines[j]) + "\e[0m"));
+                cout<<BOLD(FWHT("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m"));
             else
-                ColorPrint("\e[1m" + to_string(visableNumberLines[j]) + "\e[0m", 90);
+                ColorPrint("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m", 90);
             #endif
 
             #if (defined (_WIN32) || defined (_WIN64))
@@ -274,7 +274,7 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
             ColorPrint(' ', 44);
             #endif
 
-            colourizeText(visableLines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startLineForDisplayPage, column);
+            colourizeText(visibleLines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startLineForDisplayPage, column);
         } else {
             string blankLine = "~";
             for (int i=0; i<numberOfTerminalColumn - 1; i++) blankLine += " ";
@@ -282,8 +282,6 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
         }
     }
 
-    visableLines.clear();
-    visableNumberLines.clear();
     ShowConsoleCursor(true);
 
     if (text.at(0).size() == 0 && text.size() == 1)
