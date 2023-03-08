@@ -179,20 +179,15 @@ void showMassage(string massageType) {
 void VisualMode::VisualEdit()
 {
     ShowConsoleCursor(false);
-    string modeView;
+    string currentMode_View;
 
-    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) modeView+=" ";
-    modeView += "-- VISUAL --";
-    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) modeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentMode_View+=" ";
+    currentMode_View += "-- VISUAL --";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentMode_View+=" ";
 
     gotoxy (0, numberOfTerminalLine - 2);
     setColor(7);
-    #if (defined (_WIN32) || defined (_WIN64))
-    ColorPrint(modeView, 97);
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
-    ColorPrint(modeView, 44);
-    #endif
+    ColorPrint(currentMode_View, 97);
     ShowConsoleCursor(true);
     gotoxy (10, numberOfTerminalLine - 1);
     VisualCommandInput();
@@ -203,12 +198,10 @@ void VisualMode::VisualEdit()
     if (Vector2StringVisualCommandText == "edit" ||
         Vector2StringVisualCommandText == "E")
     {
-
         showMassage("accept");
         currentMode = "edit";
         displayLocationInfo();
         displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
-    
     } else if (Vector2StringVisualCommandText == "text -D" ||
                Vector2StringVisualCommandText == "text --delete") {
 
@@ -219,7 +212,7 @@ void VisualMode::VisualEdit()
         ShowConsoleCursor (false);
         gotoxy (44, numberOfTerminalLine - 1);
         ColorPrint("[+]", 2);
-    } else if (Vector2StringVisualCommandText.find("text -S \"")       == 0 ||
+    } else if (Vector2StringVisualCommandText.find("text -S \"") == 0 ||
                Vector2StringVisualCommandText.find("text --search \"") == 0) {
         string key;
         bool isKey=false;
@@ -227,10 +220,8 @@ void VisualMode::VisualEdit()
         {
             if (isKey && ch != '\"')
                 key += ch;
-
             if (isKey && ch == '\"')
                 isKey=false;
-
             if (ch == '\"')
                 isKey=true;
         }
