@@ -3,10 +3,10 @@
 class VisualMode: public InsertMode
 {
     private:
-        vector<vector<char>> _VisualCommandText;
-        int _columnSelected=0, line=0;
-        bool _something_happen_in_text_view=false;
-        string _string_editCommand;
+        vector<vector<char>> visualCommandText;
+        int _currentColumn=0, _currentLine=0;
+        bool SomethingHappenInMainTextView=false;
+        string Vector2StringVisualCommandText;
 
     protected:
         bool search(string key, vector<vector<char>> &text, int &line, int &column);
@@ -21,10 +21,10 @@ void VisualMode::VisualCommandInput()
     {
         char ch;
         vector<char> emptyVector;
-        if (_VisualCommandText.size() == 0)
-            _VisualCommandText.push_back(emptyVector);
+        if (visualCommandText.size() == 0)
+            visualCommandText.push_back(emptyVector);
 
-        _columnSelected = _columnSelected > _VisualCommandText.at(0).size() ? _VisualCommandText.at(0).size() : _columnSelected;
+        _currentColumn = _currentColumn > visualCommandText.at(0).size() ? visualCommandText.at(0).size() : _currentColumn;
 
         #if (defined (_WIN32) || defined (_WIN64))
         switch (ch = getch()) {
@@ -33,40 +33,40 @@ void VisualMode::VisualCommandInput()
                     switch(ch = getch())
                     {
                         case 75:
-                            left(line, _columnSelected, _editCommand);
-                            _something_happen_in_text_view=true;
+                            left(line, _currentColumn, _editCommand);
+                            SomethingHappenInMainTextView=true;
                             break;
                         case 77:
-                            right(line, _columnSelected, _editCommand);
-                            _something_happen_in_text_view=true;
+                            right(line, _currentColumn, _editCommand);
+                            SomethingHappenInMainTextView=true;
                             break;
                         case 'S':
-                            _delete(line, _columnSelected, _editCommand);
-                            _something_happen_in_text_view=true;
+                            _delete(line, _currentColumn, _editCommand);
+                            SomethingHappenInMainTextView=true;
                             break;
                         default:
-                            getCharacter(ch, line, _columnSelected, _editCommand);
-                            _something_happen_in_text_view=true;
+                            getCharacter(ch, line, _currentColumn, _editCommand);
+                            SomethingHappenInMainTextView=true;
                     }
                     break;
                     case 8:
-                        backspace(line, _columnSelected, _editCommand);
-                        _something_happen_in_text_view=true;
+                        backspace(line, _currentColumn, _editCommand);
+                        SomethingHappenInMainTextView=true;
                         break;
                     case 9:
-                        tab(line, _columnSelected, _editCommand);
-                        _something_happen_in_text_view=true;
+                        tab(line, _currentColumn, _editCommand);
+                        SomethingHappenInMainTextView=true;
                         break;
                     case 22:
-                        paste(line, _columnSelected, _editCommand);
-                        _something_happen_in_text_view=true;
+                        paste(line, _currentColumn, _editCommand);
+                        SomethingHappenInMainTextView=true;
                         break;
                     case 13:
                         enter = true;
                         break;
                     default:
                         getCharacter(ch, line, _columnSelected, _editCommand);
-                        _something_happen_in_text_view=true;
+                        SomethingHappenInMainTextView=true;
         }
         #endif
         #if (defined (LINUX) || defined (__linux__))
@@ -79,15 +79,15 @@ void VisualMode::VisualCommandInput()
                         switch(ch = getch())
                         {
                             case 68:
-                                LEFT(line, _columnSelected, _VisualCommandText);
+                                LEFT(_currentLine, _currentColumn, visualCommandText);
                                 break;
                             case 67:
-                                RIGHT(line, _columnSelected, _VisualCommandText);
+                                RIGHT(_currentLine, _currentColumn, visualCommandText);
                                 break;
                             case 51:
                                 switch(ch = getch()) {
                                     case 126:
-                                        DELETE(line, _columnSelected, _VisualCommandText, false);
+                                        DELETE(_currentLine, _currentColumn, visualCommandText, false);
                                         break;
                                     default: ;
                                 }
@@ -99,30 +99,30 @@ void VisualMode::VisualCommandInput()
                 }
                 break;
             case 127:
-                BACKSPACE(line, _columnSelected, _VisualCommandText, false);
-                _something_happen_in_text_view=true;
+                BACKSPACE(_currentLine, _currentColumn, visualCommandText, false);
+                SomethingHappenInMainTextView=true;
                 break;
             case 9:
-                TAB(line, _columnSelected, _VisualCommandText, false);
-                _something_happen_in_text_view=true;
+                TAB(_currentLine, _currentColumn, visualCommandText, false);
+                SomethingHappenInMainTextView=true;
                 break;
             case 22:
-                PASTE(line, _columnSelected, _VisualCommandText);
-                _something_happen_in_text_view=true;
+                PASTE(_currentLine, _currentColumn, visualCommandText);
+                SomethingHappenInMainTextView=true;
                 break;
             case 10:
                 enter = true;
                 break;
             default:
-                INSERT_CHARACTER(ch, line, _columnSelected, _VisualCommandText, false);
-                _something_happen_in_text_view=true;
+                INSERT_CHARACTER(ch, _currentLine, _currentColumn, visualCommandText, false);
+                SomethingHappenInMainTextView=true;
         }
         #endif
         bool showBigCommandWarning=false;
 
-        while (_VisualCommandText.at(0).size() > 32)
+        while (visualCommandText.at(0).size() > 32)
         {
-            _VisualCommandText.at(0).pop_back();
+            visualCommandText.at(0).pop_back();
             showBigCommandWarning=true;
         }
         
@@ -141,23 +141,23 @@ void VisualMode::VisualCommandInput()
             ColorPrint("[B]", 6);
         }
 
-        _string_editCommand="";
+        Vector2StringVisualCommandText="";
 
-        for (int i=0; i<_VisualCommandText.at(0).size(); i++)
-            _string_editCommand+=_VisualCommandText.at(0).at(i);
+        for (int i=0; i<visualCommandText.at(0).size(); i++)
+            Vector2StringVisualCommandText += visualCommandText.at(0).at(i);
 
         gotoxy(10, numberOfTerminalLine - 1);
-        cout<<_string_editCommand;
-        int8_t range = _string_editCommand.length() == 32 ? 0 :  32 - _string_editCommand.length() % 32;
+        cout<<Vector2StringVisualCommandText;
+        int8_t range = Vector2StringVisualCommandText.length() == 32 ? 0 :  32 - Vector2StringVisualCommandText.length() % 32;
         
         for (int i=0; i<range; i++)
             cout<<' ';
 
-        _columnSelected = _string_editCommand.size() == 0 ? _columnSelected - 1 :_columnSelected;
-        _columnSelected = _columnSelected > 32 ? 32 : _columnSelected;
-        _columnSelected = _columnSelected < 0 ? 0 : _columnSelected;
+        _currentColumn = Vector2StringVisualCommandText.size() == 0 ? _currentColumn - 1 :_currentColumn;
+        _currentColumn = _currentColumn > 32 ? 32 : _currentColumn;
+        _currentColumn = _currentColumn < 0 ? 0 : _currentColumn;
         ShowConsoleCursor(true);
-        gotoxy (10 + _columnSelected, numberOfTerminalLine - 1);
+        gotoxy (10 + _currentColumn, numberOfTerminalLine - 1);
     }
 };
 
@@ -196,11 +196,12 @@ void VisualMode::VisualEdit()
     ShowConsoleCursor(true);
     gotoxy (10, numberOfTerminalLine - 1);
     VisualCommandInput();
-    _VisualCommandText.clear();
+    visualCommandText.clear();
     gotoxy (10, numberOfTerminalLine - 1);
     cout<<"                                     ";
 
-    if (_string_editCommand == "edit" || _string_editCommand == "E")
+    if (Vector2StringVisualCommandText == "edit" ||
+        Vector2StringVisualCommandText == "E")
     {
 
         showMassage("accept");
@@ -208,7 +209,8 @@ void VisualMode::VisualEdit()
         displayLocationInfo();
         displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
     
-    } else if (_string_editCommand == "text -D" || _string_editCommand == "text --delete") {
+    } else if (Vector2StringVisualCommandText == "text -D" ||
+               Vector2StringVisualCommandText == "text --delete") {
 
         showMassage("accept");
         ClearTerminalScreen();
@@ -217,11 +219,11 @@ void VisualMode::VisualEdit()
         ShowConsoleCursor (false);
         gotoxy (44, numberOfTerminalLine - 1);
         ColorPrint("[+]", 2);
-    } else if (_string_editCommand.find("text -S \"")       == 0 ||
-                _string_editCommand.find("text --search \"") == 0) {
+    } else if (Vector2StringVisualCommandText.find("text -S \"")       == 0 ||
+               Vector2StringVisualCommandText.find("text --search \"") == 0) {
         string key;
         bool isKey=false;
-        for (char ch : _string_editCommand)
+        for (char ch : Vector2StringVisualCommandText)
         {
             if (isKey && ch != '\"')
                 key += ch;
@@ -234,7 +236,8 @@ void VisualMode::VisualEdit()
         }
         if (!search(key, mainText, currentLine, currentColumn))
             showMassage("nothing found");
-    } else if (_string_editCommand == "file -S" || _string_editCommand == "file --save") {
+    } else if (Vector2StringVisualCommandText == "file -S" ||
+               Vector2StringVisualCommandText == "file --save") {
         currentMode = "file";
         fileSystem("save", mainText);
         ClearTerminalScreen();
@@ -245,8 +248,8 @@ void VisualMode::VisualEdit()
     } else {
         showMassage("command not found");
         gotoxy (10, numberOfTerminalLine - 1);
-        _columnSelected=0;
-        _string_editCommand="";
+        _currentColumn=0;
+        Vector2StringVisualCommandText="";
     }
 }
 

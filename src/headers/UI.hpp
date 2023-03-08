@@ -18,7 +18,7 @@ class EditorUI
 
     public:
         void displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
-                        const int &selectedCharacterEnd,  const int &line, const int column);
+                               const int &selectedCharacterEnd,  const int &line, const int column);
         void printTabs();
         void displayLocationInfo();
 };
