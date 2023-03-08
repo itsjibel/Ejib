@@ -268,10 +268,10 @@ void loadLogo()
     {
         while (getline(TextLogoFile, line))
         {
-            bool ColorIsChangable=true;
+            bool ColorIsChangeable=true;
             for (char ch : line)
             {
-                if (ColorIsChangable)
+                if (ColorIsChangeable)
                 {
                     if (ch == 'E')
                         setColor(14);
@@ -282,10 +282,10 @@ void loadLogo()
                     else if (ch == '|' || ch == '_')
                         setColor(1);
                     else if (ch == '(') {
-                        ColorIsChangable=false;
+                        ColorIsChangeable=false;
                         setColor(6);
                     } else if (ch == '\'') {
-                        ColorIsChangable=false;
+                        ColorIsChangeable=false;
                         setColor(3);
                     }
                     else
