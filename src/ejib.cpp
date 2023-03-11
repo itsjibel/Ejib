@@ -9,23 +9,31 @@ class EditorSystem: public VisualMode
     private:
         void TextEditSystem();
         enum keyASCII {
-            ESCAPE_KEY      = 27,
-            SPECIAL_KEYS    = 91,
-            UP_ARROW_KEY    = 65,
-            DOWN_ARROW_KEY  = 66,
-            RIGHT_ARROW_KEY = 67,
-            LEFT_ARROW_KEY  = 68,
-            DELETE_KEY      = 126,
-            BACKSPACE_KEY   = 127,
-            ENTER_KEY       = 10,
-            TAB_KEY         = 9,
-            CTRL_B          = 2,
-            CTRL_V          = 22,
-            CTRL_F          = 6,
-            CTRL_X          = 24,
-            CTRL_P          = 16,
-            CTRL_U          = 21,
-            CTRL_R          = 18
+            SPECIAL_KEYS_LINUX      = 91,
+            UP_ARROW_KEY_LINUX      = 65,
+            DOWN_ARROW_KEY_LINUX    = 66,
+            RIGHT_ARROW_KEY_LINUX   = 67,
+            LEFT_ARROW_KEY_LINUX    = 68,
+            DELETE_KEY_LINUX        = 126,
+            BACKSPACE_KEY_LINUX     = 127,
+            ENTER_KEY_LINUX         = 10,
+            SPECIAL_KEYS_WINDOWS    = -32,
+            UP_ARROW_KEY_WINDOWS    = 72,
+            LEFT_ARROW_KEY_WINDOWS  = 75,
+            RIGHT_ARROW_KEY_WINDOWS = 77,
+            DOWN_ARROW_KEY_WINDOWS  = 80,
+            DELETE_KEY_WINDOWS      = 83,
+            BACKSPACE_KEY_WINDOWS   = 8,
+            ENTER_KEY_WINDOWS       = 13,
+            ESCAPE_KEY              = 27,
+            TAB_KEY                 = 9,
+            CTRL_B                  = 2,
+            CTRL_V                  = 22,
+            CTRL_F                  = 6,
+            CTRL_X                  = 24,
+            CTRL_P                  = 16,
+            CTRL_U                  = 21,
+            CTRL_R                  = 18
             };
 
     public:
@@ -50,82 +58,81 @@ void EditorSystem::TextEditSystem()
     #if (defined (_WIN32) || defined (_WIN64))
     switch (ch = getch())
     {
-        case 0:
-            case 0xE0:
-                switch(ch = getch())
-                {
-                    case 72:
-                        UP(lineSelected, columnSelected, input);
-                        somethingHappenTextView=true;
-                        break;
-                    case 75:
-                        LEFT(lineSelected,    columnSelected, input);
-                        somethingHappenTextView=true;
-                        break;
-                    case 77:
-                        RIGHT(lineSelected,   columnSelected, input);
-                        somethingHappenTextView=true;
-                        break;
-                    case 80:
-                        DOWN(lineSelected, columnSelected, input);
-                        somethingHappenTextView=true;
-                        break;
-                    case 83:
-                        DELETE(lineSelected, columnSelected, input);
-                        somethingHappenTextView=true;
-                        break;
-                    default:
-                        getCharacter(ch, lineSelected, columnSelected, input);
-                        somethingHappenTextView=true;
-                }
-                break;
-                case 8:
-                    BACKSPACE(lineSelected, columnSelected, input);
+        case SPECIAL_KEYS_WINDOWS:
+            switch(ch = getch())
+            {
+                case UP_ARROW_KEY_WINDOWS:
+                    UP(currentLine, currentColumn, mainText);
                     somethingHappenTextView=true;
                     break;
-                case 2:
-                    mode = "visual";
-                    break;
-                case 13:
-                    ENTER(lineSelected, columnSelected, input);
+                case LEFT_ARROW_KEY_WINDOWS:
+                    LEFT(currentLine, currentColumn, mainText);
                     somethingHappenTextView=true;
                     break;
-                case 9:
-                    TAB(lineSelected, columnSelected, input);
+                case RIGHT_ARROW_KEY_WINDOWS:
+                    RIGHT(currentLine,   currentColumn, mainText);
                     somethingHappenTextView=true;
                     break;
-                case 22:
-                    PASTE(lineSelected, columnSelected, input);
+                case DOWN_ARROW_KEY_WINDOWS:
+                    DOWN(currentLine, currentColumn, mainText);
                     somethingHappenTextView=true;
                     break;
-                case 6:
-                    mode = "file";
-                    fileSystem("save", input);
-                    clearTerminal();
-                    printInfo();
-                    printTabs();
-                    printText(input, -1, -1, lineSelected);
-                    mode = "visual";
-                    break;
-                case 24:
-                    DELETE_LINE(lineSelected, columnSelected, input);
-                    somethingHappenTextView=true;
-                    break;
-                case 16:
-                    mode = "command";
-                    SetConsoleTextAttribute(hConsole, 7);
-                    break;
-                case 21:
-                    UNDO(lineSelected, columnSelected, input);
-                    somethingHappenTextView=true;
-                    break;
-                case 18:
-                    REDO(lineSelected, columnSelected, input);
+                case DELETE_KEY_WINDOWS:
+                    DELETE_(currentLine, currentColumn, mainText, false);
                     somethingHappenTextView=true;
                     break;
                 default:
-                    INPUT_CHARACTER(ch, lineSelected, columnSelected, input);
+                    INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
                     somethingHappenTextView=true;
+            }
+            break;
+        case BACKSPACE_KEY_WINDOWS:
+            BACKSPACE(currentLine, currentColumn, mainText, false);
+            somethingHappenTextView=true;
+            break;
+        case ENTER_KEY_WINDOWS:
+            ENTER(currentLine, currentColumn, mainText, false);
+            somethingHappenTextView=true;
+            break;
+        case TAB_KEY:
+            TAB(currentLine, currentColumn, mainText, false);
+            somethingHappenTextView=true;
+            break;
+        case CTRL_B:
+            currentMode = "visual";
+            break;
+        case CTRL_V:
+            PASTE(currentLine, currentColumn, mainText);
+            somethingHappenTextView=true;
+            break;
+        case CTRL_F:
+            currentMode = "file";
+            fileSystem("save", mainText);
+            ClearTerminalScreen();
+            displayLocationInfo();
+            printTabs();
+            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+            currentMode = "edit";
+            break;
+        case CTRL_X:
+            DELETE_LINE(currentLine, currentColumn, mainText, false);
+            somethingHappenTextView=true;
+            break;
+        case CTRL_P:
+            currentMode = "command";
+            ClearTerminalScreen();
+            break;
+        case CTRL_U:
+            UNDO(currentLine, currentColumn, mainText);
+            somethingHappenTextView=true;
+            break;
+        case CTRL_R:
+            REDO(currentLine, currentColumn, mainText);
+            somethingHappenTextView=true;
+            break;
+        default:
+            INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
+            somethingHappenTextView=true;
     }
     #endif
     #if (defined (LINUX) || defined (__linux__))
@@ -134,29 +141,29 @@ void EditorSystem::TextEditSystem()
         case ESCAPE_KEY:
             switch(ch = getch())
             {
-                case SPECIAL_KEYS:
+                case SPECIAL_KEYS_LINUX:
                     switch(ch = getch())
                     {
-                        case UP_ARROW_KEY:
+                        case UP_ARROW_KEY_LINUX:
                             UP(currentLine, currentColumn, mainText);
                             somethingHappenTextView=true;
                             break;
-                        case DOWN_ARROW_KEY:
+                        case DOWN_ARROW_KEY_LINUX:
                             DOWN(currentLine, currentColumn, mainText);
                             somethingHappenTextView=true;
                             break;
-                        case RIGHT_ARROW_KEY:
+                        case RIGHT_ARROW_KEY_LINUX:
                             RIGHT(currentLine, currentColumn, mainText);
                             somethingHappenTextView=true;
                             break;
-                        case LEFT_ARROW_KEY:
+                        case LEFT_ARROW_KEY_LINUX:
                             LEFT(currentLine, currentColumn, mainText);
                             somethingHappenTextView=true;
                             break;
                         case 51:
                             switch(ch = getch())
                             {
-                                case DELETE_KEY:
+                                case DELETE_KEY_LINUX:
                                     DELETE(currentLine, currentColumn, mainText, false);
                                     somethingHappenTextView=true;
                                     break;
@@ -171,19 +178,19 @@ void EditorSystem::TextEditSystem()
                                         case 53:
                                             switch(ch = getch())
                                             {
-                                                case UP_ARROW_KEY:
+                                                case UP_ARROW_KEY_LINUX:
                                                     QUICK_UP(currentLine, currentColumn, mainText);
                                                     somethingHappenTextView=true;
                                                     break;
-                                                case DOWN_ARROW_KEY:
+                                                case DOWN_ARROW_KEY_LINUX:
                                                     QUICK_DOWN(currentLine, currentColumn, mainText);
                                                     somethingHappenTextView=true;
                                                     break;
-                                                case RIGHT_ARROW_KEY:
+                                                case RIGHT_ARROW_KEY_LINUX:
                                                     QUICK_RIGHT(currentLine, currentColumn, mainText);
                                                     somethingHappenTextView=true;
                                                     break;
-                                                case LEFT_ARROW_KEY:
+                                                case LEFT_ARROW_KEY_LINUX:
                                                     QUICK_LEFT(currentLine, currentColumn, mainText);
                                                     somethingHappenTextView=true;
                                                     break;
@@ -197,20 +204,20 @@ void EditorSystem::TextEditSystem()
                     break;
             }
             break;
-        case BACKSPACE_KEY:
+        case BACKSPACE_KEY_LINUX:
             BACKSPACE(currentLine, currentColumn, mainText, false);
             somethingHappenTextView=true;
             break;
-        case CTRL_B:
-            currentMode = "visual";
-            break;
-        case ENTER_KEY:
+        case ENTER_KEY_LINUX:
             ENTER(currentLine, currentColumn, mainText, false);
             somethingHappenTextView=true;
             break;
         case TAB_KEY:
             TAB(currentLine, currentColumn, mainText, false);
             somethingHappenTextView=true;
+            break;
+        case CTRL_B:
+            currentMode = "visual";
             break;
         case CTRL_V:
             PASTE(currentLine, currentColumn, mainText);
