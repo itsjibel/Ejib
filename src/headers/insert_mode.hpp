@@ -210,16 +210,10 @@ void InsertMode::DELETE_LINE(int &line, int &column, vector<vector<char>> &text,
         for (int i=0; i<text.at(line).size(); i++)
             CurrentLineForDelete.push_back (text.at(line).at(i));
 
-        if (line > 0)
+        if (currentMode != "visual" && !USE_FOR_REDO)
         {
-            if (currentMode != "visual" && !USE_FOR_REDO)
-            {
-                RedoStack.clear();
-                AddTrackToUndoStack (false, line - 1, column, '\n' + CurrentLineForDelete, 'L');
-            }
-        } else if (currentMode != "visual" && !USE_FOR_REDO) {
             RedoStack.clear();
-            AddTrackToUndoStack (false, 0, column, CurrentLineForDelete, 'L');
+            AddTrackToUndoStack (false, line, column, CurrentLineForDelete, 'L');
         }
 
         text.erase(text.begin() + line);
@@ -494,37 +488,48 @@ void InsertMode::UNDO(int &line, int &column, vector<vector<char>> &text)
                         }
                     }
             } else {
-                for (int i=0; i<GetLastUndoTrack().changeString.size(); i++)
+                if (GetLastUndoTrack().changeMode == 'L')
                 {
-                    if (GetLastUndoTrack().changeString.at(i) == '\n')
-                    {
-                        vector<char> StringToVector;
-                        if (GetLastUndoTrack().changeMode != 'L')
-                            for (int j=0; j<GetLastUndoTrack().changeString.size() - 1; j++)
-                                text.at(line).pop_back();
+                    vector<char> string2vector;
+                    for (char ch : GetLastUndoTrack().changeString)
+                        string2vector.push_back(ch);
 
-                        for (char ch : GetLastUndoTrack().changeString)
-                            StringToVector.push_back(ch);
+                    if (text.size() == 1 && text.at(0).size() == 0)
+                        text.clear();
                         
-                        StringToVector.erase(StringToVector.begin());
-                        text.insert (text.begin() + line + 1, StringToVector);
-
-                        if (GetLastUndoTrack().changeMode == 'B' ||
-                            GetLastUndoTrack().changeMode == 'L')
-                            line++;
-
-                        isMultipleLine=true;
-                    }
-                    if (!isMultipleLine)
+                    text.insert(text.begin() + line, string2vector);
+                } else {
+                    for (int i=0; i<GetLastUndoTrack().changeString.size(); i++)
                     {
-                        if (GetLastUndoTrack().changeMode == 'B')
-                            text.at(line).insert (text.at(line).begin() + column - 1, GetLastUndoTrack().changeString.at(0));
+                        if (GetLastUndoTrack().changeString.at(i) == '\n')
+                        {
+                            vector<char> StringToVector;
+                            if (GetLastUndoTrack().changeMode != 'L')
+                                for (int j=0; j<GetLastUndoTrack().changeString.size() - 1; j++)
+                                    text.at(line).pop_back();
 
-                        else if (GetLastUndoTrack().changeMode == 'D')
-                            text.at(line).insert (text.at(line).begin() + column, GetLastUndoTrack().changeString.at(0));
+                            for (char ch : GetLastUndoTrack().changeString)
+                                StringToVector.push_back(ch);
+                            
+                            StringToVector.erase(StringToVector.begin());
+                            text.insert (text.begin() + line + 1, StringToVector);
 
-                        else
-                            text.at(line).insert (text.at(line).begin() + i, GetLastUndoTrack().changeString.at(i));
+                            if (GetLastUndoTrack().changeMode == 'B' ||
+                                GetLastUndoTrack().changeMode == 'L')
+                                line++;
+
+                            isMultipleLine=true;
+                        }
+
+                        if (!isMultipleLine)
+                        {
+                            if (GetLastUndoTrack().changeMode == 'B')
+                                text.at(line).insert (text.at(line).begin() + column - 1, GetLastUndoTrack().changeString.at(0));
+                            else if (GetLastUndoTrack().changeMode == 'D')
+                                text.at(line).insert (text.at(line).begin() + column, GetLastUndoTrack().changeString.at(0));
+                            else
+                                text.at(line).insert (text.at(line).begin() + i, GetLastUndoTrack().changeString.at(i));
+                        }
                     }
                 }
             }
