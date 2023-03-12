@@ -8,33 +8,6 @@ class EditorSystem: public VisualMode
 {
     private:
         void TextEditSystem();
-        enum keyASCII {
-            SPECIAL_KEYS_LINUX      = 91,
-            UP_ARROW_KEY_LINUX      = 65,
-            DOWN_ARROW_KEY_LINUX    = 66,
-            RIGHT_ARROW_KEY_LINUX   = 67,
-            LEFT_ARROW_KEY_LINUX    = 68,
-            DELETE_KEY_LINUX        = 126,
-            BACKSPACE_KEY_LINUX     = 127,
-            ENTER_KEY_LINUX         = 10,
-            SPECIAL_KEYS_WINDOWS    = -32,
-            UP_ARROW_KEY_WINDOWS    = 72,
-            LEFT_ARROW_KEY_WINDOWS  = 75,
-            RIGHT_ARROW_KEY_WINDOWS = 77,
-            DOWN_ARROW_KEY_WINDOWS  = 80,
-            DELETE_KEY_WINDOWS      = 83,
-            BACKSPACE_KEY_WINDOWS   = 8,
-            ENTER_KEY_WINDOWS       = 13,
-            ESCAPE_KEY              = 27,
-            TAB_KEY                 = 9,
-            CTRL_B                  = 2,
-            CTRL_V                  = 22,
-            CTRL_F                  = 6,
-            CTRL_X                  = 24,
-            CTRL_P                  = 16,
-            CTRL_U                  = 21,
-            CTRL_R                  = 18
-            };
 
     public:
         void MainSystem()
