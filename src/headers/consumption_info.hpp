@@ -1,5 +1,9 @@
 #include <string.h>
 #include "file_system.hpp"
+#if (defined (_WIN32) || defined (_WIN64))
+#include "windows.h"
+#include "psapi.h"
+#endif
 
 int parseLine(char* line)
 {
@@ -14,6 +18,7 @@ int parseLine(char* line)
 
 string EditorMemoryUsage()
 {
+    #if (defined (LINUX) || defined (__linux__))
     FILE* file = fopen("/proc/self/status", "r");
     int result = -1;
     char line[128];
@@ -28,4 +33,12 @@ string EditorMemoryUsage()
     }
     fclose(file);
     return byteConverter(result * 1024);
+    #endif
+
+    #if (defined (_WIN32) || defined (_WIN64))
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+    SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+    return byteConverter(physMemUsedByMe);
+    #endif
 }
