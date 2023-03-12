@@ -162,6 +162,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
 
 void EditorUI::printTabs()
 {
+    ShowConsoleCursor(false);
     gotoxy (0, 0);
     cout<<"  ";
     #if (defined (_WIN32) || defined (_WIN64))
@@ -185,6 +186,7 @@ void EditorUI::printTabs()
     for (int i=0; i<numberOfTerminalColumn; i++) bar+=" ";
     gotoxy(0, 1);
     ColorPrint(bar, 97);
+    ShowConsoleCursor(true);
 }
 
 void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
@@ -293,7 +295,7 @@ void EditorUI::displayLocationInfo()
     
     for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView+=" ";
     currentModeView += "-- INSERT --";
-    for (int i=0; i<numberOfTerminalColumn / 2 - 5; i++) currentModeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView+=" ";
 
     gotoxy (0, numberOfTerminalLine - 2);
     setColor(7);

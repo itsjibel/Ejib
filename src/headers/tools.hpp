@@ -227,7 +227,7 @@ bool GetCopiedText(string &copiedText)
     #if (defined (_WIN32) || defined (_WIN64))
     if (OpenClipboard(NULL))
     {
-        string copiedText = (char*)GetClipboardData(CF_TEXT);
+        copiedText = (char*)GetClipboardData(CF_TEXT);
         CloseClipboard();
         return true;
     } else return false;
