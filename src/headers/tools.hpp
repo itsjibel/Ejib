@@ -239,7 +239,12 @@ void ColorPrint(T text, int color)
 {
     setColor(color);
     cout<<text;
+    #if (defined (_WIN32) || defined (_WIN64))
     setColor(7);
+    #endif
+    #if (defined (LINUX) || defined (__linux__))
+    setColor(0);
+    #endif
 }
 
 vector<int> GetTerminal_LineAndColumn()
