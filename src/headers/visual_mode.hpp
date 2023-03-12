@@ -12,6 +12,36 @@ class VisualMode: public InsertMode
         bool search(string key, vector<vector<char>> &text, int &line, int &column);
         void VisualCommandInput();
         void VisualEdit();
+
+    public:
+        enum keyASCII
+        {
+            SPECIAL_KEYS_LINUX      = 91,
+            UP_ARROW_KEY_LINUX      = 65,
+            DOWN_ARROW_KEY_LINUX    = 66,
+            RIGHT_ARROW_KEY_LINUX   = 67,
+            LEFT_ARROW_KEY_LINUX    = 68,
+            DELETE_KEY_LINUX        = 126,
+            BACKSPACE_KEY_LINUX     = 127,
+            ENTER_KEY_LINUX         = 10,
+            SPECIAL_KEYS_WINDOWS    = -32,
+            UP_ARROW_KEY_WINDOWS    = 72,
+            LEFT_ARROW_KEY_WINDOWS  = 75,
+            RIGHT_ARROW_KEY_WINDOWS = 77,
+            DOWN_ARROW_KEY_WINDOWS  = 80,
+            DELETE_KEY_WINDOWS      = 83,
+            BACKSPACE_KEY_WINDOWS   = 8,
+            ENTER_KEY_WINDOWS       = 13,
+            ESCAPE_KEY              = 27,
+            TAB_KEY                 = 9,
+            CTRL_B                  = 2,
+            CTRL_V                  = 22,
+            CTRL_F                  = 6,
+            CTRL_X                  = 24,
+            CTRL_P                  = 16,
+            CTRL_U                  = 21,
+            CTRL_R                  = 18
+        };
 };
 
 void VisualMode::VisualCommandInput()
@@ -27,90 +57,87 @@ void VisualMode::VisualCommandInput()
         _currentColumn = _currentColumn > visualCommandText.at(0).size() ? visualCommandText.at(0).size() : _currentColumn;
 
         #if (defined (_WIN32) || defined (_WIN64))
-        switch (ch = getch()) {
-            case 0:
-                case 0xE0:
-                    switch(ch = getch())
-                    {
-                        case 75:
-                            left(line, _currentColumn, _editCommand);
-                            SomethingHappenInMainTextView=true;
-                            break;
-                        case 77:
-                            right(line, _currentColumn, _editCommand);
-                            SomethingHappenInMainTextView=true;
-                            break;
-                        case 'S':
-                            _delete(line, _currentColumn, _editCommand);
-                            SomethingHappenInMainTextView=true;
-                            break;
-                        default:
-                            getCharacter(ch, line, _currentColumn, _editCommand);
-                            SomethingHappenInMainTextView=true;
-                    }
-                    break;
-                    case 8:
-                        backspace(line, _currentColumn, _editCommand);
+        switch (ch = getch())
+        {
+            case SPECIAL_KEYS_WINDOWS:
+                switch(ch = getch())
+                {
+                    case LEFT_ARROW_KEY_WINDOWS:
+                        LEFT(_currentLine, _currentColumn, visualCommandText);
                         SomethingHappenInMainTextView=true;
                         break;
-                    case 9:
-                        tab(line, _currentColumn, _editCommand);
+                    case RIGHT_ARROW_KEY_WINDOWS:
+                        RIGHT(_currentLine, _currentColumn, visualCommandText);
                         SomethingHappenInMainTextView=true;
                         break;
-                    case 22:
-                        paste(line, _currentColumn, _editCommand);
+                    case DELETE_KEY_WINDOWS:
+                        DELETE_(_currentLine, _currentColumn, visualCommandText, false);
                         SomethingHappenInMainTextView=true;
-                        break;
-                    case 13:
-                        enter = true;
                         break;
                     default:
-                        getCharacter(ch, line, _columnSelected, _editCommand);
+                        INSERT_CHARACTER(ch, _currentLine, _currentColumn, visualCommandText, false);
                         SomethingHappenInMainTextView=true;
+                }
+                break;
+            case BACKSPACE_KEY_WINDOWS:
+                BACKSPACE(_currentLine, _currentColumn, visualCommandText, false);
+                SomethingHappenInMainTextView=true;
+                break;
+            case TAB_KEY:
+                TAB(_currentLine, _currentColumn, visualCommandText, false);
+                SomethingHappenInMainTextView=true;
+                break;
+            case CTRL_V:
+                PASTE(_currentLine, _currentColumn, visualCommandText);
+                SomethingHappenInMainTextView=true;
+                break;
+            case ENTER_KEY_WINDOWS:
+                enter = true;
+                break;
+            default:
+                INSERT_CHARACTER(ch, _currentLine, _currentColumn, visualCommandText, false);
+                SomethingHappenInMainTextView=true;
         }
         #endif
         #if (defined (LINUX) || defined (__linux__))
         switch (ch = getch())
         {
-            case 27:
+            case ESCAPE_KEY:
                 switch(ch = getch())
                 {
-                    case 91:
+                    case SPECIAL_KEYS_LINUX:
                         switch(ch = getch())
                         {
-                            case 68:
+                            case LEFT_ARROW_KEY_LINUX:
                                 LEFT(_currentLine, _currentColumn, visualCommandText);
                                 break;
-                            case 67:
+                            case RIGHT_ARROW_KEY_LINUX:
                                 RIGHT(_currentLine, _currentColumn, visualCommandText);
                                 break;
                             case 51:
                                 switch(ch = getch()) {
-                                    case 126:
+                                    case DELETE_KEY_LINUX:
                                         DELETE(_currentLine, _currentColumn, visualCommandText, false);
                                         break;
-                                    default: ;
                                 }
                                 break;
-                            default: ;
                         }
                         break;
-                    default: ;
                 }
                 break;
-            case 127:
+            case BACKSPACE_KEY_LINUX:
                 BACKSPACE(_currentLine, _currentColumn, visualCommandText, false);
                 SomethingHappenInMainTextView=true;
                 break;
-            case 9:
+            case TAB_KEY:
                 TAB(_currentLine, _currentColumn, visualCommandText, false);
                 SomethingHappenInMainTextView=true;
                 break;
-            case 22:
+            case CTRL_V:
                 PASTE(_currentLine, _currentColumn, visualCommandText);
                 SomethingHappenInMainTextView=true;
                 break;
-            case 10:
+            case ENTER_KEY_LINUX:
                 enter = true;
                 break;
             default:
