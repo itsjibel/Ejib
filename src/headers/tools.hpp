@@ -2,13 +2,13 @@
 #include <iostream>
 #include <limits.h>
 #include <string>
-#include <sys/ioctl.h>
-#include <unistd.h>
 #include <vector>
-#include <X11/Xlib.h>
 #include <thread>
 
 #if (defined (LINUX) || defined (__linux__))
+#include <sys/ioctl.h>
+#include <X11/Xlib.h>
+#include <unistd.h>
 #define RST  "\x1B[0m"
 #define KRED "\x1B[31m"
 #define KGRN "\x1B[32m"
@@ -150,31 +150,6 @@ void Sleep(int milliseconds)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
-#endif
-
-string byteConverter(long long int bytes)
-{
-    string convertedSize;
-    if (bytes >= pb)
-        return to_string ((float)bytes/pb) + " PB";
-
-    else if (bytes >= tb && bytes < pb)
-        return to_string ((float)bytes/tb) + " TB";
-
-    else if (bytes >= gb && bytes < tb)
-        return to_string ((float)bytes / gb) + " GB";
-
-    else if (bytes >= mb && bytes < gb)
-        return to_string ((float)bytes/mb) + " MB";
-
-    else if (bytes >= kb && bytes < mb)
-        return to_string ((float)bytes/kb) + " KB";
-
-    else if (bytes < kb)
-        return to_string(bytes) + " Bytes";
-
-    return "Unknown size";
-}
 
 Bool GetLinuxClipboard(Display *display, Window window, const char *bufname,
                        const char *fmtname, string &text)
@@ -210,6 +185,32 @@ Bool GetLinuxClipboard(Display *display, Window window, const char *bufname,
     } else
         return False;
 }
+#endif
+
+string byteConverter(long long int bytes)
+{
+    string convertedSize;
+    if (bytes >= pb)
+        return to_string ((float)bytes/pb) + " PB";
+
+    else if (bytes >= tb && bytes < pb)
+        return to_string ((float)bytes/tb) + " TB";
+
+    else if (bytes >= gb && bytes < tb)
+        return to_string ((float)bytes / gb) + " GB";
+
+    else if (bytes >= mb && bytes < gb)
+        return to_string ((float)bytes/mb) + " MB";
+
+    else if (bytes >= kb && bytes < mb)
+        return to_string ((float)bytes/kb) + " KB";
+
+    else if (bytes < kb)
+        return to_string(bytes) + " Bytes";
+
+    return "Unknown size";
+}
+
 
 bool GetCopiedText(string &copiedText)
 {
@@ -226,7 +227,7 @@ bool GetCopiedText(string &copiedText)
     #if (defined (_WIN32) || defined (_WIN64))
     if (OpenClipboard(NULL))
     {
-        string copiedText = (char*)GetClipboardData(CF_TEXT);
+        copiedText = (char*)GetClipboardData(CF_TEXT);
         CloseClipboard();
         return true;
     } else return false;
@@ -238,7 +239,7 @@ void ColorPrint(T text, int color)
 {
     setColor(color);
     cout<<text;
-    setColor(0);
+    setColor(7);
 }
 
 vector<int> GetTerminal_LineAndColumn()
@@ -247,9 +248,9 @@ vector<int> GetTerminal_LineAndColumn()
     #if (defined (_WIN32) || defined (_WIN64))
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    TerminalSize.push_back(csbi.srWindow.Right - csbi.srWindow.Left + 1);
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
     TerminalSize.push_back(csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    TerminalSize.push_back(csbi.srWindow.Right - csbi.srWindow.Left + 1);
     #endif
 
     #if (defined (LINUX) || defined (__linux__))
