@@ -7,7 +7,7 @@
 
 #if (defined (LINUX) || defined (__linux__))
 #include <sys/ioctl.h>
-#include <X11/Xlib.h>
+#include "Xlib.hpp"
 #include <unistd.h>
 #define RST  "\x1B[0m"
 #define KRED "\x1B[31m"
