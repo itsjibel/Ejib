@@ -574,10 +574,10 @@ void InsertMode::REDO(int &line, int &column, vector<vector<char>> &text)
                 {
                     line = GetLastRedoTrack().changeString[0] == '\n' ? line + 1 : line;
                     BACKSPACE(line, column, text, true);
-                } else if (GetLastRedoTrack().changeMode == 'L') {
-                    int temp = text.size() == 1 && line == 0 ? 0 : line + 1;
-                    DELETE_LINE(temp, column, text, true);
-                } else if (GetLastRedoTrack().changeMode == 'D')
+                }
+                else if (GetLastRedoTrack().changeMode == 'L') 
+                    DELETE_LINE(line, column, text, true);
+                else if (GetLastRedoTrack().changeMode == 'D')
                     DELETE(line, column, text, true);
             }
 
