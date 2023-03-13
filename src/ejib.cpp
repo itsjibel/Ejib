@@ -63,6 +63,10 @@ void EditorSystem::TextEditSystem()
             BACKSPACE(currentLine, currentColumn, mainText, false);
             somethingHappenTextView=true;
             break;
+        case CTRL_BACKSPACE_KEY_WINDOWS:
+            QUICK_BACKSPACE(currentLine, currentColumn, mainText, false);
+            somethingHappenTextView=true;
+            break;
         case ENTER_KEY_WINDOWS:
             ENTER(currentLine, currentColumn, mainText, false);
             somethingHappenTextView=true;
@@ -179,6 +183,10 @@ void EditorSystem::TextEditSystem()
             break;
         case BACKSPACE_KEY_LINUX:
             BACKSPACE(currentLine, currentColumn, mainText, false);
+            somethingHappenTextView=true;
+            break;
+        case CTRL_BACKSPACE_KEY_LINUX:
+            QUICK_BACKSPACE(currentLine, currentColumn, mainText, false);
             somethingHappenTextView=true;
             break;
         case ENTER_KEY_LINUX:
