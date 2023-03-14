@@ -335,9 +335,9 @@ bool IsSeparatorCharacter (char character)
 
 void ClearTerminalScreen() {
     #if (defined (_WIN32) || defined (_WIN64))
-    system("cls");
+    clrscr();
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    system("clear");
+    printf("\033[H\033[J");
     #endif
 }
