@@ -173,6 +173,9 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<vector<char>> &text, b
 
 void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
 {
+    /* Checking text is empty or not? If is empty,
+     * there is no need to enter the process
+     */
     if (text.size() == 1 && text.at(0).size() == 0)
         return;
 
