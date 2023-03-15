@@ -186,6 +186,10 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<vector<char>> &t
             RedoStack.clear();
             AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'b');
         }
+        /* If the user didn't reach the beginning of the line and
+         * doesn't want to paste the current line to the end of the previous line,
+         * then we delete the previous character.
+         */
         text.at(line).erase (text.at(line).begin() + column - 1);
         column--;
     } else {
@@ -200,7 +204,11 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<vector<char>> &t
                 RedoStack.clear();
                 AddTrackToUndoStack (false, line - 1, column, '\n' + LineForAppending, 'b');
             }
-
+            /* If the user reaches the beginning of the line:
+             *      We paste the current line to the previous line and then delete the current line,
+             *      then we subtract one from the current line and,
+             *      change the current column to the length of the previous line,
+             */
             line--;
             column = text.at(line).size();
             vector<char> AppendCurrentLineToPreviousLine;
