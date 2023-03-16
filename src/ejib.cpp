@@ -1,3 +1,9 @@
+/* <<The System Controller>>
+ * A summary of what this library does:
+ * The file <<ejib.cpp>> controls all the switching between modes such as
+ * insert mode, visual mode, etc.
+ * Also, all keyboard inputs for insert mode are taken in this file.
+ */
 #include "headers/visual_mode.hpp"
 
 #if (defined (_WIN32) || defined (_WIN64))
@@ -12,6 +18,7 @@ class EditorSystem: public VisualMode
     public:
         void MainSystem()
         {
+            /// Controlling executive functions for each mode
             while (1)
             {
                 if (currentMode == "edit")
@@ -26,6 +33,16 @@ class EditorSystem: public VisualMode
 
 void EditorSystem::TextEditSystem()
 {
+    /* In this section, we identify keyboard inputs using <getch()> and then
+     * we call the function related to this key or keys.
+     * Note two things:
+     *      1.We separated the Windows and Linux input sections because inputs such as
+     *        Enter, Backspace, etc. have different ASCII codes in the two operating systems,
+     *        and this has caused us to separate the input of these two operating systems.
+     *      2.The reason for the many switch cases is that when you press a special button such as
+     *        Backspace, the Down, Left, Right and up Arrow keys, multiple ASCII codes are passed to <getch()>.
+     *        To control this issue we need <getch()> stitch cases multiple times.
+     */
     char ch;
     bool somethingHappenTextView=false;
     #if (defined (_WIN32) || defined (_WIN64))
@@ -234,10 +251,16 @@ void EditorSystem::TextEditSystem()
             somethingHappenTextView=true;
     }
     #endif
-
+    /* The user may need to move the page down or up or right or left with the
+     * change in the text user has made or movement the user did,
+     * so we call this function so that if the user is a downer or upper or more right or more left than usual.
+     * It will update the screen depending on it.
+     */
     if (UpdateViewport())
         somethingHappenTextView=true;
-
+    /* This <if(somethingHappenTextView)> means that if the user makes any changes to the location or text,
+     * the page and other information should be printed.
+     */
     if (somethingHappenTextView)
     {
         displayLocationInfo();
