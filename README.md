@@ -8,30 +8,39 @@
 
 + Windows
 
-## A summary of the project
+## Quick summary of the Ejib
 
-    Very fast and compact text editor
+    lightweight and fast text editor
 
 ## Editor features
 
-+ Write and delete text
++ Write, erase, paste, etc on text
 
-+ Using shortcuts like ^S, ^V and ^B to speed things up
++ Using shortcuts like __^F__ to save the file, __^V__ for paste copied text and __^B__ to change the mode to visual to speed up editing text, etc
 
-+ A section called editing commands
++ Having a section called __visual mode__ for quick editing in the text, searching in the text, moving around in the text, etc.
 
 + Save text to file or open file quickly
 
-+ __Ease of reading the code due to the fluidity of the code and segmentation of code pieces in the library and functions__
++ Colorizing the text to make it more readable for programmers
 
-## More information about edit commands
++ ### Visual mode: help/visual_mode_help.txt
 
-    + In this section, you can quickly do things that are hard to do manually.
-    such as:
-    text -S             --> "(S)earch in text"
-    file -S             --> "(S)ave the file"
-    text -D             --> "Delete all of the text"
-    text -D "something" --> "Delete all "something" from the text"'
++ ### Shortcuts: help/shortcuts_help.txt
+
++ ### General info: help/help.txt
+
+## Coding model properties
+
++ __Ease of reading the code due to the division of code parts in the library and the division of large sections to the small functions.__
++ __Detailed comments in incomprehensible parts__
+
+## Several examples of __visual mode__ commands
+
++ __text -S__ "something" <<(S)earch "something" in text>>
++ __file -S__ <<(S)ave the file>>
++ __text -D__ <<(D)elete all of the text>>
+
 And ...
 
 + __You can get more complete information about various commands in the program itself__
