@@ -1,4 +1,4 @@
-/* <<The System Controller>>
+/* <<The mode controller of ejib>>
  * A summary of what this library does:
  * The file <<ejib.cpp>> controls all the switching between modes such as
  * insert mode, visual mode, etc.
