@@ -238,13 +238,15 @@ void VisualMode::VisualEdit()
         showMassage("accept");
         currentMode = "edit";
         displayLocationInfo();
+        printTabs();
         displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
     } else if (Vector2StringVisualCommandText == "text -D" ||
                Vector2StringVisualCommandText == "text --delete") {
-
         showMassage("accept");
         ClearTerminalScreen();
+        ResetAllEditFileData();
         displayLocationInfo();
+        printTabs();
         displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
         ShowConsoleCursor (false);
         gotoxy (44, numberOfTerminalLine - 1);
