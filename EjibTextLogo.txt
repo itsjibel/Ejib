@@ -17,6 +17,6 @@
  |                        JJJ   JJ         IIIIIIIIII                         |
  |                      JJJJJJJJJ                                             |
  |                                                                            |
- |                'Ejib editor is light but has many features'        v1.0.6  |
+ |                'Ejib editor is light but has many features'        v1.0.0  |
  |____________________________________________________________________________|
 
