@@ -1,3 +1,8 @@
+/* <<Tools to make things faster and easier>>
+ * A summary of what this library does:
+ * In this library, we have prepared big and small tools in the functions,
+ * so we don't have to rewrite the tool code every time.
+ */
 #include <fstream>
 #include <iostream>
 #include <limits.h>
@@ -9,6 +14,7 @@
 #include <sys/ioctl.h>
 #include "Xlib.hpp"
 #include <unistd.h>
+/// Defining normal colors and full bright colors
 #define RST  "\x1B[0m"
 #define KRED "\x1B[31m"
 #define KGRN "\x1B[32m"
@@ -17,7 +23,6 @@
 #define KMAG "\x1B[35m"
 #define KCYN "\x1B[36m"
 #define KWHT "\x1B[37m"
-
 #define FRED(x) KRED x RST
 #define FGRN(x) KGRN x RST
 #define FYEL(x) KYEL x RST
@@ -28,7 +33,7 @@
 #define BOLD(x) "\x1B[1m" x RST
 #define UNDL(x) "\x1B[4m" x RST
 #endif
-
+/// Defining kilobytes, megabytes, etc. to byte units
 #define pb 1125899906842624
 #define tb 1099511627776
 #define gb 1073741824
@@ -117,6 +122,7 @@ char getche(void)
 
 void setColor(int ColorCode)
 {
+    /// Translate Windows color codes to Linux color codes
     ColorCode = ColorCode == 1 ? 34 : ColorCode;
     ColorCode = ColorCode == 2 ? 32 : ColorCode;
     ColorCode = ColorCode == 3 ? 36 : ColorCode;
@@ -217,9 +223,9 @@ bool GetCopiedText(string &copiedText)
     #if (defined (LINUX) || defined (__linux__))
     Display *display = XOpenDisplay(NULL);
     unsigned long color = BlackPixel(display, DefaultScreen(display));
-    Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0,0, 1,1, 0, color, color);
+    Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0, 0, 1, 1, 0, color, color);
     Bool Clipboard_Info_Received = GetLinuxClipboard(display, window, "CLIPBOARD", "UTF8_STRING", copiedText) ||
-                  GetLinuxClipboard(display, window, "CLIPBOARD", "STRING", copiedText);
+                                   GetLinuxClipboard(display, window, "CLIPBOARD", "STRING", copiedText);
     XDestroyWindow(display, window);
     XCloseDisplay(display);
     return Clipboard_Info_Received;
@@ -239,6 +245,7 @@ void ColorPrint(T text, int color)
 {
     setColor(color);
     cout<<text;
+    /// Set color to default
     #if (defined (_WIN32) || defined (_WIN64))
     setColor(7);
     #endif
@@ -278,6 +285,7 @@ void loadLogo()
             bool ColorIsChangeable=true;
             for (char ch : line)
             {
+                /// Setting color to each character for better logo viewability
                 if (ColorIsChangeable)
                 {
                     if (ch == 'E')
@@ -315,9 +323,7 @@ void loadLogo()
 
 bool IsSeparatorCharacter (char character)
 {
-    if
-    (
-        character == ' ' || character == '.' ||
+    if (character == ' ' || character == '.' ||
         character == '(' || character == ')' ||
         character == '{' || character == '}' ||
         character == '[' || character == ']' ||
@@ -326,14 +332,14 @@ bool IsSeparatorCharacter (char character)
         character == ':' || character == ';' ||
         character == '+' || character == '-' ||
         character == '/' || character == '*' ||
-        character == '^' || character == '='
-    )
+        character == '^' || character == '=')
         return true;
     else
         return false;
 }
 
-void ClearTerminalScreen() {
+void ClearTerminalScreen()
+{
     #if (defined (_WIN32) || defined (_WIN64))
     clrscr();
     #endif
