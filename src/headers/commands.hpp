@@ -53,7 +53,7 @@ class CommandLine : public FileSystem, public EditorUI
         {
             string cmd;
             #if (defined (_WIN32) || defined (_WIN64))
-            ColorPrint("cmd: ", 2)
+            ColorPrint("cmd: ", 2);
             #endif
             #if (defined (LINUX) || defined (__linux__))
             ColorPrint("\e[1mcmd: \e[0m", 2);
