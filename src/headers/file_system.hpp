@@ -1,5 +1,4 @@
 #include <fstream>
-#include <vector>
 #include "tools.hpp"
 
 using std::cin;
