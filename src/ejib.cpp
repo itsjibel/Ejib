@@ -1,5 +1,5 @@
 /* <<The mode controller of ejib>>
- * A summary of what this library does:
+ * A summary of what this main file does:
  * The file <<ejib.cpp>> controls all the switching between modes such as
  * insert mode, visual mode, etc.
  * Also, all keyboard inputs for insert mode are taken in this file.
