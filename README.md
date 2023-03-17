@@ -1,6 +1,6 @@
 # Ejib
 
-![alt text](https://github.com/itsjibel/Ejib/blob/main/EjibLogo.png?raw=true)
+![alt text](https://github.com/itsjibel/Ejib/blob/main/docs/img/logo.png?raw=true)
 
 ## Operating systems supported
 
