@@ -2,3 +2,4 @@ ejib
 ejib.o
 ejib.exe
 .vscode/
+build/.compile_linux_version.sh.swp
