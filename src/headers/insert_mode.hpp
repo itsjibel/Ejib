@@ -66,7 +66,7 @@ class InsertMode: public CommandLine
 		void INSERT_CHARACTER (char &characterInput, int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
         void BACKSPACE       (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
         void QUICK_BACKSPACE (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void DELETE          (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
+        void DELETE_          (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
         void DELETE_LINE     (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
         void ENTER           (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
         void TAB             (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
@@ -225,7 +225,7 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<vector<char>> &t
     }
 }
 
-void InsertMode::DELETE(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
+void InsertMode::DELETE_(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
 {
     if (text.size() == 1 && text.at(0).size() == 0)
         return;
@@ -643,7 +643,7 @@ void InsertMode::REDO(int &line, int &column, vector<vector<char>> &text)
                 else if (GetLastRedoStackTrack().changeMode == 'L') 
                     DELETE_LINE(line, column, text, true);
                 else if (GetLastRedoStackTrack().changeMode == 'D')
-                    DELETE(line, column, text, true);
+                    DELETE_(line, column, text, true);
             }
 
             RedoStack.pop_back();

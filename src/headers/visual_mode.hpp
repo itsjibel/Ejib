@@ -123,7 +123,7 @@ void VisualMode::VisualCommandInput()
                             case 51:
                                 switch(ch = getch()) {
                                     case DELETE_KEY_LINUX:
-                                        DELETE(_currentLine, _currentColumn, visualCommandText, false);
+                                        DELETE_(_currentLine, _currentColumn, visualCommandText, false);
                                         break;
                                 }
                                 break;

@@ -158,7 +158,7 @@ void EditorSystem::TextEditSystem()
                             switch(ch = getch())
                             {
                                 case DELETE_KEY_LINUX:
-                                    DELETE(currentLine, currentColumn, mainText, false);
+                                    DELETE_(currentLine, currentColumn, mainText, false);
                                     somethingHappenTextView=true;
                                     break;
                             }
