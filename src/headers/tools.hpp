@@ -12,7 +12,7 @@
 
 #if (defined (LINUX) || defined (__linux__))
 #include <sys/ioctl.h>
-#include "Xlib.hpp"
+#include <X11/Xlib.h>
 #include <unistd.h>
 /// Defining normal colors and full bright colors
 #define RST  "\x1B[0m"
