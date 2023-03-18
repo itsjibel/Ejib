@@ -1,3 +1,10 @@
+/* <<User guide to starting editor mods>>
+ * A summary of what this library does:
+ * This command prompt contains all the main functions to start a work with the editor.
+ * This library can give the user enough information to work with the editor,
+ * it can create and open a new file for the user using the file system library,
+ * and also control the configurations.
+ */
 #include "UI.hpp"
 
 class CommandLine : public FileSystem, public EditorUI
@@ -14,43 +21,9 @@ class CommandLine : public FileSystem, public EditorUI
             mainText.push_back(emptyVector);
         }
 
-        void DisplayHelpFile(string helpFileName)
-        {
-            string line;
-            ifstream HelpFile("../helps/" + helpFileName);
-
-            if (HelpFile.is_open())
-            {
-                while(getline (HelpFile, line))
-                {
-                    string SwitchName, explanation;
-
-                    for (char ch : line)
-                        if (ch != ']')
-                            SwitchName += ch;
-                        else {
-                            SwitchName += ch;
-                            break;
-                        }
-
-                    bool startGivingExplain = false;
-
-                    for (char ch : line)
-                        if (startGivingExplain)
-                            explanation += ch;
-                        else if (ch == ']')
-                            startGivingExplain=true;
-
-                    ColorPrint('\t' + SwitchName, 6);
-                    ColorPrint(explanation + '\n', 5);
-                }
-                HelpFile.close();
-            } else
-                ColorPrint("\tUnable to open \'" + helpFileName + "' file!\n", 4);
-        }
-
         void CommandsRouter()
         {
+            /// Giving commands and running the related function
             string cmd;
             #if (defined (_WIN32) || defined (_WIN64))
             ColorPrint("cmd: ", 2)
@@ -58,10 +31,10 @@ class CommandLine : public FileSystem, public EditorUI
             #if (defined (LINUX) || defined (__linux__))
             ColorPrint("\e[1mcmd: \e[0m", 2);
             #endif
-
             getline (cin, cmd);
             
-            if (cmd == "file -N" || cmd == "file --new") {
+            if (cmd == "file -N" || cmd == "file --new")
+            {
                 currentMode = "edit";
                 ResetAllEditFileData();
                 ClearTerminalScreen();

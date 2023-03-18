@@ -1,3 +1,7 @@
+/* <<File system of Ejib>>
+ * A summary of what this library does:
+ * The functions of this library provide all the tasks that an editor can do with the file
+ */
 #include <fstream>
 #include "tools.hpp"
 
@@ -13,6 +17,10 @@ string CurrentFilePath, CurrentFileName="untitled";
 
 void RemoveTextSpoilerCharacters (string &text)
 {
+    /* These characters are the characters that violate the editor system.
+     * For example, a tab is considered a character,
+     * and this causes problems in moving forward and backwards in the text and displaying the text
+     */
     for (int i=0; i<text.size(); i++)
     {
         if (text.at(i) == '\r' ||
@@ -43,6 +51,7 @@ class FileSystem
 
 bool FileSystem::saveFile(string filePath, string fileName, const vector<vector<char>> &text)
 {
+    /// Write vector<vector<char>> into a file
     ofstream FileForSave(filePath + fileName);
     if (FileForSave.is_open())
     {
@@ -67,11 +76,13 @@ bool FileSystem::saveFile(string filePath, string fileName, const vector<vector<
 
 bool FileSystem::loadFile(string filePath, string fileName, vector<vector<char>> &MainText)
 {
+    /// Load string text into a vector<vector<char>>
     string line;
     int lineNumber=0;
     ifstream FileForLoad (filePath + fileName);
     if (FileForLoad.is_open())
     {
+        /// Calculate the size of the file
         streampos begin, end;
         ifstream file (filePath + fileName, ios::binary);
         begin = file.tellg();
@@ -79,11 +90,13 @@ bool FileSystem::loadFile(string filePath, string fileName, vector<vector<char>>
         end = file.tellg();
         file.close();
         ColorPrint("[Warning]: Are you sure you want to open a " + byteConverter((end-begin)) + " file? [y/*]", 6);
+
         if (getch() == 'y')
         {
             vector<char> emptyVector;
             while (getline(FileForLoad, line))
             {
+                /// Write the file line by line on the main text
                 MainText.push_back(emptyVector);
                 RemoveTextSpoilerCharacters(line);
 
@@ -107,10 +120,15 @@ bool FileSystem::loadFile(string filePath, string fileName, vector<vector<char>>
 
 bool FileSystem::fileSystem (string SaveMode, vector<vector<char>> &MainText)
 {
+    /// Control all of the file actions
     bool tryAgain=true;
     while (tryAgain == true)
     {
         tryAgain = false;
+        /* When the location of the file is empty, we need to get it accurately,
+         * but when the user gives us the location of the file when opening the file or saving the file,
+         * there is no need to get it again.
+         */
         if (!haveFilePath)
         {
             ShowConsoleCursor(false);
@@ -150,8 +168,7 @@ bool FileSystem::fileSystem (string SaveMode, vector<vector<char>> &MainText)
                 }
             }
         }
-
-        if (SaveMode == "save")
+        else if (SaveMode == "save")
         {
             ShowConsoleCursor(false);
             if (saveFile (CurrentFilePath, CurrentFileName, MainText) == true)
@@ -182,4 +199,40 @@ bool FileSystem::fileSystem (string SaveMode, vector<vector<char>> &MainText)
     }
     CurrentFileName = "untitled";
     return false;
+}
+
+void DisplayHelpFile(string helpFileName)
+{
+    /// Display the specific help file in colour(for better readability)
+    string line;
+    ifstream HelpFile("../helps/" + helpFileName);
+
+    if (HelpFile.is_open())
+    {
+        while(getline (HelpFile, line))
+        {
+            string SwitchName, explanation;
+
+            for (char ch : line)
+                if (ch != ']')
+                    SwitchName += ch;
+                else {
+                    SwitchName += ch;
+                    break;
+                }
+
+            bool startGivingExplain = false;
+
+            for (char ch : line)
+                if (startGivingExplain)
+                    explanation += ch;
+                else if (ch == ']')
+                    startGivingExplain=true;
+
+            ColorPrint('\t' + SwitchName, 6);
+            ColorPrint(explanation + '\n', 5);
+        }
+        HelpFile.close();
+    } else
+        ColorPrint("\tUnable to open \'" + helpFileName + "' file!\n", 4);
 }
