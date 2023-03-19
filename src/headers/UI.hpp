@@ -1,6 +1,11 @@
+/* <<Ejib Interface>>
+ * A summary of what this library does:
+ * This library does all the work for display to the user,
+ * so if you are looking for display functions, this library can help you.
+ */
 #include <cmath>
 #include "consumption_info.hpp"
-
+/// Global variables that almost every function and object should have access to
 vector<vector<char>> mainText;
 string currentMode = "command";
 int numberOfTerminalColumn = 0, numberOfTerminalLine = 0, currentColumn = 0,
@@ -9,8 +14,8 @@ int numberOfTerminalColumn = 0, numberOfTerminalLine = 0, currentColumn = 0,
 class EditorUI
 {
     private:
-        void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
-                            const int &selectedLine, const int &currentLine, const int &column);
+        void colourizeText(const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
+                           const int &selectedLine, const int &currentLine, const int &column);
         unsigned int GetBiggestLineNumberInViewport(vector<vector<char>> &text, int startLineForDisplayPage);
 
     public:
@@ -22,24 +27,24 @@ class EditorUI
 
 unsigned int EditorUI::GetBiggestLineNumberInViewport(vector<vector<char>> &text, int startLineForDisplayPage)
 {
-    unsigned int BiggestLineNumber=1;
+    unsigned int BiggestLineNumber = 1;
     vector<int> LineNumbers;
+    /// This range specifies the last line of the viewport
     int range = startLineForDisplayPage + numberOfTerminalLine - 4 <= text.size() ?\
                 startLineForDisplayPage + numberOfTerminalLine - 4\
                 : text.size();
-
+    /// Saving all line numbers to find the biggest one
     for (int i=startLineForDisplayPage; i<range; i++)
         LineNumbers.push_back(i + 1);
-
+    /// Finding the biggest number line and putting it into 'BiggestLineNumber'
     for (int i=0; i<LineNumbers.size(); i++)
         if (LineNumbers[i] > BiggestLineNumber)
             BiggestLineNumber = LineNumbers[i];
-
     return BiggestLineNumber;
 }
 
 void EditorUI::colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
-                    const int &selectedLine, const int &currentLine, const int &column)
+                              const int &selectedLine, const int &currentLine, const int &column)
 {
     string textPart;
     int8_t color=7, tempColor=7;
@@ -159,6 +164,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
 
 void EditorUI::printTabs()
 {
+    /// Display the name of the current file
     ShowConsoleCursor(false);
     gotoxy (0, 0);
     cout<<"  ";
@@ -175,10 +181,13 @@ void EditorUI::printTabs()
     #if (defined (LINUX) || defined (__linux__))
     ColorPrint(' ', 44);
     #endif
-
+    /* Clearing the front of the current file name,
+     * for that if the user resizes the terminal,
+     * the characters don't remain in front of the current file name
+     */ 
     for (int i=18 + CurrentFileName.size(); i<numberOfTerminalColumn; i++)
         cout<<' ';
-
+    /// Display text and tab separator bar
     string bar;
     for (int i=0; i<numberOfTerminalColumn; i++) bar+=" ";
     gotoxy(0, 1);
@@ -287,32 +296,37 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
 
 void EditorUI::displayLocationInfo()
 {
+    /// Display the location information such as the column selected, line selected etc.
     ShowConsoleCursor(false);
+    /// Display current mode bar
     string currentModeView;
-    
-    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView+=" ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView += " ";
     currentModeView += "-- INSERT --";
-    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView+=" ";
-
+    for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView += " ";
+    /// Display cmd text for visual mode
     gotoxy (0, numberOfTerminalLine - 2);
     setColor(7);
     ColorPrint(currentModeView, 97);
     gotoxy (0, numberOfTerminalLine - 1);
     ColorPrint("\e[1mcmd@edit:\e[0m", 2);
-    float percentageTextSeen = 100.0 / mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) < 100.0 ?\
-          percentageTextSeen = 100.0 / mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) : 100.0;
+    /// Calculate the percentage of text read at this moment
+    float percentageTextSeen = 100.0/mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) < 100.0 ?\
+          percentageTextSeen = 100.0/mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) : 100.0;
     percentageTextSeen = percentageTextSeen < 1.0 ? 1.0 : percentageTextSeen;
-
+    /// This variable specifies from which column we should display the information about the current location
     int columnStartPrintInfoOfCurrentLocation =
         numberOfTerminalColumn - 12 - (floor(log10(currentLine + 1) + 1) +
                                        floor(log10(currentColumn + 1) + 1) +
                                        floor(log10(int(percentageTextSeen)) + 1));
-
+    /// Now we go to the same column to display the information
     gotoxy (columnStartPrintInfoOfCurrentLocation,
             numberOfTerminalLine - 1);
 
     ColorPrint(to_string(int(percentageTextSeen)) + "% ", 12);
     ColorPrint("Ln " + to_string(currentLine + 1) + ", Col " + to_string(currentColumn + 1), 3);
+    /* Clearing the back of the location information for that if the user resizes the terminal,
+     * the characters don't remain in the back of the location information
+     */
     gotoxy(9, numberOfTerminalLine - 1);
     for (int i=9; i<columnStartPrintInfoOfCurrentLocation; i++)
         cout<<' ';
