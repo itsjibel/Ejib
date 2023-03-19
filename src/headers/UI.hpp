@@ -198,100 +198,96 @@ void EditorUI::printTabs()
 void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
                                  const int &selectedCharacterEnd)
 {
-    int numberOfVisibleLines=0;
+    /// All colourization logic of the text belongs to the 'itsjibel' contributor
     vector<int> visibleNumberLines;
+    /// Lines for printing
     vector<string> visibleLines;
-    int range = startLineForDisplayPage + numberOfTerminalLine - 2 <= text.size() ?\
-                startLineForDisplayPage + numberOfTerminalLine - 2 : text.size();
-
+    /// This range specifies the last line of the viewport
+    int range = startLineForDisplayPage + numberOfTerminalLine - 4 <= text.size() ?\
+                startLineForDisplayPage + numberOfTerminalLine - 4 : text.size();
+    /// Add empty string values to the print lines to push back the original lines to it
     for (int i=0; i<numberOfTerminalLine; i++)
         visibleLines.push_back("");
-
+    /* We turn off the console cursor to don't show the user the cursor is floating into the terminal
+     * during the printing text
+     */
     ShowConsoleCursor(false);
-
-    if (!(text.size() == 1 && text.at(0).size() == 0))
-    {
+    /* We save the number of digits of the largest line number,
+     * to shift lines to the right by the number of digits of the largest line number.
+     */
+    int numberDigits_Of_LargestLineNumber = floor(log10(GetBiggestLineNumberInViewport(mainText, startLineForDisplayPage)) + 1);
+    /// Check if the main text isn't empty do the process
+    if (!(text.size() == 1 && text.at(0).empty()))
         for (int i=startLineForDisplayPage; i<range; i++)
         {
             visibleNumberLines.push_back(i + 1);
-            int countOfCharacters=0;
+            /* From the start of printing the characters,
+             * we add the main text lines of the text to the printing line
+             */
             for (int j=startColumnForDisplayPage; j<text.at(i).size(); j++)
-            {
-                if (countOfCharacters > numberOfTerminalColumn - 1) 
-                {
-                    numberOfVisibleLines++;
-                    break;
-                }
-
-                visibleLines.at(numberOfVisibleLines).push_back(text.at(i).at(j));
-                numberOfVisibleLines = j == text.at(i).size() - 1 ? numberOfVisibleLines + 1 : numberOfVisibleLines;
-                countOfCharacters++;
-            }
-            numberOfVisibleLines = countOfCharacters == 0 ? numberOfVisibleLines + 1 : numberOfVisibleLines;
+                if (visibleLines.at(i - startLineForDisplayPage).size() < numberOfTerminalColumn - 1 - numberDigits_Of_LargestLineNumber)
+                    visibleLines.at(i - startLineForDisplayPage).push_back(text.at(i).at(j));
+            else
+                break;
         }
-    }
-   
-    if ((text.at(0).size() > 0 && numberOfVisibleLines == 0))
-        numberOfVisibleLines++;
-
-    int numberDigits_Of_LargestLineNumber = floor(log10(GetBiggestLineNumberInViewport(mainText, startLineForDisplayPage)) + 1);
     gotoxy(0, 2);
     for (int j=0; j<numberOfTerminalLine - 4; j++)
     {
-        if (j < numberOfVisibleLines)
+        /* If we have this printing line in the text,
+         * and the text is not empty, then we will print the line and the line number
+         */
+        if (j < range - startLineForDisplayPage && !(text.size() == 1 && text.at(0).empty()))
         {
-            for (int l=visibleLines[j].size() % numberOfTerminalColumn; l<numberOfTerminalColumn; l++)
-                if (!(visibleLines[j].size() % numberOfTerminalColumn == 0 && visibleLines[j].size() > 0))
-                    visibleLines[j]+=' ';
-
-            while (numberDigits_Of_LargestLineNumber + visibleLines[j].size() + 1 > numberOfTerminalColumn)
-                visibleLines[j].pop_back();
-
+            /// Adding spaces to the end of the lines so that the previous characters are hidden under the spaces
+            for (int l=visibleLines.at(j).size(); l<numberOfTerminalColumn - 1 - numberDigits_Of_LargestLineNumber; l++)
+                visibleLines[j]+=' ';
+            /* To set the line number print column,
+             * we print a space before printing the line number as much as
+             * the difference between the line number digits and the largest line number digits.
+             */
             if (numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1) != 0)
                 for (int i=0; i<=numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1); i++)
                 {
                     gotoxy (i, j + 2);
                     cout<<" ";
                 }
-
+            /// Print number lines
             gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1), j + 2);
-
             #if (defined (_WIN32) || defined (_WIN64))
             if (j + startLineForDisplayPage == line)
                 ColorPrint(visibleNumberLines[j], 15);
             else
                 ColorPrint(visibleNumberLines[j], 8);
             #endif
-
             #if (defined (LINUX) || defined (__linux__))
             if (j + startLineForDisplayPage == currentLine)
                 cout<<BOLD(FWHT("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m"));
             else
                 ColorPrint("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m", 90);
             #endif
-
+            /// Print number lines bar
             #if (defined (_WIN32) || defined (_WIN64))
             ColorPrint(' ', 91);
             #endif
             #if (defined (LINUX) || defined (__linux__))
             ColorPrint(' ', 44);
             #endif
-
+            /// Print the line colourized
             colourizeText(visibleLines[j], selectedCharacterStart, selectedCharacterEnd, currentLine, j + startLineForDisplayPage, currentColumn);
         } else {
+            /// Printing an empty line symbol('~') and printing spaces after that to hide the old characters under the spaces
             string blankLine = "~";
             for (int i=0; i<numberOfTerminalColumn - 1; i++) blankLine += " ";
             ColorPrint(blankLine, 6);
         }
     }
-
-    ShowConsoleCursor(true);
-
+    /// Go to the location selected by the user and turn on the console cursor
     if (text.at(0).size() == 0 && text.size() == 1)
         gotoxy (0, 2);
     else
         gotoxy (currentColumn - startColumnForDisplayPage + numberDigits_Of_LargestLineNumber + 1,
                 currentLine - startLineForDisplayPage + 2);
+    ShowConsoleCursor(true);
 }
 
 void EditorUI::displayLocationInfo()
