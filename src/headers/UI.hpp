@@ -1,20 +1,17 @@
 #include <cmath>
 #include "consumption_info.hpp"
 
-
 vector<vector<char>> mainText;
-string currentMode="command";
-int numberOfTerminalColumn =0, numberOfTerminalLine     =0,
-    currentColumn          =0, currentLine              =0,
-    startLineForDisplayPage=0, startColumnForDisplayPage=0;
-
+string currentMode = "command";
+int numberOfTerminalColumn = 0, numberOfTerminalLine = 0, currentColumn = 0,
+    currentLine = 0, startLineForDisplayPage = 0, startColumnForDisplayPage = 0;
 
 class EditorUI
 {
     private:
         void colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
                             const int &selectedLine, const int &currentLine, const int &column);
-        unsigned int GetBiggestLineNumberInViewport();
+        unsigned int GetBiggestLineNumberInViewport(vector<vector<char>> &text, int startLineForDisplayPage);
 
     public:
         void displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
@@ -23,13 +20,13 @@ class EditorUI
         void displayLocationInfo();
 };
 
-unsigned int EditorUI::GetBiggestLineNumberInViewport()
+unsigned int EditorUI::GetBiggestLineNumberInViewport(vector<vector<char>> &text, int startLineForDisplayPage)
 {
     unsigned int BiggestLineNumber=1;
     vector<int> LineNumbers;
-    int range = startLineForDisplayPage + numberOfTerminalLine - 2 <= mainText.size() ?\
-                startLineForDisplayPage + numberOfTerminalLine - 2\
-                : mainText.size();
+    int range = startLineForDisplayPage + numberOfTerminalLine - 4 <= text.size() ?\
+                startLineForDisplayPage + numberOfTerminalLine - 4\
+                : text.size();
 
     for (int i=startLineForDisplayPage; i<range; i++)
         LineNumbers.push_back(i + 1);
@@ -228,7 +225,7 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
     if ((text.at(0).size() > 0 && numberOfVisibleLines == 0))
         numberOfVisibleLines++;
 
-    int numberDigits_Of_LargestLineNumber = floor(log10(GetBiggestLineNumberInViewport()) + 1);
+    int numberDigits_Of_LargestLineNumber = floor(log10(GetBiggestLineNumberInViewport(mainText, startLineForDisplayPage)) + 1);
     gotoxy(0, 2);
     for (int j=0; j<numberOfTerminalLine - 4; j++)
     {
