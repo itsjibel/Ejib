@@ -239,7 +239,7 @@ void VisualMode::VisualEdit()
         currentMode = "edit";
         displayLocationInfo();
         printTabs();
-        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+        displayPageOfText(mainText, -1, -1);
     } else if (Vector2StringVisualCommandText == "text -D" ||
                Vector2StringVisualCommandText == "text --delete") {
         showMassage("accept");
@@ -247,7 +247,7 @@ void VisualMode::VisualEdit()
         ResetAllEditFileData();
         displayLocationInfo();
         printTabs();
-        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+        displayPageOfText(mainText, -1, -1);
         ShowConsoleCursor (false);
         gotoxy (44, numberOfTerminalLine - 1);
         ColorPrint("[+]", 2);
@@ -273,7 +273,7 @@ void VisualMode::VisualEdit()
         ClearTerminalScreen();
         displayLocationInfo();
         printTabs();
-        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+        displayPageOfText(mainText, -1, -1);
         currentMode = "visual";
     } else {
         showMassage("command not found");
@@ -350,7 +350,7 @@ bool VisualMode::search(string key, vector<vector<char>> &text, int &line, int &
         UpdateViewport();
         ShowConsoleCursor(false);
         displayLocationInfo();
-        displayPageOfText(mainText, column - key.size() - startColumnForDisplayPage, column - 1 - startColumnForDisplayPage, line, column);
+        displayPageOfText(mainText, column - key.size() - startColumnForDisplayPage, column - 1 - startColumnForDisplayPage);
     } while (getch() != 27);
 
     currentMode = "edit";

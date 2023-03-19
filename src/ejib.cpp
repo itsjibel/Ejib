@@ -227,7 +227,7 @@ void EditorSystem::TextEditSystem()
             ClearTerminalScreen();
             displayLocationInfo();
             printTabs();
-            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+            displayPageOfText(mainText, -1, -1);
             currentMode = "edit";
             break;
         case CTRL_X:
@@ -265,7 +265,7 @@ void EditorSystem::TextEditSystem()
     {
         displayLocationInfo();
         printTabs();
-        displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+        displayPageOfText(mainText, -1, -1);
     }
 }
 

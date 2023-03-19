@@ -20,7 +20,7 @@ class EditorUI
 
     public:
         void displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
-                               const int &selectedCharacterEnd,  const int &line, const int column);
+                               const int &selectedCharacterEnd);
         void printTabs();
         void displayLocationInfo();
 };
@@ -44,11 +44,11 @@ unsigned int EditorUI::GetBiggestLineNumberInViewport(vector<vector<char>> &text
 }
 
 void EditorUI::colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
-                              const int &selectedLine, const int &currentLine, const int &column)
+                              const int &selectedLine, const int &numberLineForPrint, const int &column)
 {
     string textPart;
-    int8_t color=7, tempColor=7;
-    int index=0;
+    int8_t color = 7, tempColor = 7;
+    int index = 0;
     bool sharpArea=false,   quotationArea=false, angleBracketsArea=false,
          commentArea=false, selectedArea=false;
     char temp;
@@ -196,7 +196,7 @@ void EditorUI::printTabs()
 }
 
 void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
-                                 const int &selectedCharacterEnd,  const int &line, const int column)
+                                 const int &selectedCharacterEnd)
 {
     int numberOfVisibleLines=0;
     vector<int> visibleNumberLines;
@@ -264,7 +264,7 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
             #endif
 
             #if (defined (LINUX) || defined (__linux__))
-            if (j + startLineForDisplayPage == line)
+            if (j + startLineForDisplayPage == currentLine)
                 cout<<BOLD(FWHT("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m"));
             else
                 ColorPrint("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m", 90);
@@ -277,7 +277,7 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
             ColorPrint(' ', 44);
             #endif
 
-            colourizeText(visibleLines[j], selectedCharacterStart, selectedCharacterEnd, line, j + startLineForDisplayPage, column);
+            colourizeText(visibleLines[j], selectedCharacterStart, selectedCharacterEnd, currentLine, j + startLineForDisplayPage, currentColumn);
         } else {
             string blankLine = "~";
             for (int i=0; i<numberOfTerminalColumn - 1; i++) blankLine += " ";

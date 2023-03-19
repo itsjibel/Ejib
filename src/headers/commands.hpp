@@ -40,14 +40,14 @@ class CommandLine : public FileSystem, public EditorUI
                 ClearTerminalScreen();
                 displayLocationInfo();
                 printTabs();
-                displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+                displayPageOfText(mainText, -1, -1);
                 gotoxy (0, 2);
             } else if (cmd == "file -O" || cmd == "file --open") {
                 if (fileSystem("open", mainText) == true) {
                     currentMode = "edit";
                     displayLocationInfo();
                     printTabs();
-                    displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+                    displayPageOfText(mainText, -1, -1);
                 } else
                     ClearTerminalScreen();
             }

@@ -726,7 +726,7 @@ void InsertMode::AdjustingViewportWithSizeOfTerminal()
             ClearTerminalScreen();
             displayLocationInfo();
             printTabs();
-            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+            displayPageOfText(mainText, -1, -1);
             sizeIsChanged=true;
             ShowConsoleCursor(true);
         }
@@ -735,7 +735,7 @@ void InsertMode::AdjustingViewportWithSizeOfTerminal()
         {
             displayLocationInfo();
             printTabs();
-            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
+            displayPageOfText(mainText, -1, -1);
         }
 
         tempNumberOfTerminalColumn = numberOfTerminalColumn;
