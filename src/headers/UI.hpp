@@ -15,7 +15,7 @@ class EditorUI
 {
     private:
         void colourizeText(const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
-                           const int &selectedLine, const int &currentLine, const int &column);
+                           const int &selectedLine, const int &numberLineForPrint);
         unsigned int GetBiggestLineNumberInViewport(vector<vector<char>> &text, int startLineForDisplayPage);
 
     public:
@@ -44,7 +44,7 @@ unsigned int EditorUI::GetBiggestLineNumberInViewport(vector<vector<char>> &text
 }
 
 void EditorUI::colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
-                              const int &selectedLine, const int &numberLineForPrint, const int &column)
+                              const int &selectedLine, const int &numberLineForPrint)
 {
     /// All colourization logic of the text belongs to the 'itsjibel' contributor
     /* In this function, all the characters are coloured according to their type,
@@ -53,14 +53,19 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
     string textPart;
     int8_t color = WHITE, tempColor = WHITE;
     int index = 0;
+    /// Name of colour ranges
     bool sharpArea=false,   quotationArea=false, angleBracketsArea=false,
          commentArea=false, selectedArea=false;
     char temp;
 
     for (char character : text)
     {
-        if ((index == selectedCharacterStart || index == selectedCharacterEnd)
-            && selectedLine == currentLine)
+        /* If the printed line number was equal to the selected line,
+         * and the printed character number was equal to the first selected index or the last selected index,
+         * then this printed range is a selected range, so we will make its background colour red.
+         */
+        if ((index == selectedCharacterStart || index == selectedCharacterEnd) &&
+             selectedLine == numberLineForPrint)
         {
             selectedArea = !selectedArea;
             color = RED_BACKGROUND;
@@ -68,11 +73,14 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     character == '+' || character == '^' || character == '%' ||
                     character == '=' || character == '<' || character == '>') &&
                     !quotationArea && !commentArea && !selectedArea) {
-
+            /* If the character was a mathematical character and we were not in another colour range,
+             * we will make the character red
+             */
+            /// If the previous character was '/' and this character was also '/', then this is a comment range
             commentArea = temp == '/' && character == '/' ? true : commentArea;
             color = RED;
             sharpArea=false;
-
+            /// Specifying the bracket angle colour range
             if (character == '<')
             {
                 for (int i=index; i<text.size(); i++)
@@ -90,6 +98,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea)
         {
+            /// If we were not in colour range and this character was a scope character, we would make it Aqua
             color = BAQUA;
             sharpArea=false;
             angleBracketsArea=false;
@@ -100,6 +109,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     character == '$' || character == '?') && !quotationArea &&
                     !angleBracketsArea && !commentArea && !selectedArea)
         {
+            /// If we were not in colour range and this character was a specific character, we would make it Magenta
             color = BPURPLE;
             sharpArea=false;
             angleBracketsArea=false;
@@ -111,16 +121,18 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     character == '9') && !quotationArea && !angleBracketsArea &&
                     !commentArea && !selectedArea)
         {
+            /// If we were not in colour range and this character was a number character, we would make it Green
             color = GREEN;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
         }
         else if ((character == '.' || character == ',' || character == ';' ||
-                    character == ':' || character == '/' || character == '\\') &&
+                    character == ':' || character == '\\') &&
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea)
         {
+            /// If we were not in colour range and this character was a delayer's character, we would make it Bright Blue
             color = BBLUE;
             sharpArea=false;
             angleBracketsArea=false;
@@ -129,9 +141,13 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
         else if (character == '\'' || character == '\"' && !angleBracketsArea &&
                 !commentArea && !selectedArea)
         {
+            /// If we were not in colour range and this character was a quotation character, we would make it Yellow
             color = YELLOW;
             sharpArea=false;
-
+            /* If the character is a quote character,
+             * and if we have another quote character in front of this character,
+             * we consider the quotation range from the current character to the second character.
+             */
             if (character == '\"' || character == '\'')
                 if (quotationArea)
                     quotationArea = false;
@@ -144,10 +160,13 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                         }
         } else if (!sharpArea && !quotationArea && !angleBracketsArea &&
                    !commentArea && !selectedArea)
+            /// If we are not in any colour range and any specific character, then the character colour is white
             color = WHITE;
 
         sharpArea = character == '#' ? true : sharpArea;
-
+        /* If the current color is not the same as the previous color,
+         * then we should consider this as a part and print it with the current color
+         */
         if (color != tempColor)
         {
             ColorPrint(textPart, tempColor);
@@ -161,8 +180,8 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
 
         if (selectedCharacterStart == selectedCharacterEnd)
             selectedArea=false;
-
     }
+    /// Print the last part of text
     ColorPrint(textPart, color);
 }
 
@@ -276,7 +295,7 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
             ColorPrint(' ', 44);
             #endif
             /// Print the line colourized
-            colourizeText(visibleLines[j], selectedCharacterStart, selectedCharacterEnd, currentLine, j + startLineForDisplayPage, currentColumn);
+            colourizeText(visibleLines[j], selectedCharacterStart, selectedCharacterEnd, currentLine, j + startLineForDisplayPage);
         } else {
             /// Printing an empty line symbol('~') and printing spaces after that to hide the old characters under the spaces
             string blankLine = "~";
