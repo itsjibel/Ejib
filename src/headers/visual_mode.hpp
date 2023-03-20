@@ -166,16 +166,16 @@ void VisualMode::VisualCommandInput()
         ShowConsoleCursor(false);
         gotoxy (0, numberOfTerminalLine - 1);
         #if (defined (_WIN32) || defined (_WIN64))
-        ColorPrint("cmd@edit: ", 10);
+        ColorPrint("cmd@edit: ", BGREEN);
         #endif
         #if (defined (LINUX) || defined (__linux__))
-        ColorPrint("\e[1mcmd@edit: \e[0m", 32);
+        ColorPrint("\e[1mcmd@edit: \e[0m", BGREEN);
         #endif
 
         if (showBigCommandWarning)
         {
             gotoxy (44, numberOfTerminalLine - 1);
-            ColorPrint("[B]", 6);
+            ColorPrint("[B]", YELLOW);
         }
 
         Vector2StringVisualCommandText="";
@@ -198,19 +198,19 @@ void VisualMode::VisualCommandInput()
     }
 };
 
-void showMassage(string massageType) {
+void showMassage(string massageType)
+{
     if (massageType == "accept")
     {
         gotoxy (44, numberOfTerminalLine - 1);
-        ColorPrint("[+]", 2);
+        ColorPrint("[+]", GREEN);
     } else if (massageType == "command not found") {
         gotoxy (44, numberOfTerminalLine - 1);
-        ColorPrint("[!]", 4);
+        ColorPrint("[!]", RED);
     } else if (massageType == "nothing found") {
         gotoxy (44, numberOfTerminalLine - 1);
-        ColorPrint("[?]", 4);
+        ColorPrint("[?]", RED);
     }
-    
 }
 
 void VisualMode::VisualEdit()
@@ -223,8 +223,8 @@ void VisualMode::VisualEdit()
     for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentMode_View+=" ";
 
     gotoxy (0, numberOfTerminalLine - 2);
-    setColor(7);
-    ColorPrint(currentMode_View, 97);
+    setColor(WHITE);
+    ColorPrint(currentMode_View, YELLOW_BACKGROUND);
     ShowConsoleCursor(true);
     gotoxy (10, numberOfTerminalLine - 1);
     VisualCommandInput();
@@ -250,7 +250,7 @@ void VisualMode::VisualEdit()
         displayPageOfText(mainText, -1, -1);
         ShowConsoleCursor (false);
         gotoxy (44, numberOfTerminalLine - 1);
-        ColorPrint("[+]", 2);
+        ColorPrint("[+]", GREEN);
     } else if (Vector2StringVisualCommandText.find("text -S \"") == 0 ||
                Vector2StringVisualCommandText.find("text --search \"") == 0) {
         string key;

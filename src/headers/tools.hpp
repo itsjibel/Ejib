@@ -9,12 +9,31 @@
 #include <string>
 #include <vector>
 #include <thread>
+/// Defining normal colors and full bright colors codes
+#define BLUE 1
+#define GREEN 2
+#define AQUA 3
+#define RED 4
+#define PURPLE 5
+#define YELLOW 6
+#define WHITE 7
+#define GRAY 8
+#define BBLUE 9
+#define BGREEN 10
+#define BAQUA 11
+#define BRED 12
+#define BPURPLE 13
+#define BYELLOW 14
+#define BWHITE 15
+#define BGRAY 16
+#define RED_BACKGROUND 79
+#define YELLOW_BACKGROUND 97
 
 #if (defined (LINUX) || defined (__linux__))
 #include <sys/ioctl.h>
 #include <X11/Xlib.h>
 #include <unistd.h>
-/// Defining normal colors and full bright colors
+/// Defining normal colors and full bright colors strings
 #define RST  "\x1B[0m"
 #define KRED "\x1B[31m"
 #define KGRN "\x1B[32m"
@@ -123,24 +142,24 @@ char getche(void)
 void setColor(int ColorCode)
 {
     /// Translate Windows color codes to Linux color codes
-    ColorCode = ColorCode == 1 ? 34 : ColorCode;
-    ColorCode = ColorCode == 2 ? 32 : ColorCode;
-    ColorCode = ColorCode == 3 ? 36 : ColorCode;
-    ColorCode = ColorCode == 4 ? 31 : ColorCode;
-    ColorCode = ColorCode == 5 ? 35 : ColorCode;
-    ColorCode = ColorCode == 6 ? 33 : ColorCode;
-    ColorCode = ColorCode == 7 ? 37 : ColorCode;
-    ColorCode = ColorCode == 8 ? 90 : ColorCode;
-    ColorCode = ColorCode == 9 ? 94 : ColorCode;
-    ColorCode = ColorCode == 10 ? 92 : ColorCode;
-    ColorCode = ColorCode == 11 ? 96 : ColorCode;
-    ColorCode = ColorCode == 12 ? 91 : ColorCode;
-    ColorCode = ColorCode == 13 ? 95 : ColorCode;
-    ColorCode = ColorCode == 14 ? 93 : ColorCode;
-    ColorCode = ColorCode == 15 ? 97 : ColorCode;
-    ColorCode = ColorCode == 16 ? 100 : ColorCode;
-    ColorCode = ColorCode == 79 ? 41 : ColorCode;
-    ColorCode = ColorCode == 97 ? 44 : ColorCode;
+    ColorCode = ColorCode == BLUE ? 34 : ColorCode;
+    ColorCode = ColorCode == GREEN ? 32 : ColorCode;
+    ColorCode = ColorCode == AQUA ? 36 : ColorCode;
+    ColorCode = ColorCode == RED ? 31 : ColorCode;
+    ColorCode = ColorCode == PURPLE ? 35 : ColorCode;
+    ColorCode = ColorCode == YELLOW ? 33 : ColorCode;
+    ColorCode = ColorCode == WHITE ? 37 : ColorCode;
+    ColorCode = ColorCode == GRAY ? 90 : ColorCode;
+    ColorCode = ColorCode == BBLUE ? 94 : ColorCode;
+    ColorCode = ColorCode == BGREEN ? 92 : ColorCode;
+    ColorCode = ColorCode == BAQUA ? 96 : ColorCode;
+    ColorCode = ColorCode == BRED ? 91 : ColorCode;
+    ColorCode = ColorCode == BPURPLE ? 95 : ColorCode;
+    ColorCode = ColorCode == BYELLOW ? 93 : ColorCode;
+    ColorCode = ColorCode == BWHITE ? 97 : ColorCode;
+    ColorCode = ColorCode == BGRAY ? 100 : ColorCode;
+    ColorCode = ColorCode == RED_BACKGROUND ? 41 : ColorCode;
+    ColorCode = ColorCode == YELLOW_BACKGROUND ? 44 : ColorCode;
     cout<<"\033[" + to_string (ColorCode) + "m";
 }
 
@@ -247,7 +266,7 @@ void ColorPrint(T text, int color)
     cout<<text;
     /// Set color to default
     #if (defined (_WIN32) || defined (_WIN64))
-    setColor(7);
+    setColor(WHITE);
     #endif
     #if (defined (LINUX) || defined (__linux__))
     setColor(0);
@@ -289,36 +308,36 @@ void loadLogo()
                 if (ColorIsChangeable)
                 {
                     if (ch == 'E')
-                        setColor(14);
+                        setColor(BYELLOW);
                     else if (ch == 'B')
-                        setColor(12);
+                        setColor(BRED);
                     else if (ch == 'J' || ch == 'I' || ch == '#' || ch == '=')
-                        setColor(13);
+                        setColor(BPURPLE);
                     else if (ch == '|' || ch == '_')
-                        setColor(1);
+                        setColor(BLUE);
                     else if (ch == '(') {
                         ColorIsChangeable=false;
-                        setColor(6);
+                        setColor(YELLOW);
                     } else if (ch == '\'') {
                         ColorIsChangeable=false;
-                        setColor(3);
+                        setColor(AQUA);
                     }
                     else
                         setColor(0);
                 }
                 else if (ch == '|')
-                    setColor(1);
+                    setColor(BLUE);
                 else if (ch == 'v')
-                    setColor(7);
+                    setColor(WHITE);
                 else if (ch == '\'')
-                    setColor(3);
+                    setColor(AQUA);
 
                 cout<<ch;
             }
             cout<<'\n';
         }
     } else
-        ColorPrint("[Path Error]: Unable to open logo file\n", 4);
+        ColorPrint("[Path Error]: Unable to open logo file\n", RED);
 }
 
 bool IsSeparatorCharacter (char character)

@@ -46,8 +46,12 @@ unsigned int EditorUI::GetBiggestLineNumberInViewport(vector<vector<char>> &text
 void EditorUI::colourizeText (const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
                               const int &selectedLine, const int &numberLineForPrint, const int &column)
 {
+    /// All colourization logic of the text belongs to the 'itsjibel' contributor
+    /* In this function, all the characters are coloured according to their type,
+     * they are part by part so that each part is not the same colour as the previous and next parts.
+     */
     string textPart;
-    int8_t color = 7, tempColor = 7;
+    int8_t color = WHITE, tempColor = WHITE;
     int index = 0;
     bool sharpArea=false,   quotationArea=false, angleBracketsArea=false,
          commentArea=false, selectedArea=false;
@@ -59,14 +63,14 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
             && selectedLine == currentLine)
         {
             selectedArea = !selectedArea;
-            color = 79;
+            color = RED_BACKGROUND;
         } else if ((character == '/' || character == '*' || character == '-' ||
                     character == '+' || character == '^' || character == '%' ||
                     character == '=' || character == '<' || character == '>') &&
                     !quotationArea && !commentArea && !selectedArea) {
 
             commentArea = temp == '/' && character == '/' ? true : commentArea;
-            color = 4;
+            color = RED;
             sharpArea=false;
 
             if (character == '<')
@@ -86,7 +90,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea)
         {
-            color = 11;
+            color = BAQUA;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -96,7 +100,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     character == '$' || character == '?') && !quotationArea &&
                     !angleBracketsArea && !commentArea && !selectedArea)
         {
-            color = 13;
+            color = BPURPLE;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -107,7 +111,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     character == '9') && !quotationArea && !angleBracketsArea &&
                     !commentArea && !selectedArea)
         {
-            color = 2;
+            color = GREEN;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -117,7 +121,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                     !quotationArea && !angleBracketsArea && !commentArea &&
                     !selectedArea)
         {
-            color = 9;
+            color = BBLUE;
             sharpArea=false;
             angleBracketsArea=false;
             quotationArea=false;
@@ -125,7 +129,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
         else if (character == '\'' || character == '\"' && !angleBracketsArea &&
                 !commentArea && !selectedArea)
         {
-            color = 6;
+            color = YELLOW;
             sharpArea=false;
 
             if (character == '\"' || character == '\'')
@@ -140,7 +144,7 @@ void EditorUI::colourizeText (const string &text, const int &selectedCharacterSt
                         }
         } else if (!sharpArea && !quotationArea && !angleBracketsArea &&
                    !commentArea && !selectedArea)
-            color = 7;
+            color = WHITE;
 
         sharpArea = character == '#' ? true : sharpArea;
 
@@ -169,17 +173,17 @@ void EditorUI::printTabs()
     gotoxy (0, 0);
     cout<<"  ";
     #if (defined (_WIN32) || defined (_WIN64))
-    ColorPrint(' ', 91);
+    ColorPrint(' ', YELLOW_BACKGROUND);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    ColorPrint(' ', 44);
+    ColorPrint(' ', YELLOW_BACKGROUND);
     #endif
     ColorPrint(" \e[1m" + CurrentFileName + "\e[0m ", 7);
     #if (defined (_WIN32) || defined (_WIN64))
-    ColorPrint(' ', 91);
+    ColorPrint(' ', YELLOW_BACKGROUND);
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    ColorPrint(' ', 44);
+    ColorPrint(' ', YELLOW_BACKGROUND);
     #endif
     /* Clearing the front of the current file name,
      * for that if the user resizes the terminal,
@@ -191,14 +195,13 @@ void EditorUI::printTabs()
     string bar;
     for (int i=0; i<numberOfTerminalColumn; i++) bar+=" ";
     gotoxy(0, 1);
-    ColorPrint(bar, 97);
+    ColorPrint(bar, YELLOW_BACKGROUND);
     ShowConsoleCursor(true);
 }
 
 void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
                                  const int &selectedCharacterEnd)
 {
-    /// All colourization logic of the text belongs to the 'itsjibel' contributor
     vector<int> visibleNumberLines;
     /// Lines for printing
     vector<string> visibleLines;
@@ -255,9 +258,9 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
             gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1), j + 2);
             #if (defined (_WIN32) || defined (_WIN64))
             if (j + startLineForDisplayPage == line)
-                ColorPrint(visibleNumberLines[j], 15);
+                ColorPrint(visibleNumberLines[j], BWHITE);
             else
-                ColorPrint(visibleNumberLines[j], 8);
+                ColorPrint(visibleNumberLines[j], GRAY);
             #endif
             #if (defined (LINUX) || defined (__linux__))
             if (j + startLineForDisplayPage == currentLine)
@@ -278,7 +281,7 @@ void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &se
             /// Printing an empty line symbol('~') and printing spaces after that to hide the old characters under the spaces
             string blankLine = "~";
             for (int i=0; i<numberOfTerminalColumn - 1; i++) blankLine += " ";
-            ColorPrint(blankLine, 6);
+            ColorPrint(blankLine, YELLOW);
         }
     }
     /// Go to the location selected by the user and turn on the console cursor
@@ -301,10 +304,10 @@ void EditorUI::displayLocationInfo()
     for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView += " ";
     /// Display cmd text for visual mode
     gotoxy (0, numberOfTerminalLine - 2);
-    setColor(7);
-    ColorPrint(currentModeView, 97);
+    setColor(WHITE);
+    ColorPrint(currentModeView, YELLOW_BACKGROUND);
     gotoxy (0, numberOfTerminalLine - 1);
-    ColorPrint("\e[1mcmd@edit:\e[0m", 2);
+    ColorPrint("\e[1mcmd@edit:\e[0m", GREEN);
     /// Calculate the percentage of text read at this moment
     float percentageTextSeen = 100.0/mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) < 100.0 ?\
           percentageTextSeen = 100.0/mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) : 100.0;
@@ -318,8 +321,8 @@ void EditorUI::displayLocationInfo()
     gotoxy (columnStartPrintInfoOfCurrentLocation,
             numberOfTerminalLine - 1);
 
-    ColorPrint(to_string(int(percentageTextSeen)) + "% ", 12);
-    ColorPrint("Ln " + to_string(currentLine + 1) + ", Col " + to_string(currentColumn + 1), 3);
+    ColorPrint(to_string(int(percentageTextSeen)) + "% ", BRED);
+    ColorPrint("Ln " + to_string(currentLine + 1) + ", Col " + to_string(currentColumn + 1), AQUA);
     /* Clearing the back of the location information for that if the user resizes the terminal,
      * the characters don't remain in the back of the location information
      */

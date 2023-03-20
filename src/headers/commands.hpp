@@ -26,10 +26,10 @@ class CommandLine : public FileSystem, public EditorUI
             /// Giving commands and running the related function
             string cmd;
             #if (defined (_WIN32) || defined (_WIN64))
-            ColorPrint("cmd: ", 2);
+            ColorPrint("cmd: ", GREEN);
             #endif
             #if (defined (LINUX) || defined (__linux__))
-            ColorPrint("\e[1mcmd: \e[0m", 2);
+            ColorPrint("\e[1mcmd: \e[0m", GREEN);
             #endif
             getline (cin, cmd);
             
@@ -76,6 +76,6 @@ class CommandLine : public FileSystem, public EditorUI
             else if (cmd == "") {}
 
             else
-                ColorPrint("[Command Error]: command not found\n", 4);
+                ColorPrint("[Command Error]: command not found\n", RED);
         }
 };

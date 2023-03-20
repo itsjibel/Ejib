@@ -89,7 +89,7 @@ bool FileSystem::loadFile(string filePath, string fileName, vector<vector<char>>
         file.seekg (0, ios::end);
         end = file.tellg();
         file.close();
-        ColorPrint("[Warning]: Are you sure you want to open a " + byteConverter((end-begin)) + " file? [y/*]", 6);
+        ColorPrint("[Warning]: Are you sure you want to open a " + byteConverter((end-begin)) + " file? [y/*]", YELLOW);
 
         if (getch() == 'y')
         {
@@ -135,11 +135,11 @@ bool FileSystem::fileSystem (string SaveMode, vector<vector<char>> &MainText)
             ClearTerminalScreen();
             ClearTerminalScreen();
             gotoxy (0, 0);
-            ColorPrint("Enter file name(With extension): ", 2);
+            ColorPrint("Enter file name(With extension): ", GREEN);
             ShowConsoleCursor(true);
             getline (cin, CurrentFileName);
             ShowConsoleCursor(false);
-            ColorPrint("Enter file path: ", 2);
+            ColorPrint("Enter file path: ", GREEN);
             ShowConsoleCursor(true);
             getline (cin, CurrentFilePath);
         }
@@ -156,8 +156,8 @@ bool FileSystem::fileSystem (string SaveMode, vector<vector<char>> &MainText)
                     tryAgain=true;
                     agreeWithFileSize=true;
                 } else {
-                    ColorPrint("[Path Error]: Unable to open file! (Make sure the path is correct)\n", 4);
-                    ColorPrint("[Warning]: Try again? [y/*] ", 6);
+                    ColorPrint("[Path Error]: Unable to open file! (Make sure the path is correct)\n", RED);
+                    ColorPrint("[Warning]: Try again? [y/*] ", YELLOW);
                     tryAgain = getch() == 'y' ? true : false;
 
                     if (!tryAgain)
@@ -176,14 +176,14 @@ bool FileSystem::fileSystem (string SaveMode, vector<vector<char>> &MainText)
                 if (haveFilePath)
                 {
                     gotoxy (44, 29);
-                    ColorPrint("[+]", 4);
+                    ColorPrint("[+]", GREEN);
                     gotoxy(10, 29);
                 }
                 haveFilePath=true;
                 return true;
             } else {
-                ColorPrint("[Path Error]: Unable to open file! (Make sure the path is correct)\n", 4);
-                ColorPrint("[Warning]: Try again? [y/*] ", 6);
+                ColorPrint("[Path Error]: Unable to open file! (Make sure the path is correct)\n", RED);
+                ColorPrint("[Warning]: Try again? [y/*] ", YELLOW);
                 tryAgain = getch() == 'y' ? true : false;
 
                 if (!tryAgain)
@@ -229,10 +229,10 @@ void DisplayHelpFile(string helpFileName)
                 else if (ch == ']')
                     startGivingExplain=true;
 
-            ColorPrint('\t' + SwitchName, 6);
-            ColorPrint(explanation + '\n', 5);
+            ColorPrint('\t' + SwitchName, YELLOW);
+            ColorPrint(explanation + '\n', PURPLE);
         }
         HelpFile.close();
     } else
-        ColorPrint("\tUnable to open \'" + helpFileName + "' file!\n", 4);
+        ColorPrint("[Path Error]: Unable to open \'" + helpFileName + "' file!\n", RED);
 }
