@@ -352,7 +352,9 @@ bool VisualMode::search(string key, vector<vector<char>> &text, int &line, int &
         displayLocationInfo();
         displayPageOfText(mainText, column - key.size() - startColumnForDisplayPage, column - 1 - startColumnForDisplayPage);
     } while (getch() != 27);
-
+    displayLocationInfo();
+    printTabs();
+    displayPageOfText(mainText, -1, -1);
     currentMode = "edit";
     return true;
 }
