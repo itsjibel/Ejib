@@ -310,33 +310,34 @@ void VisualMode::VisualEdit()
 
 bool VisualMode::search(string key, vector<vector<char>> &text, int &line, int &column)
 {
-    int previousColumn=column, tempLine=line, firstCatchColumn, firstCatchLine;
-    bool first_time=true, anythingFound=false;
-    column=-1; line=0;
-    do {
-        string s;
+    int previousColumn = column, tempLine = line, firstMatchColumn, firstMatchLine;
+    bool first_time = true, anythingFound = false;
+    column = -1; line = 0;
+    do
+    {
+        string vector2string;
         int find_index;
-
+        /// Convert main text line to string
         for (char ch : text.at(line))
-            s.push_back(ch);
+            vector2string.push_back(ch);
 
         if (key.size() > 0)
             find_index = column > 0 ? column : 0;
         else
             find_index = column;
-
-        column = s.find(key, find_index);
-            
+        /// Find the search key in the current line
+        column = vector2string.find(key, find_index);
+        /// If the search key matches the line:
         if (column != string::npos)
         {
             if (anythingFound == false)
             {
-                firstCatchColumn = column;
-                firstCatchLine = line;
+                firstMatchColumn = column;
+                firstMatchLine = line;
             }
             anythingFound=true;
         }
-        
+        /// While the search key matches the line:
         while (column < 0)
         {
             if (text.size() > line + 1)
@@ -344,42 +345,46 @@ bool VisualMode::search(string key, vector<vector<char>> &text, int &line, int &
             else {
                 if (anythingFound)
                 {
-                    line=firstCatchLine;
-                    column=firstCatchColumn;
+                    line=firstMatchLine;
+                    column=firstMatchColumn;
                     break;
                 } else {
                     column = previousColumn;
                     line = tempLine;
+                    /// Nothing was found because we are in the last line and column and the search key was not match any line
                     return false;
                 }
             }
-            s.clear();
+            vector2string.clear();
 
             for (char ch : text.at(line))
-                s.push_back(ch);
-
-            column = s.find(key, 0);
-
+                vector2string.push_back(ch);
+            /// Find the search key in the new line
+            column = vector2string.find(key, 0);
+            /// If the search key matches the line:
             if (column != string::npos)
             {
                 if (anythingFound == false)
                 {
-                    firstCatchColumn = column;
-                    firstCatchLine = line;
+                    firstMatchColumn = column;
+                    firstMatchLine = line;
                 }
                 anythingFound=true;
             }
         }
-
+        /// Search key searched one time
+        /// Now we should add to column to the size of the search key
         column = column + key.size();
+        /// Display the viewport
         UpdateViewport();
         ShowConsoleCursor(false);
         displayLocationInfo();
         displayPageOfText(mainText, column - key.size() - startColumnForDisplayPage, column - 1 - startColumnForDisplayPage);
     } while (getch() != 27);
+    /// Display the viewport again to show the user we are no more in the search
     displayLocationInfo();
-        printTabs();
-        displayPageOfText(mainText, -1, -1);
+    printTabs();
+    displayPageOfText(mainText, -1, -1);
     currentMode = "edit";
     return true;
 }
