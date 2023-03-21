@@ -1,11 +1,18 @@
+/* <<The thing that makes editing faster (The Visual mode)>>
+ * A summary of what this library does:
+ * This library is a kind of shortcut for manual editing work.
+ * If you want to change all the words "cat" to "dog",
+ * it doesn't make sense to delete all the "cat" words and write all the "dog" 
+ * instead of this from a shortcut: text --replace "cat" "dog" you use
+ */
 #include "insert_mode.hpp"
 
 class VisualMode: public InsertMode
 {
     private:
         vector<vector<char>> visualCommandText;
-        int _currentColumn=0, _currentLine=0;
-        bool SomethingHappenInMainTextView=false;
+        int _currentColumn = 0, _currentLine = 0;
+        bool SomethingHappenInMainTextView = false;
         string Vector2StringVisualCommandText;
 
     protected:
@@ -14,50 +21,61 @@ class VisualMode: public InsertMode
         void VisualEdit();
 
     public:
+        /* Each key has its own ASCII code, this Enum defines all the ASCII codes of the required keys.
+         * To understand better, write a program that casts a getch() into an integer value, and then prints it,
+         * now try something like control + B and see the answer
+         */
         enum keyASCII
         {
-            SPECIAL_KEYS_LINUX         = 91,
-            UP_ARROW_KEY_LINUX         = 65,
-            DOWN_ARROW_KEY_LINUX       = 66,
-            RIGHT_ARROW_KEY_LINUX      = 67,
-            LEFT_ARROW_KEY_LINUX       = 68,
-            DELETE_KEY_LINUX           = 126,
-            BACKSPACE_KEY_LINUX        = 127,
-            CTRL_BACKSPACE_KEY_LINUX   = 8,
-            ENTER_KEY_LINUX            = 10,
-            SPECIAL_KEYS_WINDOWS       = -32,
-            UP_ARROW_KEY_WINDOWS       = 72,
-            LEFT_ARROW_KEY_WINDOWS     = 75,
-            RIGHT_ARROW_KEY_WINDOWS    = 77,
-            DOWN_ARROW_KEY_WINDOWS     = 80,
-            DELETE_KEY_WINDOWS         = 83,
-            BACKSPACE_KEY_WINDOWS      = 8,
+            SPECIAL_KEYS_LINUX = 91,
+            UP_ARROW_KEY_LINUX = 65,
+            DOWN_ARROW_KEY_LINUX = 66,
+            RIGHT_ARROW_KEY_LINUX = 67,
+            LEFT_ARROW_KEY_LINUX = 68,
+            DELETE_KEY_LINUX = 126,
+            BACKSPACE_KEY_LINUX = 127,
+            CTRL_BACKSPACE_KEY_LINUX = 8,
+            ENTER_KEY_LINUX = 10,
+            SPECIAL_KEYS_WINDOWS = -32,
+            UP_ARROW_KEY_WINDOWS = 72,
+            LEFT_ARROW_KEY_WINDOWS = 75,
+            RIGHT_ARROW_KEY_WINDOWS = 77,
+            DOWN_ARROW_KEY_WINDOWS = 80,
+            DELETE_KEY_WINDOWS = 83,
+            BACKSPACE_KEY_WINDOWS = 8,
             CTRL_BACKSPACE_KEY_WINDOWS = 127,
-            ENTER_KEY_WINDOWS          = 13,
-            ESCAPE_KEY                 = 27,
-            TAB_KEY                    = 9,
-            CTRL_B                     = 2,
-            CTRL_V                     = 22,
-            CTRL_F                     = 6,
-            CTRL_X                     = 24,
-            CTRL_P                     = 16,
-            CTRL_U                     = 21,
-            CTRL_R                     = 18
+            ENTER_KEY_WINDOWS = 13,
+            ESCAPE_KEY = 27,
+            TAB_KEY = 9,
+            CTRL_B = 2,
+            CTRL_V = 22,
+            CTRL_F = 6,
+            CTRL_X = 24,
+            CTRL_P = 16,
+            CTRL_U = 21,
+            CTRL_R = 18
         };
 };
 
 void VisualMode::VisualCommandInput()
 {
-    bool enter=false;
+    bool enter = false;
+    /* Writing a command in visual mode is a type of insert mode
+     * because the same functions are used for editing commands,
+     * and for this reason, the input system is like insert mode,
+     * but because we don't have things like going up and down in visual mode,
+     * it is logical to will not define them here
+     */
+    /// We have to continue editing the visual mode command until the user does not press enter (to submit the command).
     while (!enter)
     {
         char ch;
         vector<char> emptyVector;
         if (visualCommandText.size() == 0)
-            visualCommandText.push_back(emptyVector);
-
+            visualCommandText.push_back(emptyVector); /// For not giving segmentation fault
+        /// The current column shouldn't be bigger than the command text size
         _currentColumn = _currentColumn > visualCommandText.at(0).size() ? visualCommandText.at(0).size() : _currentColumn;
-
+        /// Giving inputs (just like insert mode)
         #if (defined (_WIN32) || defined (_WIN64))
         switch (ch = getch())
         {
@@ -155,8 +173,12 @@ void VisualMode::VisualCommandInput()
                 SomethingHappenInMainTextView=true;
         }
         #endif
+        /* The user should not be able to enter more than some range command,
+         * because this will disrupt the display of the user command,
+         * and when she tried to enter more command characters,
+         * we should show a warning to the user that you can't enter more characters.
+         */
         bool showBigCommandWarning=false;
-
         while (visualCommandText.at(0).size() > 32)
         {
             visualCommandText.at(0).pop_back();
@@ -177,19 +199,18 @@ void VisualMode::VisualCommandInput()
             gotoxy (44, numberOfTerminalLine - 1);
             ColorPrint("[B]", YELLOW);
         }
-
+        /// We should put vector<char> into the string to check better what is the command
         Vector2StringVisualCommandText="";
-
         for (int i=0; i<visualCommandText.at(0).size(); i++)
             Vector2StringVisualCommandText += visualCommandText.at(0).at(i);
-
+        /// Display the command for the user
         gotoxy(10, numberOfTerminalLine - 1);
         cout<<Vector2StringVisualCommandText;
+        /// Clear command statuses of visual mode
         int8_t range = Vector2StringVisualCommandText.length() == 32 ? 0 :  32 - Vector2StringVisualCommandText.length() % 32;
-        
         for (int i=0; i<range; i++)
             cout<<' ';
-
+        /// We check the status of the column so that it is not wrong and out of range, if it is, we fix it
         _currentColumn = Vector2StringVisualCommandText.size() == 0 ? _currentColumn - 1 :_currentColumn;
         _currentColumn = _currentColumn > 32 ? 32 : _currentColumn;
         _currentColumn = _currentColumn < 0 ? 0 : _currentColumn;
@@ -200,6 +221,7 @@ void VisualMode::VisualCommandInput()
 
 void showMassage(string massageType)
 {
+    /// The command statuses
     if (massageType == "accept")
     {
         gotoxy (44, numberOfTerminalLine - 1);
@@ -215,9 +237,9 @@ void showMassage(string massageType)
 
 void VisualMode::VisualEdit()
 {
+    /// In this section, we only check what command the user gave and execute that command with functions
     ShowConsoleCursor(false);
     string currentMode_View;
-
     for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentMode_View+=" ";
     currentMode_View += "-- VISUAL --";
     for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentMode_View+=" ";
@@ -226,12 +248,15 @@ void VisualMode::VisualEdit()
     setColor(WHITE);
     ColorPrint(currentMode_View, YELLOW_BACKGROUND);
     ShowConsoleCursor(true);
+    /// Giving the command
     gotoxy (10, numberOfTerminalLine - 1);
     VisualCommandInput();
+    /// Clear the command text, for the next command
     visualCommandText.clear();
     gotoxy (10, numberOfTerminalLine - 1);
+    /// Clear previous command entries using spaces
     cout<<"                                     ";
-
+    /// Just check the command
     if (Vector2StringVisualCommandText == "edit" ||
         Vector2StringVisualCommandText == "E")
     {
