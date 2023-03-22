@@ -564,7 +564,10 @@ void InsertMode::UNDO(int &line, int &column, vector<string> &text)
                         {
                             for (int j=0; j<GetLastUndoStackTrack().changeString.size() - 1; j++)
                                 text.at(line).pop_back();
-                            text.insert (text.begin() + line + 1, GetLastUndoStackTrack().changeString);
+
+                            string temp = GetLastUndoStackTrack().changeString;
+                            temp.erase(temp.begin());
+                            text.insert (text.begin() + line + 1, temp);
 
                             if (GetLastUndoStackTrack().changeMode == 'B')
                                 line++;
