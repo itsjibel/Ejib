@@ -205,7 +205,7 @@ void DisplayHelpFile(string helpFileName)
 {
     /// Display the specific help file in colour(for better readability)
     string line;
-    ifstream HelpFile("../helps/" + helpFileName);
+    ifstream HelpFile("../help/" + helpFileName);
 
     if (HelpFile.is_open())
     {

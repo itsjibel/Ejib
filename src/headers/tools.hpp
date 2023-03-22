@@ -296,7 +296,7 @@ vector<int> GetTerminal_LineAndColumn()
 void loadLogo()
 {
     string line;
-    ifstream TextLogoFile ("EjibTextLogo.txt");
+    ifstream TextLogoFile ("../EjibTextLogo.txt");
     if (TextLogoFile.is_open())
     {
         while (getline(TextLogoFile, line))
