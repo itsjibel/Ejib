@@ -17,8 +17,8 @@ class CommandLine : public FileSystem, public EditorUI
             startLineForDisplayPage=0;
             startColumnForDisplayPage=0;
             mainText.clear();
-            vector<char> emptyVector;
-            mainText.push_back(emptyVector);
+            string emptyString;
+            mainText.push_back(emptyString);
         }
 
         void CommandsRouter()

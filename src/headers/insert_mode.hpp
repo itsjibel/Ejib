@@ -63,27 +63,27 @@ class InsertMode: public CommandLine
 
 	public:
         /// Text editing functions:
-		void INSERT_CHARACTER (char &characterInput, int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void BACKSPACE       (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void QUICK_BACKSPACE (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void DELETE_          (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void DELETE_LINE     (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void ENTER           (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void TAB             (int &line, int &column, vector<vector<char>> &text, bool UseForRedoing);
-        void PASTE           (int &line, int &column, vector<vector<char>> &text);
-        void PASTE           (int &line, int &column, vector<vector<char>> &text, string stringForPaste);
+		void INSERT_CHARACTER (char &characterInput, int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void BACKSPACE       (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void QUICK_BACKSPACE (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void DELETE_          (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void DELETE_LINE     (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void ENTER           (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void TAB             (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void PASTE           (int &line, int &column, vector<string> &text);
+        void PASTE           (int &line, int &column, vector<string> &text, string stringForPaste);
 
-        void UP          (int &line, int &column,  const vector<vector<char>> &text);
-        void LEFT        (int &line, int &column,  const vector<vector<char>> &text);
-        void DOWN        (int &line, int &column,  const vector<vector<char>> &text);
-        void RIGHT       (int &line, int &column,  const vector<vector<char>> &text);
-        void QUICK_UP    (int &line, int &column,  const vector<vector<char>> &text);
-        void QUICK_LEFT  (int &line, int &column,  const vector<vector<char>> &text);
-        void QUICK_DOWN  (int &line, int &column,  const vector<vector<char>> &text);
-        void QUICK_RIGHT (int &line, int &column,  const vector<vector<char>> &text);
+        void UP          (int &line, int &column,  const vector<string> &text);
+        void LEFT        (int &line, int &column,  const vector<string> &text);
+        void DOWN        (int &line, int &column,  const vector<string> &text);
+        void RIGHT       (int &line, int &column,  const vector<string> &text);
+        void QUICK_UP    (int &line, int &column,  const vector<string> &text);
+        void QUICK_LEFT  (int &line, int &column,  const vector<string> &text);
+        void QUICK_DOWN  (int &line, int &column,  const vector<string> &text);
+        void QUICK_RIGHT (int &line, int &column,  const vector<string> &text);
 
-        void UNDO (int &line, int &column, vector<vector<char>> &text);
-        void REDO (int &line, int &column, vector<vector<char>> &text);
+        void UNDO (int &line, int &column, vector<string> &text);
+        void REDO (int &line, int &column, vector<string> &text);
 
         unsigned int GetBiggestLineNumberInViewport();
         bool UpdateViewport();
@@ -91,7 +91,7 @@ class InsertMode: public CommandLine
 };
 
 void InsertMode::INSERT_CHARACTER(char &characterInput, int &line, int &column,
-                                  vector<vector<char>> &text, bool UseForRedoing)
+                                  vector<string> &text, bool UseForRedoing)
 {
     /// Check whether the character input is keyboard characters or not
     if (characterInput > 31 && characterInput < 127)
@@ -117,7 +117,7 @@ void InsertMode::INSERT_CHARACTER(char &characterInput, int &line, int &column,
     }
 }
 
-void InsertMode::BACKSPACE(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
+void InsertMode::BACKSPACE(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
     /* Checking text is empty or not? If is empty,
      * there is no need to enter the process
@@ -157,7 +157,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<vector<char>> &text, b
              */
             line--;
             column = text.at(line).size();
-            vector<char> AppendCurrentLineToPreviousLine;
+            string AppendCurrentLineToPreviousLine;
 
             for (int i=0; i<text.at(line).size(); i++)
                 AppendCurrentLineToPreviousLine.push_back (text.at(line).at(i));
@@ -171,7 +171,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<vector<char>> &text, b
     }
 }
 
-void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
+void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
     /* Checking text is empty or not? If is empty,
      * there is no need to enter the process
@@ -211,7 +211,7 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<vector<char>> &t
              */
             line--;
             column = text.at(line).size();
-            vector<char> AppendCurrentLineToPreviousLine;
+            string AppendCurrentLineToPreviousLine;
 
             for (int i=0; i<text.at(line).size(); i++)
                 AppendCurrentLineToPreviousLine.push_back (text.at(line).at(i));
@@ -225,7 +225,7 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<vector<char>> &t
     }
 }
 
-void InsertMode::DELETE_(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
+void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
     if (text.size() == 1 && text.at(0).size() == 0)
         return;
@@ -262,7 +262,7 @@ void InsertMode::DELETE_(int &line, int &column, vector<vector<char>> &text, boo
     }
 }
 
-void InsertMode::DELETE_LINE(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
+void InsertMode::DELETE_LINE(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
     if (text.size() == 1 && text.at(0).size() == 0)
         return;
@@ -290,12 +290,12 @@ void InsertMode::DELETE_LINE(int &line, int &column, vector<vector<char>> &text,
     } else
         line=0;
 
-    vector<char> emptyVector;
+    string emptyString;
     if (text.size() == 0)
-        text.push_back(emptyVector);
+        text.push_back(emptyString);
 }
 
-void InsertMode::ENTER(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
+void InsertMode::ENTER(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
     if (currentMode != "visual" && !UseForRedoing)
     {
@@ -303,7 +303,7 @@ void InsertMode::ENTER(int &line, int &column, vector<vector<char>> &text, bool 
         AddTrackToUndoStack (true, line, column, '\n', 'E');
     }
 
-    vector<char> appendToNextLine;
+    string appendToNextLine;
 
     for (int i=column; i<text.at(line).size(); i++)
         appendToNextLine.push_back (text.at(line).at(i));
@@ -316,7 +316,7 @@ void InsertMode::ENTER(int &line, int &column, vector<vector<char>> &text, bool 
     column=0;
 }
 
-void InsertMode::TAB(int &line, int &column, vector<vector<char>> &text, bool UseForRedoing)
+void InsertMode::TAB(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
     if (currentMode != "visual" && !UseForRedoing)
     {
@@ -328,10 +328,10 @@ void InsertMode::TAB(int &line, int &column, vector<vector<char>> &text, bool Us
     column += 4;
 }
 
-void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text)
+void InsertMode::PASTE(int &line, int &column, vector<string> &text)
 {
     string copiedText;
-    vector<char> linkToEndOfPaste;
+    string linkToEndOfPaste;
 
     for (int i=column; i<text.at(line).size(); i++)
         linkToEndOfPaste.push_back(text.at(line).at(i));
@@ -342,9 +342,9 @@ void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text)
     if (GetCopiedText(copiedText))
     {
         RemoveTextSpoilerCharacters(copiedText);
-        vector<char> emptyVector;
+        string emptyString;
         if (text.size() == 0)
-            text.insert(text.begin() + line + 1, emptyVector);
+            text.insert(text.begin() + line + 1, emptyString);
 
         if (currentMode != "visual")
         {
@@ -362,7 +362,7 @@ void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text)
             if (copiedText.at(i) == '\n')
             {
                 column=0;
-                text.insert(text.begin() + line + 1, emptyVector);
+                text.insert(text.begin() + line + 1, emptyString);
                 line++;
             }
         }
@@ -372,18 +372,18 @@ void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text)
         text.at(line).push_back(linkToEndOfPaste.at(i));
 }
 
-void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text, string stringForPaste)
+void InsertMode::PASTE(int &line, int &column, vector<string> &text, string stringForPaste)
 {
-    vector<char> linkToEndOfPaste;
+    string linkToEndOfPaste;
 
     for (int i=column; i<text.at(line).size(); i++)
         linkToEndOfPaste.push_back(text.at(line).at(i));
 
     for (int i=0; i<linkToEndOfPaste.size(); i++)
         text.at(line).pop_back();
-    vector<char> emptyVector;
+    string emptyString;
     if (text.size() == 0)
-        text.insert(text.begin() + line + 1, emptyVector);
+        text.insert(text.begin() + line + 1, emptyString);
 
     for (int i=0; i<stringForPaste.size(); i++)
     {
@@ -395,7 +395,7 @@ void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text, strin
         if (stringForPaste.at(i) == '\n')
         {
             column=0;
-            text.insert(text.begin() + line + 1, emptyVector);
+            text.insert(text.begin() + line + 1, emptyString);
             line++;
         }
     }
@@ -404,7 +404,7 @@ void InsertMode::PASTE(int &line, int &column, vector<vector<char>> &text, strin
         text.at(line).push_back(linkToEndOfPaste.at(i));
 }
 
-void InsertMode::UP(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::UP(int &line, int &column, const vector<string> &text)
 {
     if (line > 0)
     {
@@ -413,7 +413,7 @@ void InsertMode::UP(int &line, int &column, const vector<vector<char>> &text)
     }
 }
 
-void InsertMode::LEFT(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::LEFT(int &line, int &column, const vector<string> &text)
 {
     column = column - 1 > -1 ? column - 1 : -1;
 
@@ -426,7 +426,7 @@ void InsertMode::LEFT(int &line, int &column, const vector<vector<char>> &text)
             column=0;
 }
 
-void InsertMode::DOWN(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::DOWN(int &line, int &column, const vector<string> &text)
 {
     if (line < text.size() - 1)
     {
@@ -435,7 +435,7 @@ void InsertMode::DOWN(int &line, int &column, const vector<vector<char>> &text)
     }
 }
 
-void InsertMode::RIGHT(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::RIGHT(int &line, int &column, const vector<string> &text)
 {
     column++;
     if (column > text.at(line).size())
@@ -447,7 +447,7 @@ void InsertMode::RIGHT(int &line, int &column, const vector<vector<char>> &text)
             column = text.at(line).size();
 }
 
-void InsertMode::QUICK_UP(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::QUICK_UP(int &line, int &column, const vector<string> &text)
 {
     for (int i=0; i<5; i++)
     {
@@ -459,7 +459,7 @@ void InsertMode::QUICK_UP(int &line, int &column, const vector<vector<char>> &te
     }
 }
 
-void InsertMode::QUICK_LEFT(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::QUICK_LEFT(int &line, int &column, const vector<string> &text)
 {
     do
     {
@@ -477,7 +477,7 @@ void InsertMode::QUICK_LEFT(int &line, int &column, const vector<vector<char>> &
     } while (!IsSeparatorCharacter(text.at(line).at(column)));
 }
 
-void InsertMode::QUICK_DOWN(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::QUICK_DOWN(int &line, int &column, const vector<string> &text)
 {
     for (int i=0; i<5; i++)
     {
@@ -489,7 +489,7 @@ void InsertMode::QUICK_DOWN(int &line, int &column, const vector<vector<char>> &
     }
 }
 
-void InsertMode::QUICK_RIGHT(int &line, int &column, const vector<vector<char>> &text)
+void InsertMode::QUICK_RIGHT(int &line, int &column, const vector<string> &text)
 {
     do
     {
@@ -507,7 +507,7 @@ void InsertMode::QUICK_RIGHT(int &line, int &column, const vector<vector<char>> 
     } while (!IsSeparatorCharacter(text.at(line).at(column - 1)));
 }
 
-void InsertMode::UNDO(int &line, int &column, vector<vector<char>> &text)
+void InsertMode::UNDO(int &line, int &column, vector<string> &text)
 {
     char tempChangeMode = UndoStack.size() > 0 ? GetLastUndoStackTrack().changeMode : ' ';
     do
@@ -516,12 +516,12 @@ void InsertMode::UNDO(int &line, int &column, vector<vector<char>> &text)
         {
             RedoStack.push_back(UndoStack.back());
             column = GetLastUndoStackTrack().startActionColumn;
-            line   = GetLastUndoStackTrack().startActionLine;
+            line = GetLastUndoStackTrack().startActionLine;
             bool isMultipleLine=false;
 
             if (GetLastUndoStackTrack().isWrite)
             {
-                vector<char> lastLineDeleted;
+                string lastLineDeleted;
                 for (int i=0; i<GetLastUndoStackTrack().changeString.size(); i++)
                 {
                     if (GetLastUndoStackTrack().changeString.at(i) == '\n')
@@ -553,32 +553,21 @@ void InsertMode::UNDO(int &line, int &column, vector<vector<char>> &text)
             } else {
                 if (GetLastUndoStackTrack().changeMode == 'L')
                 {
-                    vector<char> string2vector;
-                    for (char ch : GetLastUndoStackTrack().changeString)
-                        string2vector.push_back(ch);
-
                     if (text.size() == 1 && text.at(0).size() == 0)
                         text.clear();
                         
-                    text.insert(text.begin() + line, string2vector);
+                    text.insert(text.begin() + line, GetLastUndoStackTrack().changeString);
                 } else {
                     for (int i=0; i<GetLastUndoStackTrack().changeString.size(); i++)
                     {
                         if (GetLastUndoStackTrack().changeString.at(i) == '\n')
                         {
-                            vector<char> StringToVector;
                             for (int j=0; j<GetLastUndoStackTrack().changeString.size() - 1; j++)
                                 text.at(line).pop_back();
-
-                            for (char ch : GetLastUndoStackTrack().changeString)
-                                StringToVector.push_back(ch);
-                            
-                            StringToVector.erase(StringToVector.begin());
-                            text.insert (text.begin() + line + 1, StringToVector);
+                            text.insert (text.begin() + line + 1, GetLastUndoStackTrack().changeString);
 
                             if (GetLastUndoStackTrack().changeMode == 'B')
                                 line++;
-
                             isMultipleLine=true;
                         }
 
@@ -608,7 +597,7 @@ void InsertMode::UNDO(int &line, int &column, vector<vector<char>> &text)
         );
 }
 
-void InsertMode::REDO(int &line, int &column, vector<vector<char>> &text)
+void InsertMode::REDO(int &line, int &column, vector<string> &text)
 {
     char tempChangeMode = RedoStack.size() > 0 ? GetLastRedoStackTrack().changeMode : ' ';
     do

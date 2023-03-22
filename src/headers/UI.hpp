@@ -6,7 +6,7 @@
 #include <cmath>
 #include "consumption_info.hpp"
 /// Global variables that almost every function and object should have access to
-vector<vector<char>> mainText;
+vector<string> mainText;
 string currentMode = "command";
 int numberOfTerminalColumn = 0, numberOfTerminalLine = 0, currentColumn = 0,
     currentLine = 0, startLineForDisplayPage = 0, startColumnForDisplayPage = 0;
@@ -16,16 +16,16 @@ class EditorUI
     private:
         void colourizeText(const string &text, const int &selectedCharacterStart, const int &selectedCharacterEnd,
                            const int &selectedLine, const int &numberLineForPrint);
-        unsigned int GetBiggestLineNumberInViewport(vector<vector<char>> &text, int startLineForDisplayPage);
+        unsigned int GetBiggestLineNumberInViewport(vector<string> &text, int startLineForDisplayPage);
 
     public:
-        void displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
+        void displayPageOfText(const vector<string> &text, const int &selectedCharacterStart,
                                const int &selectedCharacterEnd);
         void printTabs();
         void displayLocationInfo();
 };
 
-unsigned int EditorUI::GetBiggestLineNumberInViewport(vector<vector<char>> &text, int startLineForDisplayPage)
+unsigned int EditorUI::GetBiggestLineNumberInViewport(vector<string> &text, int startLineForDisplayPage)
 {
     unsigned int BiggestLineNumber = 1;
     vector<int> LineNumbers;
@@ -218,7 +218,7 @@ void EditorUI::printTabs()
     ShowConsoleCursor(true);
 }
 
-void EditorUI::displayPageOfText(const vector<vector<char>> &text, const int &selectedCharacterStart,
+void EditorUI::displayPageOfText(const vector<string> &text, const int &selectedCharacterStart,
                                  const int &selectedCharacterEnd)
 {
     vector<int> visibleNumberLines;
@@ -326,7 +326,7 @@ void EditorUI::displayLocationInfo()
     setColor(WHITE);
     ColorPrint(currentModeView, YELLOW_BACKGROUND);
     gotoxy (0, numberOfTerminalLine - 1);
-    ColorPrint("\e[1mcmd@edit:\e[0m", GREEN);
+    ColorPrint("\e[1mcmd@edit:\e[0m", BGREEN);
     /// Calculate the percentage of text read at this moment
     float percentageTextSeen = 100.0/mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) < 100.0 ?\
           percentageTextSeen = 100.0/mainText.size() * (startLineForDisplayPage + numberOfTerminalLine - 1) : 100.0;

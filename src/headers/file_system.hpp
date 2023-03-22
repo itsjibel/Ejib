@@ -44,14 +44,14 @@ class FileSystem
         bool agreeWithFileSize=true;
 
     public:
-        bool saveFile(string filePath, string fileName, const vector<vector<char>> &text);
-        bool loadFile(string filePath, string fileName, vector<vector<char>> &outputText);
-        bool fileSystem (string mode, vector<vector<char>> &outputText);
+        bool saveFile(string filePath, string fileName, const vector<string> &text);
+        bool loadFile(string filePath, string fileName, vector<string> &outputText);
+        bool fileSystem (string mode, vector<string> &outputText);
 };
 
-bool FileSystem::saveFile(string filePath, string fileName, const vector<vector<char>> &text)
+bool FileSystem::saveFile(string filePath, string fileName, const vector<string> &text)
 {
-    /// Write vector<vector<char>> into a file
+    /// Write vector<string> into a file
     ofstream FileForSave(filePath + fileName);
     if (FileForSave.is_open())
     {
@@ -74,9 +74,9 @@ bool FileSystem::saveFile(string filePath, string fileName, const vector<vector<
     return false;
 }
 
-bool FileSystem::loadFile(string filePath, string fileName, vector<vector<char>> &MainText)
+bool FileSystem::loadFile(string filePath, string fileName, vector<string> &MainText)
 {
-    /// Load string text into a vector<vector<char>>
+    /// Load string text into a vector<string>
     string line;
     int lineNumber=0;
     ifstream FileForLoad (filePath + fileName);
@@ -93,11 +93,11 @@ bool FileSystem::loadFile(string filePath, string fileName, vector<vector<char>>
 
         if (getch() == 'y')
         {
-            vector<char> emptyVector;
+            string emptyString;
             while (getline(FileForLoad, line))
             {
                 /// Write the file line by line on the main text
-                MainText.push_back(emptyVector);
+                MainText.push_back(emptyString);
                 RemoveTextSpoilerCharacters(line);
 
                 for (char ch : line)
@@ -118,7 +118,7 @@ bool FileSystem::loadFile(string filePath, string fileName, vector<vector<char>>
     }
 }
 
-bool FileSystem::fileSystem (string SaveMode, vector<vector<char>> &MainText)
+bool FileSystem::fileSystem (string SaveMode, vector<string> &MainText)
 {
     /// Control all of the file actions
     bool tryAgain=true;
