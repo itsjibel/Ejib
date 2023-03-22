@@ -143,12 +143,8 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<string> &text, bool Us
         {
             if (currentMode != "visual" && !UseForRedoing)
             {
-                string LineForAppending;
-                for (int i=0; i<text.at(line).size(); i++)
-                    LineForAppending.push_back (text.at(line).at(i));
-
                 RedoStack.clear();
-                AddTrackToUndoStack (false, line - 1, column, '\n' + LineForAppending, 'B');
+                AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b');
             }
             /* If the user reaches the beginning of the line:
              *      We paste the current line to the previous line and then delete the current line,
@@ -157,15 +153,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<string> &text, bool Us
              */
             line--;
             column = text.at(line).size();
-            string AppendCurrentLineToPreviousLine;
-
-            for (int i=0; i<text.at(line).size(); i++)
-                AppendCurrentLineToPreviousLine.push_back (text.at(line).at(i));
-
-            for (int i=0; i<text.at(line + 1).size(); i++)
-                AppendCurrentLineToPreviousLine.push_back (text.at(line+1).at(i));
-
-            text.at(line) = AppendCurrentLineToPreviousLine;
+            text.at(line).append(text.at(line + 1));
             text.erase (text.begin() + line + 1);
         }
     }
@@ -197,12 +185,8 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, b
         {
             if (currentMode != "visual" && !UseForRedoing)
             {
-                string LineForAppending;
-                for (int i=0; i<text.at(line).size(); i++)
-                    LineForAppending.push_back (text.at(line).at(i));
-
                 RedoStack.clear();
-                AddTrackToUndoStack (false, line - 1, column, '\n' + LineForAppending, 'b');
+                AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b');
             }
             /* If the user reaches the beginning of the line:
              *      We paste the current line to the previous line and then delete the current line,
@@ -211,15 +195,7 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, b
              */
             line--;
             column = text.at(line).size();
-            string AppendCurrentLineToPreviousLine;
-
-            for (int i=0; i<text.at(line).size(); i++)
-                AppendCurrentLineToPreviousLine.push_back (text.at(line).at(i));
-
-            for (int i=0; i<text.at(line + 1).size(); i++)
-                AppendCurrentLineToPreviousLine.push_back (text.at(line+1).at(i));
-
-            text.at(line) = AppendCurrentLineToPreviousLine;
+            text.at(line).append(text.at(line + 1));
             text.erase (text.begin() + line + 1);
         }
     }
