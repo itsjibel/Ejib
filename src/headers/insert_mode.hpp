@@ -88,6 +88,7 @@ class InsertMode: public CommandLine
         unsigned int GetBiggestLineNumberInViewport();
         bool UpdateViewport();
         void AdjustingViewportWithSizeOfTerminal();
+        void setLineWithMouseWheelAction();
 };
 
 void InsertMode::INSERT_CHARACTER(char &characterInput, int &line, int &column,
@@ -709,5 +710,38 @@ void InsertMode::AdjustingViewportWithSizeOfTerminal()
         tempNumberOfTerminalColumn = numberOfTerminalColumn;
         tempNumberOfTerminalLine = numberOfTerminalLine;
         Sleep(1);
+    }
+}
+
+void InsertMode::setLineWithMouseWheelAction()
+{
+    int fd;
+    struct input_event ie;
+    if ((fd = open("/dev/input/event7", O_RDONLY)) == -1)
+    {
+        perror("opening device");
+        exit(EXIT_FAILURE);
+    }
+
+    while (read(fd, &ie, sizeof(struct input_event)))
+    {
+        bool somethingHappenTextView = false;
+        if (ie.type == EV_REL && ie.code == REL_WHEEL)
+            if (ie.value > 0)
+            {
+                QUICK_UP(currentLine, currentColumn, mainText);
+                if (UpdateViewport())
+                    displayPageOfText(mainText, -1, -1);
+                displayLocationInfo();
+                displayPageOfText(mainText, -1, -1);
+            }
+            else if (ie.value < 0)
+            {
+                QUICK_DOWN(currentLine, currentColumn, mainText);
+                if (UpdateViewport())
+                    displayPageOfText(mainText, -1, -1);
+                displayLocationInfo();
+                displayPageOfText(mainText, -1, -1);
+            }
     }
 }
