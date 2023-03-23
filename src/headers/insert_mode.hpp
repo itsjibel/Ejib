@@ -8,16 +8,6 @@
 #include <stdio.h>
 #endif
 
-
-
-
-
-
-
-
-
-
-
 class InsertMode: public CommandLine
 {
     private:
