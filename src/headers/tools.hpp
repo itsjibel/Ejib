@@ -3,10 +3,13 @@
  * In this library, we have prepared big and small tools in the functions,
  * so we don't have to rewrite the tool code every time.
  */
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <limits.h>
+#include <linux/input.h>
 #include <string>
+#include <unistd.h>
 #include <vector>
 #include <thread>
 /// Defining normal colors and full bright colors codes
@@ -94,7 +97,7 @@ void setColor(int ColorCode)
 
 void gotoxy(int x, int y)
 {
-    printf("%c[%d;%df", 0x1B, y + 1, x + 1);
+    printf("\033[%d;%dH", y + 1, x + 1);
 }
 
 static struct termios old, current;
@@ -363,6 +366,6 @@ void ClearTerminalScreen()
     system("cls");
     #endif
     #if (defined (LINUX) || defined (__linux__))
-    printf("\033[H\033[J");
+    system("clear");
     #endif
 }
