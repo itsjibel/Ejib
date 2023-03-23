@@ -275,6 +275,7 @@ int main()
     loadLogo();
 	EditorSystem Ejib;
     std::thread ContorlViewportWithTerminalSize = std::thread (&InsertMode::AdjustingViewportWithSizeOfTerminal, Ejib);
+    std::thread SetCurrentLineValueWithMouseWheelAction = std::thread (&InsertMode::setLineWithMouseWheelAction, Ejib);
 	Ejib.MainSystem();
     ContorlViewportWithTerminalSize.join();
 }
