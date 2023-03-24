@@ -4,9 +4,9 @@
 
 ## Operating systems supported
 
-+ Linux
-
-+ Windows
++ __Linux based__:
+  + Ubuntu
+  + Fedora
 
 ## Quick summary of the Ejib
 
