@@ -1,2 +1,2 @@
 #!/bin/bash
-g++ ../src/ejib.cpp -o ejib.o -lX11 -O3 -s -pipe -march=native -flto -fno-exceptions
+g++ src/ejib.cpp -o ejib -lX11 -O3 -s -pipe -march=native -flto -fno-exceptions
