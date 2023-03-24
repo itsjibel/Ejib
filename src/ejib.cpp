@@ -6,10 +6,6 @@
  */
 #include "headers/visual_mode.hpp"
 
-#if (defined (_WIN32) || defined (_WIN64))
-#include "headers/mingw.thread.hpp"
-#endif
-
 class EditorSystem: public VisualMode
 {
     private:
@@ -45,91 +41,6 @@ void EditorSystem::TextEditSystem()
      */
     char ch;
     bool somethingHappenTextView=false;
-    #if (defined (_WIN32) || defined (_WIN64))
-    switch (ch = getch())
-    {
-        case SPECIAL_KEYS_WINDOWS:
-            switch(ch = getch())
-            {
-                case UP_ARROW_KEY_WINDOWS:
-                    UP(currentLine, currentColumn, mainText);
-                    somethingHappenTextView=true;
-                    break;
-                case LEFT_ARROW_KEY_WINDOWS:
-                    LEFT(currentLine, currentColumn, mainText);
-                    somethingHappenTextView=true;
-                    break;
-                case RIGHT_ARROW_KEY_WINDOWS:
-                    RIGHT(currentLine,   currentColumn, mainText);
-                    somethingHappenTextView=true;
-                    break;
-                case DOWN_ARROW_KEY_WINDOWS:
-                    DOWN(currentLine, currentColumn, mainText);
-                    somethingHappenTextView=true;
-                    break;
-                case DELETE_KEY_WINDOWS:
-                    DELETE_(currentLine, currentColumn, mainText, false);
-                    somethingHappenTextView=true;
-                    break;
-                default:
-                    INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
-                    somethingHappenTextView=true;
-            }
-            break;
-        case BACKSPACE_KEY_WINDOWS:
-            BACKSPACE(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
-        case CTRL_BACKSPACE_KEY_WINDOWS:
-            QUICK_BACKSPACE(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
-        case ENTER_KEY_WINDOWS:
-            ENTER(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
-        case TAB_KEY:
-            TAB(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
-        case CTRL_B:
-            currentMode = "visual";
-            break;
-        case CTRL_V:
-            PASTE(currentLine, currentColumn, mainText);
-            somethingHappenTextView=true;
-            break;
-        case CTRL_F:
-            currentMode = "file";
-            fileSystem("save", mainText);
-            ClearTerminalScreen();
-            displayLocationInfo();
-            printTabs();
-            displayPageOfText(mainText, -1, -1, currentLine, currentColumn);
-            currentMode = "edit";
-            break;
-        case CTRL_X:
-            DELETE_LINE(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
-        case CTRL_P:
-            currentMode = "command";
-            ClearTerminalScreen();
-            break;
-        case CTRL_U:
-            UNDO(currentLine, currentColumn, mainText);
-            somethingHappenTextView=true;
-            break;
-        case CTRL_R:
-            REDO(currentLine, currentColumn, mainText);
-            somethingHappenTextView=true;
-            break;
-        default:
-            INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-    }
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
     switch (ch = getch())
     {
         case ESCAPE_KEY:
@@ -250,7 +161,6 @@ void EditorSystem::TextEditSystem()
             INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
             somethingHappenTextView=true;
     }
-    #endif
     /* The user may need to move the page down or up or right or left with the
      * change in the text user has made or movement the user did,
      * so we call this function so that if the user is a downer or upper or more right or more left than usual.

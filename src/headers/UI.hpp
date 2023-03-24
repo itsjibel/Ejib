@@ -191,19 +191,9 @@ void EditorUI::printTabs()
     ShowConsoleCursor(false);
     gotoxy (0, 0);
     cout<<"  ";
-    #if (defined (_WIN32) || defined (_WIN64))
     ColorPrint(' ', YELLOW_BACKGROUND);
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
-    ColorPrint(' ', YELLOW_BACKGROUND);
-    #endif
     ColorPrint(" \e[1m" + CurrentFileName + "\e[0m ", 7);
-    #if (defined (_WIN32) || defined (_WIN64))
     ColorPrint(' ', YELLOW_BACKGROUND);
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
-    ColorPrint(' ', YELLOW_BACKGROUND);
-    #endif
     /* Clearing the front of the current file name,
      * for that if the user resizes the terminal,
      * the characters don't remain in front of the current file name
@@ -275,25 +265,12 @@ void EditorUI::displayPageOfText(const vector<string> &text, const int &selected
                 }
             /// Print number lines
             gotoxy (numberDigits_Of_LargestLineNumber - floor(log10(visibleNumberLines[j]) + 1), j + 2);
-            #if (defined (_WIN32) || defined (_WIN64))
-            if (j + startLineForDisplayPage == line)
-                ColorPrint(visibleNumberLines[j], BWHITE);
-            else
-                ColorPrint(visibleNumberLines[j], GRAY);
-            #endif
-            #if (defined (LINUX) || defined (__linux__))
             if (j + startLineForDisplayPage == currentLine)
                 cout<<BOLD(FWHT("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m"));
             else
                 ColorPrint("\e[1m" + to_string(visibleNumberLines[j]) + "\e[0m", 90);
-            #endif
             /// Print number lines bar
-            #if (defined (_WIN32) || defined (_WIN64))
-            ColorPrint(' ', 91);
-            #endif
-            #if (defined (LINUX) || defined (__linux__))
             ColorPrint(' ', 44);
-            #endif
             /// Print the line colourized
             colourizeText(visibleLines[j], selectedCharacterStart, selectedCharacterEnd, currentLine, j + startLineForDisplayPage);
         } else {

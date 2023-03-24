@@ -9,9 +9,12 @@
 #include <limits.h>
 #include <linux/input.h>
 #include <string>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
-#include <thread>
+#include <X11/Xlib.h>
 /// Defining normal colors and full bright colors codes
 #define BLUE 1
 #define GREEN 2
@@ -32,10 +35,6 @@
 #define RED_BACKGROUND 79
 #define YELLOW_BACKGROUND 97
 
-#if (defined (LINUX) || defined (__linux__))
-#include <sys/ioctl.h>
-#include <X11/Xlib.h>
-#include <unistd.h>
 /// Defining normal colors and full bright colors strings
 #define RST  "\x1B[0m"
 #define KRED "\x1B[31m"
@@ -54,7 +53,6 @@
 #define FWHT(x) KWHT x RST
 #define BOLD(x) "\x1B[1m" x RST
 #define UNDL(x) "\x1B[4m" x RST
-#endif
 /// Defining kilobytes, megabytes, etc. to byte units
 #define pb 1125899906842624
 #define tb 1099511627776
@@ -67,33 +65,6 @@ using std::ifstream;
 using std::string;
 using std::to_string;
 using std::vector;
-
-#if (defined (_WIN32) || defined (_WIN64))
-#include <windows.h>
-#include <conio.h>
-
-HANDLE hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
-void gotoxy (SHORT x, SHORT y)
-{
-    SetConsoleCursorPosition (hConsole, COORD {x, y});
-}
-
-void ShowConsoleCursor (bool showFlag)
-{
-    CONSOLE_CURSOR_INFO cursorInfo;
-    GetConsoleCursorInfo (hConsole, &cursorInfo);
-    cursorInfo.bVisible = showFlag;
-    SetConsoleCursorInfo (hConsole, &cursorInfo);
-}
-
-void setColor(int ColorCode)
-{
-    SetConsoleTextAttribute (hConsole, ColorCode);
-}
-#endif
-
-#if (defined (LINUX) || defined (__linux__))
-#include <termios.h>
 
 void gotoxy(int x, int y)
 {
@@ -213,7 +184,6 @@ Bool GetLinuxClipboard(Display *display, Window window, const char *bufname,
     } else
         return False;
 }
-#endif
 
 string byteConverter(long long int bytes)
 {
@@ -242,7 +212,6 @@ string byteConverter(long long int bytes)
 
 bool GetCopiedText(string &copiedText)
 {
-    #if (defined (LINUX) || defined (__linux__))
     Display *display = XOpenDisplay(NULL);
     unsigned long color = BlackPixel(display, DefaultScreen(display));
     Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0, 0, 1, 1, 0, color, color);
@@ -251,15 +220,6 @@ bool GetCopiedText(string &copiedText)
     XDestroyWindow(display, window);
     XCloseDisplay(display);
     return Clipboard_Info_Received;
-    #endif
-    #if (defined (_WIN32) || defined (_WIN64))
-    if (OpenClipboard(NULL))
-    {
-        copiedText = (char*)GetClipboardData(CF_TEXT);
-        CloseClipboard();
-        return true;
-    } else return false;
-    #endif
 }
 
 template <class T>
@@ -267,32 +227,17 @@ void ColorPrint(T text, int color)
 {
     setColor(color);
     cout<<text;
-    /// Set color to default
-    #if (defined (_WIN32) || defined (_WIN64))
-    setColor(WHITE);
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
+    /// Set color to default]
     setColor(0);
-    #endif
 }
 
 vector<int> GetTerminal_LineAndColumn()
 {
     vector<int> TerminalSize;
-    #if (defined (_WIN32) || defined (_WIN64))
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    TerminalSize.push_back(csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    TerminalSize.push_back(csbi.srWindow.Right - csbi.srWindow.Left + 1);
-    #endif
-
-    #if (defined (LINUX) || defined (__linux__))
     struct winsize w;
     ioctl (STDOUT_FILENO, TIOCGWINSZ, &w);
     TerminalSize.push_back(w.ws_row);
     TerminalSize.push_back(w.ws_col);
-    #endif
     return TerminalSize;
 }
 
@@ -362,10 +307,5 @@ bool IsSeparatorCharacter (char character)
 
 void ClearTerminalScreen()
 {
-    #if (defined (_WIN32) || defined (_WIN64))
-    system("cls");
-    #endif
-    #if (defined (LINUX) || defined (__linux__))
     system("clear");
-    #endif
 }

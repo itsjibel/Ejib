@@ -75,54 +75,6 @@ void VisualMode::VisualCommandInput()
         /// The current column shouldn't be bigger than the command text size
         _currentColumn = _currentColumn > visualCommandText.at(0).size() ? visualCommandText.at(0).size() : _currentColumn;
         /// Giving inputs (just like insert mode)
-        #if (defined (_WIN32) || defined (_WIN64))
-        switch (ch = getch())
-        {
-            case SPECIAL_KEYS_WINDOWS:
-                switch(ch = getch())
-                {
-                    case LEFT_ARROW_KEY_WINDOWS:
-                        LEFT(_currentLine, _currentColumn, visualCommandText);
-                        SomethingHappenInMainTextView=true;
-                        break;
-                    case RIGHT_ARROW_KEY_WINDOWS:
-                        RIGHT(_currentLine, _currentColumn, visualCommandText);
-                        SomethingHappenInMainTextView=true;
-                        break;
-                    case DELETE_KEY_WINDOWS:
-                        DELETE_(_currentLine, _currentColumn, visualCommandText, false);
-                        SomethingHappenInMainTextView=true;
-                        break;
-                    default:
-                        INSERT_CHARACTER(ch, _currentLine, _currentColumn, visualCommandText, false);
-                        SomethingHappenInMainTextView=true;
-                }
-                break;
-            case BACKSPACE_KEY_WINDOWS:
-                BACKSPACE(_currentLine, _currentColumn, visualCommandText, false);
-                SomethingHappenInMainTextView=true;
-                break;
-            case CTRL_BACKSPACE_KEY_WINDOWS:
-                QUICK_BACKSPACE(_currentLine, _currentColumn, visualCommandText, false);
-                SomethingHappenInMainTextView=true;
-                break;
-            case TAB_KEY:
-                TAB(_currentLine, _currentColumn, visualCommandText, false);
-                SomethingHappenInMainTextView=true;
-                break;
-            case CTRL_V:
-                PASTE(_currentLine, _currentColumn, visualCommandText);
-                SomethingHappenInMainTextView=true;
-                break;
-            case ENTER_KEY_WINDOWS:
-                enter = true;
-                break;
-            default:
-                INSERT_CHARACTER(ch, _currentLine, _currentColumn, visualCommandText, false);
-                SomethingHappenInMainTextView=true;
-        }
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
         switch (ch = getch())
         {
             case ESCAPE_KEY:
@@ -171,7 +123,6 @@ void VisualMode::VisualCommandInput()
                 INSERT_CHARACTER(ch, _currentLine, _currentColumn, visualCommandText, false);
                 SomethingHappenInMainTextView=true;
         }
-        #endif
         /* The user should not be able to enter more than some range command,
          * because this will disrupt the display of the user command,
          * and when she tried to enter more command characters,
@@ -186,12 +137,7 @@ void VisualMode::VisualCommandInput()
         
         ShowConsoleCursor(false);
         gotoxy (0, numberOfTerminalLine - 1);
-        #if (defined (_WIN32) || defined (_WIN64))
-        ColorPrint("cmd@edit: ", BGREEN);
-        #endif
-        #if (defined (LINUX) || defined (__linux__))
         ColorPrint("\e[1mcmd@edit: \e[0m", BGREEN);
-        #endif
 
         if (showBigCommandWarning)
         {
