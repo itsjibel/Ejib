@@ -719,8 +719,8 @@ void InsertMode::setLineWithMouseWheelAction()
     struct input_event ie;
     if ((fd = open("/dev/input/event7", O_RDONLY)) == -1)
     {
-        perror("opening device");
-        exit(EXIT_FAILURE);
+        perror("/dev/input/event7 for mouse wheel detection");
+        return;
     }
 
     while (read(fd, &ie, sizeof(struct input_event)))
