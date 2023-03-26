@@ -5,6 +5,10 @@
  */
 #include "commands.hpp"
 #if (defined (LINUX) || defined (__linux__))
+#include <array>
+#include <cstdio>
+#include <memory>
+#include <stdexcept>
 #include <stdio.h>
 #endif
 
