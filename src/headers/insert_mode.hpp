@@ -713,15 +713,43 @@ void InsertMode::AdjustingViewportWithSizeOfTerminal()
     }
 }
 
+string execute_command(const char* cmd)
+{
+    std::array<char, 128> buffer;
+    string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    if (!pipe)
+        throw std::runtime_error("popen() failed!");
+
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)
+        result += buffer.data();
+
+    return result;
+}
+
 void InsertMode::setLineWithMouseWheelAction()
 {
     int fd;
     struct input_event ie;
-    if ((fd = open("/dev/input/event7", O_RDONLY)) == -1)
+
+    if (execute_command("cat /etc/issue | grep -c \"Kali\"")[0] == '1')
     {
-        perror("/dev/input/event7 for mouse wheel detection");
+        if ((fd = open("/dev/input/event4", O_RDONLY)) == -1)
+        {
+            perror("/dev/input/event4 for mouse wheel detection");
+            return;
+        }
+    } else if (execute_command("cat /etc/issue | grep -c \"Ubuntu\"")[0] == '1') {
+        if ((fd = open("/dev/input/event7", O_RDONLY)) == -1)
+        {
+            perror("/dev/input/event7 for mouse wheel detection");
+            return;
+        }
+    } else {
+        cout<<"\n[Support Error]: Your OS is unsupported by Ejib\n";
         return;
     }
+
 
     while (read(fd, &ie, sizeof(struct input_event)))
     {
