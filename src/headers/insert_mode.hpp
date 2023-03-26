@@ -744,9 +744,9 @@ void InsertMode::setLineWithMouseWheelAction()
             return;
         }
     } else if (execute_command("cat /etc/issue | grep -c \"Ubuntu\"")[0] == '1') {
-        if ((fd = open("/dev/input/event7", O_RDONLY)) == -1)
+        if ((fd = open("/dev/input/event8", O_RDONLY)) == -1)
         {
-            perror("/dev/input/event7 for mouse wheel detection");
+            perror("/dev/input/event8 for mouse wheel detection");
             return;
         }
     } else {
