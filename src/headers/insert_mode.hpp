@@ -44,15 +44,23 @@ class InsertMode: public CommandLine
         vector<Track> UndoStack, RedoStack;
         template <class T>
         void AddTrackToUndoStack(bool isWrite, int startActionLine, int startActionColumn,
-                                 T changeString, char changeMode)
+                                 T changeString, char changeMode, string currentMode, bool useForRedoing)
         {
-            Track TrackForAdd;
-            TrackForAdd.changeString = changeString;
-            TrackForAdd.startActionColumn = startActionColumn;
-            TrackForAdd.startActionLine = startActionLine;
-            TrackForAdd.isWrite = isWrite;
-            TrackForAdd.changeMode = changeMode;
-            UndoStack.push_back(TrackForAdd);
+            /* If the user isn't in the visual mode and this function was not used for redoing,
+             * add this action to undo-stack.
+             */
+            if (currentMode != "visual" && !useForRedoing)
+            {
+                Track TrackForAdd;
+                TrackForAdd.changeString = changeString;
+                TrackForAdd.startActionColumn = startActionColumn;
+                TrackForAdd.startActionLine = startActionLine;
+                TrackForAdd.isWrite = isWrite;
+                TrackForAdd.changeMode = changeMode;
+                UndoStack.push_back(TrackForAdd);
+                /// When we are in real text (not previous actions), we should always keep redo stack empty
+                RedoStack.clear();
+            }
         }
 
         Track GetLastUndoStackTrack()
@@ -104,14 +112,10 @@ void InsertMode::INSERT_CHARACTER(char &characterInput, int &line, int &column,
         /* If the user isn't in the visual mode and this function was not used for redoing,
          * add this action to undo-stack.
          */
-        if (currentMode != "visual" && !UseForRedoing)
-        {
-            if (characterInput == ' ')
-                AddTrackToUndoStack (true, line, column, characterInput, 'S');
-            else
-                AddTrackToUndoStack (true, line, column, characterInput, 'C');
-            RedoStack.clear();
-        }
+        if (characterInput == ' ')
+            AddTrackToUndoStack (true, line, column, characterInput, 'S', currentMode, UseForRedoing);
+        else
+            AddTrackToUndoStack (true, line, column, characterInput, 'C', currentMode, UseForRedoing);
         /// Adding character to main text
         if (column != text.at(line).size())
             text.at(line).insert (text.at(line).begin() + column, characterInput);
@@ -132,11 +136,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<string> &text, bool Us
 
     if (column > 0)
     {
-        if (currentMode != "visual" && !UseForRedoing)
-        {
-            RedoStack.clear();
-            AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'B');
-        }
+        AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'B', currentMode, UseForRedoing);
         /* If the user didn't reach the beginning of the line and
          * doesn't want to paste the current line to the end of the previous line,
          * then we delete the previous character.
@@ -146,11 +146,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<string> &text, bool Us
     } else {
         if (line > 0)
         {
-            if (currentMode != "visual" && !UseForRedoing)
-            {
-                RedoStack.clear();
-                AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b');
-            }
+            AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b', currentMode, UseForRedoing);
             /* If the user reaches the beginning of the line:
              *      We paste the current line to the previous line and then delete the current line,
              *      then we subtract one from the current line and,
@@ -174,11 +170,7 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, b
 
     if (column > 0)
     {
-        if (currentMode != "visual" && !UseForRedoing)
-        {
-            RedoStack.clear();
-            AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'b');
-        }
+        AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'b', currentMode, UseForRedoing);
         /* If the user didn't reach the beginning of the line and
          * doesn't want to paste the current line to the end of the previous line,
          * then we delete the previous character.
@@ -188,11 +180,7 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, b
     } else {
         if (line > 0)
         {
-            if (currentMode != "visual" && !UseForRedoing)
-            {
-                RedoStack.clear();
-                AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b');
-            }
+            AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b', currentMode, UseForRedoing);
             /* If the user reaches the beginning of the line:
              *      We paste the current line to the previous line and then delete the current line,
              *      then we subtract one from the current line and,
@@ -215,11 +203,7 @@ void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseF
     {
         if (text.at(line).size() > column)
         {
-            if (currentMode != "visual" && !UseForRedoing)
-            {
-                RedoStack.clear();
-                AddTrackToUndoStack (false, line, column, text.at(line).at(column), 'D');
-            }
+            AddTrackToUndoStack (false, line, column, text.at(line).at(column), 'D', currentMode, UseForRedoing);
             text.at(line).erase (text.at(line).begin() + column);
         } else {
             if (line < text.size() - 1)
@@ -228,11 +212,7 @@ void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseF
                 for (int i=0; i<text.at(line + 1).size(); i++)
                     AppendCurrentLineToNextLine.push_back (text.at(line + 1).at(i));
 
-                if (currentMode != "visual" && !UseForRedoing)
-                {
-                    RedoStack.clear();
-                    AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, 'D');
-                }
+                AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, 'D', currentMode, UseForRedoing);
 
                 for (int i=0; i<text.at(line + 1).size(); i++)
                     text.at(line).push_back(text.at(line + 1).at(i));
@@ -253,13 +233,7 @@ void InsertMode::DELETE_LINE(int &line, int &column, vector<string> &text, bool 
         string CurrentLineForDelete;
         for (int i=0; i<text.at(line).size(); i++)
             CurrentLineForDelete.push_back (text.at(line).at(i));
-
-        if (currentMode != "visual" && !UseForRedoing)
-        {
-            RedoStack.clear();
-            AddTrackToUndoStack (false, line, column, CurrentLineForDelete, 'L');
-        }
-
+        AddTrackToUndoStack (false, line, column, CurrentLineForDelete, 'L', currentMode, UseForRedoing);
         text.erase(text.begin() + line);
         column=0;
     }
@@ -278,12 +252,7 @@ void InsertMode::DELETE_LINE(int &line, int &column, vector<string> &text, bool 
 
 void InsertMode::ENTER(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
-    if (currentMode != "visual" && !UseForRedoing)
-    {
-        RedoStack.clear();
-        AddTrackToUndoStack (true, line, column, '\n', 'E');
-    }
-
+    AddTrackToUndoStack (true, line, column, '\n', 'E', currentMode, UseForRedoing);
     string appendToNextLine;
 
     for (int i=column; i<text.at(line).size(); i++)
@@ -299,12 +268,7 @@ void InsertMode::ENTER(int &line, int &column, vector<string> &text, bool UseFor
 
 void InsertMode::TAB(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
-    if (currentMode != "visual" && !UseForRedoing)
-    {
-        RedoStack.clear();
-        AddTrackToUndoStack (true, line, column, "    ", 'T');
-    }
-
+    AddTrackToUndoStack (true, line, column, "    ", 'T', currentMode, UseForRedoing);
     text.at(line).insert (text.at(line).begin() + column, {' ', ' ', ' ', ' '});
     column += 4;
 }
@@ -326,12 +290,6 @@ void InsertMode::PASTE(int &line, int &column, vector<string> &text)
         string emptyString;
         if (text.size() == 0)
             text.insert(text.begin() + line + 1, emptyString);
-
-        if (currentMode != "visual")
-        {
-            AddTrackToUndoStack (true, line, column, copiedText, 'P');
-            RedoStack.clear();
-        }
 
         for (int i=0; i<copiedText.size(); i++)
         {
@@ -744,9 +702,9 @@ void InsertMode::setLineWithMouseWheelAction()
             return;
         }
     } else if (execute_command("cat /etc/issue | grep -c \"Ubuntu\"")[0] == '1') {
-        if ((fd = open("/dev/input/event8", O_RDONLY)) == -1)
+        if ((fd = open("/dev/input/event7", O_RDONLY)) == -1)
         {
-            perror("/dev/input/event8 for mouse wheel detection");
+            perror("/dev/input/event7 for mouse wheel detection");
             return;
         }
     } else {
