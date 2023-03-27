@@ -146,7 +146,7 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<string> &text, bool Us
     } else {
         if (line > 0)
         {
-            AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b', currentMode, UseForRedoing);
+            AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'B', currentMode, UseForRedoing);
             /* If the user reaches the beginning of the line:
              *      We paste the current line to the previous line and then delete the current line,
              *      then we subtract one from the current line and,
