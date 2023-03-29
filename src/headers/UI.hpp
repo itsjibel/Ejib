@@ -7,9 +7,11 @@
 #include "consumption_info.hpp"
 /// Global variables that almost every function and object should have access to
 vector<string> mainText;
+vector<string> visualCommandText;
 string currentMode = "command";
 int numberOfTerminalColumn = 0, numberOfTerminalLine = 0, currentColumn = 0,
-    currentLine = 0, startLineForDisplayPage = 0, startColumnForDisplayPage = 0;
+    currentLine = 0, startLineForDisplayPage = 0, startColumnForDisplayPage = 0,
+    _currentColumn = 0, _currentLine = 0, startCharacterForPrintCommand = 0;
 
 class EditorUI
 {
