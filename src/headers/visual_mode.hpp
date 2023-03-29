@@ -10,9 +10,9 @@
 class VisualMode: public InsertMode
 {
     private:
-        vector<string> visualCommandText;
-        int _currentColumn = 0, _currentLine = 0, startCharacterForPrint = 0;
         bool SomethingHappenInMainTextView = false;
+        int tempNumberOfTerminalColumn=0,
+            tempNumberOfTerminalLine=0;
 
     protected:
         bool search(string key, vector<string> &text, int &line, int &column);
@@ -21,6 +21,7 @@ class VisualMode: public InsertMode
         void DisplayVisualCommand();
 
     public:
+        void AdjustingViewportWithSizeOfTerminal();
         /* Each key has its own ASCII code, this Enum defines all the ASCII codes of the required keys.
          * To understand better, write a program that casts a getch() into an integer value, and then prints it,
          * now try something like control + B and see the answer
@@ -59,10 +60,12 @@ class VisualMode: public InsertMode
 
 void VisualMode::DisplayVisualCommand()
 {
+    if (visualCommandText.size() == 0)
+        return;
     /// Display the command, just like displayPageOfText() in the UI library for insert mode
     string commandForDisplay;
     gotoxy(10, numberOfTerminalLine - 1);
-    for (int i=startCharacterForPrint; i<startCharacterForPrint + numberOfTerminalColumn / 2 - 11; i++)
+    for (int i=startCharacterForPrintCommand; i<startCharacterForPrintCommand + numberOfTerminalColumn / 2 - 11; i++)
         if (i < visualCommandText.at(0).size())
             commandForDisplay.push_back(visualCommandText.at(0).at(i));
     cout<<commandForDisplay;
@@ -139,10 +142,10 @@ void VisualMode::VisualCommandInput()
         gotoxy (0, numberOfTerminalLine - 1);
         ColorPrint("\e[1mcmd@edit: \e[0m", BGREEN);
         /// Update the start character for displaying the command text
-        while (_currentColumn - numberOfTerminalColumn / 2 +11> startCharacterForPrint)
-            startCharacterForPrint++;
-        while (_currentColumn - startCharacterForPrint < 0)
-            startCharacterForPrint--;
+        while (_currentColumn - numberOfTerminalColumn / 2 +11 > startCharacterForPrintCommand)
+            startCharacterForPrintCommand++;
+        while (_currentColumn - startCharacterForPrintCommand < 0)
+            startCharacterForPrintCommand--;
         /// We check the status of the column so that it is not wrong and out of range, if it is, we fix it
         _currentColumn = _currentColumn < 0 ? 0 : _currentColumn;
         /// Clear command statuses of visual mode and previous command characters
@@ -151,7 +154,7 @@ void VisualMode::VisualCommandInput()
         /// Display the command for the user
         DisplayVisualCommand();
         ShowConsoleCursor(true);
-        gotoxy (10 + _currentColumn - startCharacterForPrint, numberOfTerminalLine - 1);
+        gotoxy (10 + _currentColumn - startCharacterForPrintCommand, numberOfTerminalLine - 1);
     }
 }
 
@@ -317,4 +320,40 @@ bool VisualMode::search(string key, vector<string> &text, int &line, int &column
     displayPageOfText(mainText, -1, -1);
     currentMode = "edit";
     return true;
+}
+
+void VisualMode::AdjustingViewportWithSizeOfTerminal()
+{
+    while(1)
+    {
+        bool sizeIsChanged=false;
+        numberOfTerminalLine = GetTerminal_LineAndColumn().at(0);
+        numberOfTerminalColumn = GetTerminal_LineAndColumn().at(1);
+
+        if ((numberOfTerminalColumn != tempNumberOfTerminalColumn ||
+             numberOfTerminalLine   != tempNumberOfTerminalLine) &&
+            (currentMode == "visual" || currentMode == "edit"))
+        {
+            UpdateViewport();
+            ClearTerminalScreen();
+            displayLocationInfo();
+            //DisplayVisualCommand();
+            printTabs();
+            displayPageOfText(mainText, -1, -1);
+            sizeIsChanged=true;
+            ShowConsoleCursor(true);
+        }
+
+        if (sizeIsChanged)
+        {
+            displayLocationInfo();
+            DisplayVisualCommand();
+            printTabs();
+            displayPageOfText(mainText, -1, -1);
+        }
+
+        tempNumberOfTerminalColumn = numberOfTerminalColumn;
+        tempNumberOfTerminalLine = numberOfTerminalLine;
+        Sleep(1);
+    }
 }
