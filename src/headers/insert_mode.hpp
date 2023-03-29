@@ -14,10 +14,6 @@
 
 class InsertMode: public CommandLine
 {
-    private:
-        int tempNumberOfTerminalColumn=0,
-            tempNumberOfTerminalLine=0;
-
     protected:
         /* To undo and redo things,
          * you need tracks that store enough information for undoing and redoing.
@@ -639,40 +635,6 @@ bool InsertMode::UpdateViewport()
     }
 
     return updated;
-}
-
-void InsertMode::AdjustingViewportWithSizeOfTerminal()
-{
-    while(1)
-    {
-        bool sizeIsChanged=false;
-        numberOfTerminalLine = GetTerminal_LineAndColumn().at(0);
-        numberOfTerminalColumn = GetTerminal_LineAndColumn().at(1);
-
-        if ((numberOfTerminalColumn != tempNumberOfTerminalColumn ||
-             numberOfTerminalLine   != tempNumberOfTerminalLine) &&
-            (currentMode == "visual" || currentMode == "edit"))
-        {
-            UpdateViewport();
-            ClearTerminalScreen();
-            displayLocationInfo();
-            printTabs();
-            displayPageOfText(mainText, -1, -1);
-            sizeIsChanged=true;
-            ShowConsoleCursor(true);
-        }
-
-        if (sizeIsChanged)
-        {
-            displayLocationInfo();
-            printTabs();
-            displayPageOfText(mainText, -1, -1);
-        }
-
-        tempNumberOfTerminalColumn = numberOfTerminalColumn;
-        tempNumberOfTerminalLine = numberOfTerminalLine;
-        Sleep(1);
-    }
 }
 
 string execute_command(const char* cmd)
