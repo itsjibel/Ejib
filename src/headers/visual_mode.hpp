@@ -59,6 +59,7 @@ class VisualMode: public InsertMode
 
 void VisualMode::DisplayVisualCommand()
 {
+    /// Display the command, just like displayPageOfText() in the UI library for insert mode
     string commandForDisplay;
     gotoxy(10, numberOfTerminalLine - 1);
     for (int i=startCharacterForPrint; i<startCharacterForPrint + numberOfTerminalColumn / 2 - 11; i++)
@@ -144,7 +145,7 @@ void VisualMode::VisualCommandInput()
             startCharacterForPrint--;
         /// We check the status of the column so that it is not wrong and out of range, if it is, we fix it
         _currentColumn = _currentColumn < 0 ? 0 : _currentColumn;
-        /// Clear command statuses of visual mode
+        /// Clear command statuses of visual mode and previous command characters
         for (int i=0; i<numberOfTerminalColumn / 2 - 11; i++)
             cout<<' ';
         /// Display the command for the user
@@ -173,12 +174,12 @@ void showMassage(string massageType)
 void VisualMode::VisualEdit()
 {
     /// In this section, we only check what command the user gave and execute that command with functions
+    /// Print the mode bar
     ShowConsoleCursor(false);
     string currentMode_View;
     for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentMode_View+=" ";
     currentMode_View += "-- VISUAL --";
     for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentMode_View+=" ";
-
     gotoxy (0, numberOfTerminalLine - 2);
     setColor(WHITE);
     ColorPrint(currentMode_View, YELLOW_BACKGROUND);
