@@ -11,13 +11,14 @@ class VisualMode: public InsertMode
 {
     private:
         vector<string> visualCommandText;
-        int _currentColumn = 0, _currentLine = 0;
+        int _currentColumn = 0, _currentLine = 0, startCharacterForPrint = 0;
         bool SomethingHappenInMainTextView = false;
 
     protected:
         bool search(string key, vector<string> &text, int &line, int &column);
         void VisualCommandInput();
         void VisualEdit();
+        void DisplayVisualCommand();
 
     public:
         /* Each key has its own ASCII code, this Enum defines all the ASCII codes of the required keys.
@@ -55,6 +56,16 @@ class VisualMode: public InsertMode
             CTRL_R = 18
         };
 };
+
+void VisualMode::DisplayVisualCommand()
+{
+    string commandForDisplay;
+    gotoxy(10, numberOfTerminalLine - 1);
+    for (int i=startCharacterForPrint; i<startCharacterForPrint + numberOfTerminalColumn / 2 - 11; i++)
+        if (i < visualCommandText.at(0).size())
+            commandForDisplay.push_back(visualCommandText.at(0).at(i));
+    cout<<commandForDisplay;
+}
 
 void VisualMode::VisualCommandInput()
 {
@@ -123,40 +134,23 @@ void VisualMode::VisualCommandInput()
                 INSERT_CHARACTER(ch, _currentLine, _currentColumn, visualCommandText, false);
                 SomethingHappenInMainTextView=true;
         }
-        /* The user should not be able to enter more than some range command,
-         * because this will disrupt the display of the user command,
-         * and when she tried to enter more command characters,
-         * we should show a warning to the user that you can't enter more characters.
-         */
-        bool showBigCommandWarning=false;
-        while (visualCommandText.at(0).size() > 32)
-        {
-            visualCommandText.at(0).pop_back();
-            showBigCommandWarning=true;
-        }
-        
         ShowConsoleCursor(false);
         gotoxy (0, numberOfTerminalLine - 1);
         ColorPrint("\e[1mcmd@edit: \e[0m", BGREEN);
-
-        if (showBigCommandWarning)
-        {
-            gotoxy (44, numberOfTerminalLine - 1);
-            ColorPrint("[B]", YELLOW);
-        }
-        /// Display the command for the user
-        gotoxy(10, numberOfTerminalLine - 1);
-        cout<<visualCommandText.at(0);
-        /// Clear command statuses of visual mode
-        int8_t range = visualCommandText.at(0).length() == 32 ? 0 :  32 - visualCommandText.at(0).length() % 32;
-        for (int i=0; i<range; i++)
-            cout<<' ';
+        /// Update the start character for displaying the command text
+        while (_currentColumn - numberOfTerminalColumn / 2 +11> startCharacterForPrint)
+            startCharacterForPrint++;
+        while (_currentColumn - startCharacterForPrint < 0)
+            startCharacterForPrint--;
         /// We check the status of the column so that it is not wrong and out of range, if it is, we fix it
-        _currentColumn = visualCommandText.at(0).size() == 0 ? _currentColumn - 1 :_currentColumn;
-        _currentColumn = _currentColumn > 32 ? 32 : _currentColumn;
         _currentColumn = _currentColumn < 0 ? 0 : _currentColumn;
+        /// Clear command statuses of visual mode
+        for (int i=0; i<numberOfTerminalColumn / 2 - 11; i++)
+            cout<<' ';
+        /// Display the command for the user
+        DisplayVisualCommand();
         ShowConsoleCursor(true);
-        gotoxy (10 + _currentColumn, numberOfTerminalLine - 1);
+        gotoxy (10 + _currentColumn - startCharacterForPrint, numberOfTerminalLine - 1);
     }
 }
 
@@ -165,13 +159,13 @@ void showMassage(string massageType)
     /// The command statuses
     if (massageType == "accept")
     {
-        gotoxy (44, numberOfTerminalLine - 1);
+        gotoxy (numberOfTerminalColumn / 2 - 4, numberOfTerminalLine - 1);
         ColorPrint("[+]", GREEN);
     } else if (massageType == "command not found") {
-        gotoxy (44, numberOfTerminalLine - 1);
+        gotoxy (numberOfTerminalColumn / 2 - 4, numberOfTerminalLine - 1);
         ColorPrint("[!]", RED);
     } else if (massageType == "nothing found") {
-        gotoxy (44, numberOfTerminalLine - 1);
+        gotoxy (numberOfTerminalColumn / 2 - 4, numberOfTerminalLine - 1);
         ColorPrint("[?]", RED);
     }
 }
@@ -194,7 +188,8 @@ void VisualMode::VisualEdit()
     VisualCommandInput();
     gotoxy (10, numberOfTerminalLine - 1);
     /// Clear previous command entries using spaces
-    cout<<"                                     ";
+    for (int i=0; i<numberOfTerminalColumn / 2 - 11; i++)
+        cout<<' ';
     /// Just check the command
     if (visualCommandText.at(0) == "edit" ||
         visualCommandText.at(0) == "E")
