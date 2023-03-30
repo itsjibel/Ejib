@@ -84,9 +84,8 @@ void VisualMode::VisualCommandInput()
     while (!enter)
     {
         char ch;
-        string emptyString;
         if (visualCommandText.size() == 0)
-            visualCommandText.push_back(emptyString); /// For not giving segmentation fault
+            visualCommandText.push_back(""); /// For not giving segmentation fault
         /// The current column shouldn't be bigger than the command text size
         _currentColumn = _currentColumn > visualCommandText.at(0).size() ? visualCommandText.at(0).size() : _currentColumn;
         /// Giving inputs (just like insert mode)

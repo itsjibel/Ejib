@@ -93,11 +93,10 @@ bool FileSystem::loadFile(string filePath, string fileName, vector<string> &Main
 
         if (getch() == 'y')
         {
-            string emptyString;
             while (getline(FileForLoad, line))
             {
                 /// Write the file line by line on the main text
-                MainText.push_back(emptyString);
+                MainText.push_back("");
                 RemoveTextSpoilerCharacters(line);
 
                 for (char ch : line)

@@ -280,9 +280,8 @@ void InsertMode::DELETE_LINE(int &line, int &column, vector<string> &text, bool 
     } else
         line=0;
 
-    string emptyString;
     if (text.size() == 0)
-        text.push_back(emptyString);
+        text.push_back("");
 }
 
 void InsertMode::ENTER(int &line, int &column, vector<string> &text, bool UseForRedoing)
@@ -322,9 +321,8 @@ void InsertMode::PASTE(int &line, int &column, vector<string> &text)
     if (GetCopiedText(copiedText))
     {
         RemoveTextSpoilerCharacters(copiedText);
-        string emptyString;
         if (text.size() == 0)
-            text.insert(text.begin() + line + 1, emptyString);
+            text.insert(text.begin() + line + 1, "");
 
         for (int i=0; i<copiedText.size(); i++)
         {
@@ -336,7 +334,7 @@ void InsertMode::PASTE(int &line, int &column, vector<string> &text)
             if (copiedText.at(i) == '\n')
             {
                 column=0;
-                text.insert(text.begin() + line + 1, emptyString);
+                text.insert(text.begin() + line + 1, "");
                 line++;
             }
         }
@@ -355,9 +353,8 @@ void InsertMode::PASTE(int &line, int &column, vector<string> &text, string stri
 
     for (int i=0; i<linkToEndOfPaste.size(); i++)
         text.at(line).pop_back();
-    string emptyString;
     if (text.size() == 0)
-        text.insert(text.begin() + line + 1, emptyString);
+        text.insert(text.begin() + line + 1, "");
 
     for (int i=0; i<stringForPaste.size(); i++)
     {
@@ -369,7 +366,7 @@ void InsertMode::PASTE(int &line, int &column, vector<string> &text, string stri
         if (stringForPaste.at(i) == '\n')
         {
             column=0;
-            text.insert(text.begin() + line + 1, emptyString);
+            text.insert(text.begin() + line + 1, "");
             line++;
         }
     }
