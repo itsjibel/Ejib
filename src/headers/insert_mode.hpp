@@ -191,10 +191,6 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, b
     }
 }
 
-void InsertMode::QUICK_DELETE(int &line, int &column, vector<string> &text, bool UseForRedoing)
-{
-}
-
 void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
     if (text.size() == 1 && text.at(0).size() == 0)
@@ -222,6 +218,44 @@ void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseF
             }
         }
     }
+}
+
+void InsertMode::QUICK_DELETE(int &line, int &column, vector<string> &text, bool UseForRedoing)
+{
+    do
+    {
+        if ((text.size() == 1 && text.at(0).size() == 0) || text.size() == 0)
+        {
+            if (text.size() == 0)
+                text.push_back("");
+            return;
+        } else {
+            if (text.size() == 1 && text.at(0).size() == 1)
+                text.at(0).pop_back();
+            return;
+        }
+
+        if (text.at(line).size() - 1 > column)
+        {
+            AddTrackToUndoStack (false, line, column, text.at(line).at(column), 'D', currentMode, UseForRedoing);
+            text.at(line).erase (text.at(line).begin() + column);
+        } else {
+            if (line < text.size() - 1)
+            {
+                string AppendCurrentLineToNextLine;
+                for (int i=0; i<text.at(line + 1).size(); i++)
+                    AppendCurrentLineToNextLine.push_back (text.at(line + 1).at(i));
+
+                AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, 'D', currentMode, UseForRedoing);
+
+                for (int i=0; i<text.at(line + 1).size(); i++)
+                    text.at(line).push_back(text.at(line + 1).at(i));
+
+                text.erase (text.begin() + line + 1);
+            }
+            break;
+        }
+    } while (!IsSeparatorCharacter(text.at(line).at(column)));
 }
 
 void InsertMode::DELETE_LINE(int &line, int &column, vector<string> &text, bool UseForRedoing)
