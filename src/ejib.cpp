@@ -72,6 +72,20 @@ void EditorSystem::TextEditSystem()
                                     DELETE_(currentLine, currentColumn, mainText, false);
                                     somethingHappenTextView=true;
                                     break;
+                                case 59:
+                                    switch(ch = getch())
+                                    {
+                                        case 53:
+                                            switch(ch = getch())
+                                            {
+                                                case DELETE_KEY_LINUX:
+                                                    QUICK_DELETE(currentLine, currentColumn, mainText, false);
+                                                    somethingHappenTextView=true;
+                                                    break;
+                                            }
+                                        break;
+                                    }
+                                break;
                             }
                             break;
                         case 49:

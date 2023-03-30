@@ -72,14 +72,15 @@ class InsertMode: public CommandLine
 	public:
         /// Text editing functions:
 		void INSERT_CHARACTER (char &characterInput, int &line, int &column, vector<string> &text, bool UseForRedoing);
-        void BACKSPACE       (int &line, int &column, vector<string> &text, bool UseForRedoing);
-        void QUICK_BACKSPACE (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void BACKSPACE        (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void QUICK_BACKSPACE  (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void QUICK_DELETE     (int &line, int &column, vector<string> &text, bool UseForRedoing);
         void DELETE_          (int &line, int &column, vector<string> &text, bool UseForRedoing);
-        void DELETE_LINE     (int &line, int &column, vector<string> &text, bool UseForRedoing);
-        void ENTER           (int &line, int &column, vector<string> &text, bool UseForRedoing);
-        void TAB             (int &line, int &column, vector<string> &text, bool UseForRedoing);
-        void PASTE           (int &line, int &column, vector<string> &text);
-        void PASTE           (int &line, int &column, vector<string> &text, string stringForPaste);
+        void DELETE_LINE      (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void ENTER            (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void TAB              (int &line, int &column, vector<string> &text, bool UseForRedoing);
+        void PASTE            (int &line, int &column, vector<string> &text);
+        void PASTE            (int &line, int &column, vector<string> &text, string stringForPaste);
 
         void UP          (int &line, int &column,  const vector<string> &text);
         void LEFT        (int &line, int &column,  const vector<string> &text);
@@ -188,6 +189,10 @@ void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, b
             text.erase (text.begin() + line + 1);
         }
     }
+}
+
+void InsertMode::QUICK_DELETE(int &line, int &column, vector<string> &text, bool UseForRedoing)
+{
 }
 
 void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseForRedoing)
