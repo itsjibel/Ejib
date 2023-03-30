@@ -1,6 +1,8 @@
-[ctrl + B] Go to visual command
-[ctrl + V] Paste to text
-[ctrl + U] Undo
-[ctrl + R] Redo
-[ctrl + X] Delete current line
-[ctrl + P] Go to command mode
+[ctrl + B]         Go to visual command
+[ctrl + V]         Paste to text
+[ctrl + U]         Undo
+[ctrl + R]         Redo
+[ctrl + X]         Delete current line
+[ctrl + P]         Go to command mode
+[ctrl + Delete]    Erase a forward word
+[ctrl + Backspace] Erase a backward word
