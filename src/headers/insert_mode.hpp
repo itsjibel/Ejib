@@ -205,15 +205,8 @@ void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseF
         } else {
             if (line < text.size() - 1)
             {
-                string AppendCurrentLineToNextLine;
-                for (int i=0; i<text.at(line + 1).size(); i++)
-                    AppendCurrentLineToNextLine.push_back (text.at(line + 1).at(i));
-
-                AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, 'D', currentMode, UseForRedoing);
-
-                for (int i=0; i<text.at(line + 1).size(); i++)
-                    text.at(line).push_back(text.at(line + 1).at(i));
-
+                AddTrackToUndoStack (false, line, column, '\n' + text.at(line + 1), 'D', currentMode, UseForRedoing);
+                text.at(line).append(text.at(line + 1));
                 text.erase (text.begin() + line + 1);
             }
         }
@@ -229,10 +222,12 @@ void InsertMode::QUICK_DELETE(int &line, int &column, vector<string> &text, bool
             if (text.size() == 0)
                 text.push_back("");
             return;
-        } else {
-            if (text.size() == 1 && text.at(0).size() == 1)
-                text.at(0).pop_back();
-            return;
+        }
+
+        if (text.size() == 1 && text.at(0).size() == 1)
+        {
+            text.at(0).pop_back();
+            break;
         }
 
         if (text.at(line).size() - 1 > column)
@@ -242,15 +237,9 @@ void InsertMode::QUICK_DELETE(int &line, int &column, vector<string> &text, bool
         } else {
             if (line < text.size() - 1)
             {
-                string AppendCurrentLineToNextLine;
-                for (int i=0; i<text.at(line + 1).size(); i++)
-                    AppendCurrentLineToNextLine.push_back (text.at(line + 1).at(i));
-
-                AddTrackToUndoStack (false, line, column, '\n' + AppendCurrentLineToNextLine, 'D', currentMode, UseForRedoing);
-
-                for (int i=0; i<text.at(line + 1).size(); i++)
-                    text.at(line).push_back(text.at(line + 1).at(i));
-
+                AddTrackToUndoStack (false, line, column, '\n' + text.at(line + 1), 'D', currentMode, UseForRedoing);
+                text.at(line).pop_back();
+                text.at(line).append(text.at(line + 1));
                 text.erase (text.begin() + line + 1);
             }
             break;
