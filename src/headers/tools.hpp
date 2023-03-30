@@ -299,7 +299,8 @@ bool IsSeparatorCharacter (char character)
         character == ':' || character == ';' ||
         character == '+' || character == '-' ||
         character == '/' || character == '*' ||
-        character == '^' || character == '=')
+        character == '^' || character == '=' ||
+        character == '\n')
         return true;
     else
         return false;
