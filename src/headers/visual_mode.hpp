@@ -250,49 +250,29 @@ void VisualMode::VisualEdit()
 bool VisualMode::search(string key, vector<string> &text, int &line, int &column)
 {
     int previousColumn = column, tempLine = line, firstMatchColumn, firstMatchLine;
-    bool first_time = true, anythingFound = false;
+    bool anythingFound = false;
+    char choose = ENTER_KEY_LINUX;
     column = -1; line = 0;
-    do
+    while (1)
     {
+        currentMode = "search";
+        bool goPrevious = false, goForward = false;
         int find_index;
+        if (choose == ESCAPE_KEY)
+            break;
+        else if (choose == BACKSPACE_KEY_LINUX)
+            goPrevious = true;
+        else if (choose == ENTER_KEY_LINUX)
+            goForward = true;
 
-        if (key.size() > 0)
-            find_index = column > 0 ? column : 0;
-        else
-            find_index = column;
-        /// Find the search key in the current line
-        column = text.at(line).find(key, find_index);
-        /// If the search key matches the line:
-        if (column != string::npos)
+        if (goForward)
         {
-            if (anythingFound == false)
-            {
-                firstMatchColumn = column;
-                firstMatchLine = line;
-            }
-            anythingFound=true;
-        }
-        /// While the search key matches the line:
-        while (column < 0)
-        {
-            if (text.size() > line + 1)
-                line++;
-            else {
-                if (anythingFound)
-                {
-                    line=firstMatchLine;
-                    column=firstMatchColumn;
-                    break;
-                } else {
-                    column = previousColumn;
-                    line = tempLine;
-                    /// Nothing was found because we are in the last line and column and the search key was not match any line
-                    return false;
-                }
-            }
-
-            /// Find the search key in the new line
-            column = text.at(line).find(key, 0);
+            if (key.size() > 0)
+                find_index = column > 0 ? column : 0;
+            else
+                find_index = column;
+            /// Find the search key in the current line
+            column = text.at(line).find(key, find_index);
             /// If the search key matches the line:
             if (column != string::npos)
             {
@@ -303,6 +283,39 @@ bool VisualMode::search(string key, vector<string> &text, int &line, int &column
                 }
                 anythingFound=true;
             }
+            /// While the search key matches the line:
+            while (column < 0)
+            {
+                if (text.size() > line + 1)
+                    line++;
+                else {
+                    if (anythingFound)
+                    {
+                        line=firstMatchLine;
+                        column=firstMatchColumn;
+                        break;
+                    } else {
+                        column = previousColumn;
+                        line = tempLine;
+                        /// Nothing was found because we are in the last line and column and the search key was not match any line
+                        return false;
+                    }
+                }
+
+                /// Find the search key in the new line
+                column = text.at(line).find(key, 0);
+                /// If the search key matches the line:
+                if (column != string::npos)
+                {
+                    if (anythingFound == false)
+                    {
+                        firstMatchColumn = column;
+                        firstMatchLine = line;
+                    }
+                    anythingFound=true;
+                }
+            }
+        } else if (goPrevious) {
         }
         /// Search key searched one time
         /// Now we should add to column to the size of the search key
@@ -312,7 +325,8 @@ bool VisualMode::search(string key, vector<string> &text, int &line, int &column
         ShowConsoleCursor(false);
         displayLocationInfo();
         displayPageOfText(mainText, column - key.size() - startColumnForDisplayPage, column - 1 - startColumnForDisplayPage);
-    } while (getch() != 27);
+        choose = getch();
+    }
     /// Display the viewport again to show the user we are no more in the search
     displayLocationInfo();
     printTabs();
