@@ -249,23 +249,33 @@ void VisualMode::VisualEdit()
 
 bool VisualMode::search(string key, vector<string> &text, int &line, int &column)
 {
+    struct locationInfoOfWordsSearched
+    {
+        int column;
+        int line;
+    };
+    vector<locationInfoOfWordsSearched> wordsLocation;
     int previousColumn = column, tempLine = line, firstMatchColumn, firstMatchLine;
     bool anythingFound = false;
     char choose = ENTER_KEY_LINUX;
     column = -1; line = 0;
+
     while (1)
     {
         currentMode = "search";
-        bool goPrevious = false, goForward = false;
         int find_index;
         if (choose == ESCAPE_KEY)
             break;
         else if (choose == BACKSPACE_KEY_LINUX)
-            goPrevious = true;
+        {
+            if (wordsLocation.size() > 1)
+            {
+                wordsLocation.pop_back();
+                line = wordsLocation.back().line;
+                column = wordsLocation.back().column;
+            }
+        }
         else if (choose == ENTER_KEY_LINUX)
-            goForward = true;
-
-        if (goForward)
         {
             if (key.size() > 0)
                 find_index = column > 0 ? column : 0;
@@ -315,11 +325,14 @@ bool VisualMode::search(string key, vector<string> &text, int &line, int &column
                     anythingFound=true;
                 }
             }
-        } else if (goPrevious) {
+            locationInfoOfWordsSearched word;
+            /// Now we should add to column to the size of the search key
+            column = column + key.size();
+            word.column = column;
+            word.line = line;
+            wordsLocation.push_back(word);
         }
         /// Search key searched one time
-        /// Now we should add to column to the size of the search key
-        column = column + key.size();
         /// Display the viewport
         UpdateViewport();
         ShowConsoleCursor(false);
