@@ -264,7 +264,7 @@ bool VisualMode::search(string key, vector<string> &text, int &line, int &column
     {
         currentMode = "search";
         int find_index;
-        if (choose == ESCAPE_KEY)
+        if (choose == 'q')
             break;
         else if (choose == BACKSPACE_KEY_LINUX)
         {
@@ -338,6 +338,14 @@ bool VisualMode::search(string key, vector<string> &text, int &line, int &column
         ShowConsoleCursor(false);
         displayLocationInfo();
         displayPageOfText(mainText, column - key.size() - startColumnForDisplayPage, column - 1 - startColumnForDisplayPage);
+        /// Display current mode bar
+        string currentModeView;
+        for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView += " ";
+        currentModeView += "-- SEARCH --";
+        for (int i=0; i<numberOfTerminalColumn / 2 - 6; i++) currentModeView += " ";
+        gotoxy (0, numberOfTerminalLine - 2);
+        setColor(WHITE);
+        ColorPrint(currentModeView, YELLOW_BACKGROUND);
         choose = getch();
     }
     /// Display the viewport again to show the user we are no more in the search
