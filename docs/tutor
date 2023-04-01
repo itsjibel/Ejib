@@ -1,0 +1,23 @@
+# __Ejib Tutorial__
+
++ ## Command line
+
+  __Quick summary of Command Line__
+
+     ` Command line is for choose what process you want to run `
+
+  __Commands for the Command Line:__
+
+  + __file -N or --new__ is for create a new file
+
+  + __file -O or --open__ is for open a new file
+
+  + __help -F or --file__ is for more information about file commands
+
+  + __help -V or --visual__ is for more information about visual mode commands
+
+  + __help -S or --shortcuts__ is for more information about shortcuts
+
+  + __exit__ is for exit the program
+
+  + __clear__ is for clear the terminal screen
