@@ -1,3 +1,4 @@
 [file -S | --save]   Save the file
 [edit | E]           Go to edit mode
 [text -D | --delete] Delete all of the text
+[exit]               Exit the program
