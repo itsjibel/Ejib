@@ -160,8 +160,22 @@ void EditorSystem::TextEditSystem()
             somethingHappenTextView=true;
             break;
         case CTRL_P:
-            currentMode = "command";
-            ClearTerminalScreen();
+            gotoxy (10, numberOfTerminalLine - 1);
+            ColorPrint ("[Warning]: Save the current file? [y/*] ", YELLOW);
+            if (getch() == 'y')
+            {
+                currentMode = "file";
+                fileSystem("save", mainText);
+                ClearTerminalScreen();
+                ShowConsoleCursor(true);
+                currentMode = "command";
+                ClearTerminalScreen();
+            } else {
+                ClearTerminalScreen();
+                ShowConsoleCursor(true);
+                currentMode = "command";
+                ClearTerminalScreen();
+            }
             break;
         case CTRL_U:
             UNDO(currentLine, currentColumn, mainText);

@@ -237,6 +237,21 @@ void VisualMode::VisualEdit()
         printTabs();
         displayPageOfText(mainText, -1, -1);
         currentMode = "visual";
+    } else if (visualCommandText.at(0) == "exit") {
+        gotoxy (10, numberOfTerminalLine - 1);
+        ColorPrint ("[Warning]: Save the current file? [y/*] ", YELLOW);
+        if (getch() == 'y')
+        {
+            currentMode = "file";
+            fileSystem("save", mainText);
+            ClearTerminalScreen();
+            ShowConsoleCursor(true);
+            exit(0);
+        } else {
+            ClearTerminalScreen();
+            ShowConsoleCursor(true);
+            exit(0);
+        }
     } else {
         showMassage("command not found");
         gotoxy (10, numberOfTerminalLine - 1);
