@@ -7,6 +7,7 @@
 + __Linux based__:
   + Ubuntu
   + Fedora
+  + Kali
 
 ## Quick summary of the Ejib
 
@@ -37,10 +38,8 @@
 
 ## Several examples of __visual mode__ commands
 
-+ __text -S__ "something" <<(S)earch "something" in text>>
-+ __file -S__ <<(S)ave the file>>
-+ __text -D__ <<(D)elete all of the text>>
++ __text -S "something"__ Search "something" in text
++ __file -S__ Save the file
++ __text -D__ Delete all of the text
 
-And ...
-
-+ __You can get more complete information about various commands in the program itself__
+## __You can get more complete information about various commands in the program itself__
