@@ -215,22 +215,11 @@ void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseF
 
 void InsertMode::QUICK_DELETE(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
+    if (text.size() == 1 && text.at(0).size() == 0)
+        return;
     do
     {
-        if ((text.size() == 1 && text.at(0).size() == 0) || text.size() == 0)
-        {
-            if (text.size() == 0)
-                text.push_back("");
-            return;
-        }
-
-        if (text.size() == 1 && text.at(0).size() == 1)
-        {
-            text.at(0).pop_back();
-            break;
-        }
-
-        if (text.at(line).size() - 1 > column)
+        if (text.at(line).size() > column)
         {
             AddTrackToUndoStack (false, line, column, text.at(line).at(column), 'D', currentMode, UseForRedoing);
             text.at(line).erase (text.at(line).begin() + column);
@@ -238,12 +227,14 @@ void InsertMode::QUICK_DELETE(int &line, int &column, vector<string> &text, bool
             if (line < text.size() - 1)
             {
                 AddTrackToUndoStack (false, line, column, '\n' + text.at(line + 1), 'D', currentMode, UseForRedoing);
-                text.at(line).pop_back();
                 text.at(line).append(text.at(line + 1));
                 text.erase (text.begin() + line + 1);
             }
             break;
         }
+
+        if (column == text.at(line).size())
+            break;
     } while (!IsSeparatorCharacter(text.at(line).at(column)));
 }
 
