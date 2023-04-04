@@ -159,36 +159,43 @@ void InsertMode::BACKSPACE(int &line, int &column, vector<string> &text, bool Us
 
 void InsertMode::QUICK_BACKSPACE(int &line, int &column, vector<string> &text, bool UseForRedoing)
 {
-    /* Checking text is empty or not? If is empty,
-     * there is no need to enter the process
-     */
-    if (text.size() == 1 && text.at(0).size() == 0)
-        return;
-
-    if (column > 0)
+    do
     {
-        AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'b', currentMode, UseForRedoing);
-        /* If the user didn't reach the beginning of the line and
-         * doesn't want to paste the current line to the end of the previous line,
-         * then we delete the previous character.
+        /* Checking text is empty or not? If is empty,
+         * there is no need to enter the process
          */
-        text.at(line).erase (text.at(line).begin() + column - 1);
-        column--;
-    } else {
-        if (line > 0)
+        if (text.size() == 1 && text.at(0).empty())
+            return;
+
+        if (column > 0)
         {
-            AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'b', currentMode, UseForRedoing);
-            /* If the user reaches the beginning of the line:
-             *      We paste the current line to the previous line and then delete the current line,
-             *      then we subtract one from the current line and,
-             *      change the current column to the length of the previous line,
+            AddTrackToUndoStack (false, line, column, text.at(line).at(column - 1), 'B', currentMode, UseForRedoing);
+            /* If the user didn't reach the beginning of the line and
+             * doesn't want to paste the current line to the end of the previous line,
+             * then we delete the previous character.
              */
-            line--;
-            column = text.at(line).size();
-            text.at(line).append(text.at(line + 1));
-            text.erase (text.begin() + line + 1);
+            text.at(line).erase (text.at(line).begin() + column - 1);
+            column--;
+        } else {
+            if (line > 0)
+            {
+                AddTrackToUndoStack (false, line - 1, column, '\n' + text.at(line), 'B', currentMode, UseForRedoing);
+                /* If the user reaches the beginning of the line:
+                *      We paste the current line to the previous line and then delete the current line,
+                *      then we subtract one from the current line and,
+                *      change the current column to the length of the previous line,
+                */
+                line--;
+                column = text.at(line).size();
+                text.at(line).append(text.at(line + 1));
+                text.erase (text.begin() + line + 1);
+            }
+            break;
         }
-    }
+
+        if (column == 0)
+            break;
+    } while (!IsSeparatorCharacter(text.at(line).at(column - 1)));
 }
 
 void InsertMode::DELETE_(int &line, int &column, vector<string> &text, bool UseForRedoing)
@@ -579,9 +586,6 @@ void InsertMode::REDO(int &line, int &column, vector<string> &text)
                 {
                     line = GetLastRedoStackTrack().changeString[0] == '\n' ? line + 1 : line;
                     BACKSPACE(line, column, text, true);
-                } else if (GetLastRedoStackTrack().changeMode == 'b') {
-                    line = GetLastRedoStackTrack().changeString[0] == '\n' ? line + 1 : line;
-                    QUICK_BACKSPACE(line, column, text, true);
                 }
                 else if (GetLastRedoStackTrack().changeMode == 'L') 
                     DELETE_LINE(line, column, text, true);
@@ -689,7 +693,6 @@ void InsertMode::setLineWithMouseWheelAction()
         cout<<"\n[Support Error]: Your OS is unsupported by Ejib\n";
         return;
     }
-
 
     while (read(fd, &ie, sizeof(struct input_event)))
     {
