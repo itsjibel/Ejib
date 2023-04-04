@@ -44,150 +44,170 @@ void EditorSystem::TextEditSystem()
     switch (ch = getch())
     {
         case ESCAPE_KEY:
+        switch(ch = getch())
+        {
+            case SPECIAL_KEYS_LINUX:
             switch(ch = getch())
             {
-                case SPECIAL_KEYS_LINUX:
+                case UP_ARROW_KEY_LINUX:
+                UP(currentLine, currentColumn, mainText);
+                somethingHappenTextView=true;
+                break;
+
+                case DOWN_ARROW_KEY_LINUX:
+                DOWN(currentLine, currentColumn, mainText);
+                somethingHappenTextView=true;
+                break;
+
+                case RIGHT_ARROW_KEY_LINUX:
+                RIGHT(currentLine, currentColumn, mainText);
+                somethingHappenTextView=true;
+                break;
+
+                case LEFT_ARROW_KEY_LINUX:
+                LEFT(currentLine, currentColumn, mainText);
+                somethingHappenTextView=true;
+                break;
+
+                case 51:
+                switch(ch = getch())
+                {
+                    case DELETE_KEY_LINUX:
+                    DELETE_(currentLine, currentColumn, mainText, false);
+                    somethingHappenTextView=true;
+                    break;
+
+                    case 59:
                     switch(ch = getch())
                     {
-                        case UP_ARROW_KEY_LINUX:
-                            UP(currentLine, currentColumn, mainText);
+                        case 53:
+                        switch(ch = getch())
+                        {
+                            case DELETE_KEY_LINUX:
+                            QUICK_DELETE(currentLine, currentColumn, mainText, false);
                             somethingHappenTextView=true;
                             break;
-                        case DOWN_ARROW_KEY_LINUX:
-                            DOWN(currentLine, currentColumn, mainText);
-                            somethingHappenTextView=true;
-                            break;
-                        case RIGHT_ARROW_KEY_LINUX:
-                            RIGHT(currentLine, currentColumn, mainText);
-                            somethingHappenTextView=true;
-                            break;
-                        case LEFT_ARROW_KEY_LINUX:
-                            LEFT(currentLine, currentColumn, mainText);
-                            somethingHappenTextView=true;
-                            break;
-                        case 51:
-                            switch(ch = getch())
-                            {
-                                case DELETE_KEY_LINUX:
-                                    DELETE_(currentLine, currentColumn, mainText, false);
-                                    somethingHappenTextView=true;
-                                    break;
-                                case 59:
-                                    switch(ch = getch())
-                                    {
-                                        case 53:
-                                            switch(ch = getch())
-                                            {
-                                                case DELETE_KEY_LINUX:
-                                                    QUICK_DELETE(currentLine, currentColumn, mainText, false);
-                                                    somethingHappenTextView=true;
-                                                    break;
-                                            }
-                                        break;
-                                    }
-                                break;
-                            }
-                            break;
-                        case 49:
-                            switch(ch = getch())
-                            {
-                                case 59: 
-                                    switch(ch = getch())
-                                    {
-                                        case 53:
-                                            switch(ch = getch())
-                                            {
-                                                case UP_ARROW_KEY_LINUX:
-                                                    QUICK_UP(currentLine, currentColumn, mainText);
-                                                    somethingHappenTextView=true;
-                                                    break;
-                                                case DOWN_ARROW_KEY_LINUX:
-                                                    QUICK_DOWN(currentLine, currentColumn, mainText);
-                                                    somethingHappenTextView=true;
-                                                    break;
-                                                case RIGHT_ARROW_KEY_LINUX:
-                                                    QUICK_RIGHT(currentLine, currentColumn, mainText);
-                                                    somethingHappenTextView=true;
-                                                    break;
-                                                case LEFT_ARROW_KEY_LINUX:
-                                                    QUICK_LEFT(currentLine, currentColumn, mainText);
-                                                    somethingHappenTextView=true;
-                                                    break;
-                                            }
-                                            break;
-                                    }
-                                    break;
-                            }
-                            break;
+                        }
+                        break;
                     }
                     break;
+                }
+                break;
+                case 49:
+                switch(ch = getch())
+                {
+                    case 59: 
+                    switch(ch = getch())
+                    {
+                        case 53:
+                        switch(ch = getch())
+                        {
+                            case UP_ARROW_KEY_LINUX:
+                            QUICK_UP(currentLine, currentColumn, mainText);
+                            somethingHappenTextView=true;
+                            break;
+
+                            case DOWN_ARROW_KEY_LINUX:
+                            QUICK_DOWN(currentLine, currentColumn, mainText);
+                            somethingHappenTextView=true;
+                            break;
+
+                            case RIGHT_ARROW_KEY_LINUX:
+                            QUICK_RIGHT(currentLine, currentColumn, mainText);
+                            somethingHappenTextView=true;
+                            break;
+
+                            case LEFT_ARROW_KEY_LINUX:
+                            QUICK_LEFT(currentLine, currentColumn, mainText);
+                            somethingHappenTextView=true;
+                            break;
+                        }
+                        break;
+                    }
+                    break;
+                }
+                break;
             }
             break;
+        }
+        break;
+
         case BACKSPACE_KEY_LINUX:
-            BACKSPACE(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
+        BACKSPACE(currentLine, currentColumn, mainText, false);
+        somethingHappenTextView=true;
+        break;
+
         case CTRL_BACKSPACE_KEY_LINUX:
-            QUICK_BACKSPACE(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
+        QUICK_BACKSPACE(currentLine, currentColumn, mainText, false);
+        somethingHappenTextView=true;
+        break;
+
         case ENTER_KEY_LINUX:
-            ENTER(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
+        ENTER(currentLine, currentColumn, mainText, false);
+        somethingHappenTextView=true;
+        break;
+
         case TAB_KEY:
-            TAB(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
+        TAB(currentLine, currentColumn, mainText, false);
+        somethingHappenTextView=true;
+        break;
+
         case CTRL_B:
-            currentMode = "visual";
-            break;
+        currentMode = "visual";
+        break;
+
         case CTRL_V:
-            PASTE(currentLine, currentColumn, mainText);
-            somethingHappenTextView=true;
-            break;
+        PASTE(currentLine, currentColumn, mainText);
+        somethingHappenTextView=true;
+        break;
+
         case CTRL_F:
+        currentMode = "file";
+        fileSystem("save", mainText);
+        ClearTerminalScreen();
+        displayLocationInfo();
+        printTabs();
+        displayPageOfText(mainText, -1, -1);
+        currentMode = "edit";
+        break;
+
+        case CTRL_X:
+        DELETE_LINE(currentLine, currentColumn, mainText, false);
+        somethingHappenTextView=true;
+        break;
+
+        case CTRL_P:
+        gotoxy (10, numberOfTerminalLine - 1);
+        ColorPrint ("[Warning]: Save the current file? [y/*] ", YELLOW);
+        if (getch() == 'y')
+        {
             currentMode = "file";
             fileSystem("save", mainText);
             ClearTerminalScreen();
-            displayLocationInfo();
-            printTabs();
-            displayPageOfText(mainText, -1, -1);
-            currentMode = "edit";
-            break;
-        case CTRL_X:
-            DELETE_LINE(currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
-            break;
-        case CTRL_P:
-            gotoxy (10, numberOfTerminalLine - 1);
-            ColorPrint ("[Warning]: Save the current file? [y/*] ", YELLOW);
-            if (getch() == 'y')
-            {
-                currentMode = "file";
-                fileSystem("save", mainText);
-                ClearTerminalScreen();
-                ShowConsoleCursor(true);
-                currentMode = "command";
-                ClearTerminalScreen();
-            } else {
-                ClearTerminalScreen();
-                ShowConsoleCursor(true);
-                currentMode = "command";
-                ClearTerminalScreen();
-            }
-            break;
+            ShowConsoleCursor(true);
+            currentMode = "command";
+            ClearTerminalScreen();
+        } else {
+            ClearTerminalScreen();
+            ShowConsoleCursor(true);
+            currentMode = "command";
+            ClearTerminalScreen();
+        }
+        break;
+
         case CTRL_U:
-            UNDO(currentLine, currentColumn, mainText);
-            somethingHappenTextView=true;
-            break;
+        UNDO(currentLine, currentColumn, mainText);
+        somethingHappenTextView=true;
+        break;
+
         case CTRL_R:
-            REDO(currentLine, currentColumn, mainText);
-            somethingHappenTextView=true;
-            break;
+        REDO(currentLine, currentColumn, mainText);
+        somethingHappenTextView=true;
+        break;
+
         default:
-            INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
-            somethingHappenTextView=true;
+        INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
+        somethingHappenTextView=true;
     }
     /* The user may need to move the page down or up or right or left with the
      * change in the text user has made or movement the user did,
