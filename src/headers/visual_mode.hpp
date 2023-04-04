@@ -403,6 +403,6 @@ void VisualMode::AdjustingViewportWithSizeOfTerminal()
 
         tempNumberOfTerminalColumn = numberOfTerminalColumn;
         tempNumberOfTerminalLine = numberOfTerminalLine;
-        Sleep(1);
+        Sleep(25);
     }
 }
