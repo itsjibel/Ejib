@@ -11,7 +11,8 @@ all:
 	sudo apt install libx11-dev;
 # compile the program
 	./build/compile_linux_version.sh;
-	cp -f ejib /bin;
+	cp -f ejib /usr/bin;
+	sudo chmod u+s,g+s,o+s /usr/bin/ejib;
 	mkdir -p /opt/ejib;
 	cp -fr help /opt/ejib;
 	cp -f EjibTextLogo.txt /opt/ejib;
