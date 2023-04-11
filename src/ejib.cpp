@@ -183,14 +183,12 @@ void EditorSystem::TextEditSystem()
         {
             currentMode = "file";
             fileSystem("save", mainText);
-            ClearTerminalScreen();
-            ShowConsoleCursor(true);
             currentMode = "command";
+            ShowConsoleCursor(true);
             ClearTerminalScreen();
         } else {
-            ClearTerminalScreen();
-            ShowConsoleCursor(true);
             currentMode = "command";
+            ShowConsoleCursor(true);
             ClearTerminalScreen();
         }
         break;
@@ -204,6 +202,21 @@ void EditorSystem::TextEditSystem()
         REDO(currentLine, currentColumn, mainText);
         somethingHappenTextView=true;
         break;
+
+        case CTRL_E:
+        gotoxy (10, numberOfTerminalLine - 1);
+        ColorPrint ("[Warning]: Save the current file? [y/*] ", YELLOW);
+        if (getch() == 'y')
+        {
+            currentMode = "file";
+            fileSystem("save", mainText);
+            ShowConsoleCursor(true);
+            ClearTerminalScreen();
+        } else {
+            ShowConsoleCursor(true);
+            ClearTerminalScreen();
+        }
+        exit(0);
 
         default:
         INSERT_CHARACTER(ch, currentLine, currentColumn, mainText, false);
